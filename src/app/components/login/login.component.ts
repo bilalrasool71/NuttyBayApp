@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { UtilsModule } from '../../core/utilities/utils.module';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-login',
@@ -11,7 +12,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 export class LoginComponent {
   loginForm !: FormGroup;
 
-  constructor(private fb: FormBuilder) {
+  constructor(private fb: FormBuilder, private router: Router) {
     this.loginForm = this.fb.group({
       username: ['', Validators.required],
       password: ['', Validators.required]
@@ -19,6 +20,7 @@ export class LoginComponent {
   }
 
   onLogin() {
-    console.log(this.loginForm.value)
+    console.log(this.loginForm.value);
+    this.router.navigate(['/param']);
   }
 }

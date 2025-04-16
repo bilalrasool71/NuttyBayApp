@@ -3,10 +3,10 @@ import { CommonModule } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { PasswordModule } from 'primeng/password';
-import { IconFieldModule } from 'primeng/iconfield';
-import { InputIconModule } from 'primeng/inputicon';
-
+import { FloatLabelModule } from 'primeng/floatlabel';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { DatePickerModule } from 'primeng/datepicker';
+import { SelectModule } from 'primeng/select';
 
 
 @NgModule({
@@ -18,9 +18,10 @@ import { ReactiveFormsModule, FormsModule } from '@angular/forms';
     ButtonModule,
     InputTextModule,
     PasswordModule,
-
+    FloatLabelModule,
+    DatePickerModule,
+    SelectModule,
     ReactiveFormsModule,
-    
     FormsModule
   ]
 })

@@ -1,0 +1,25 @@
+<div class="min-h-screen flex items-center justify-center px-4">
+    <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md">
+        <div class="text-center mb-6">
+            <i class="pi pi-user text-yellow-500" style="font-size: 2.5rem;"></i>
+            <h2 class="text-2xl font-bold mt-2">One Step</h2>
+            <p class="text-sm text-gray-500">Param Forms</p>
+        </div>
+
+        <form [formGroup]="paramForm" (ngSubmit)="onParamSave()">
+            <div class="grid lg:grid-cols-1 md:grid-cols-1 sm:grid-cols-1 grid-cols-1 gap-6">
+                <p-floatlabel variant="on">
+                    <p-datepicker formControlName="date" [showIcon]="true" inputId="date" [showOnFocus]="false" />
+                    <label for="date">Date</label>
+                </p-floatlabel>
+
+                <p-floatlabel variant="on">
+                    <p-select [options]="cities" formControlName="product" optionLabel="name" optionValue="code" placeholder="Select Product" [filter]="true" />
+                    <label for="password">Product</label>
+                </p-floatlabel>
+
+                <p-button label="Proceed" type="submit" class="text-right" [disabled]="paramForm.invalid"></p-button>
+            </div>
+        </form>
+    </div>
+</div>

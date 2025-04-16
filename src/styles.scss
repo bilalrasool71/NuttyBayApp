@@ -1,2 +1,7 @@
 @use "tailwindcss";
 @import "primeicons/primeicons.css";
+
+
+.p-inputtext, .p-password,.p-datepicker, .p-select {
+    @apply w-full;
+}
