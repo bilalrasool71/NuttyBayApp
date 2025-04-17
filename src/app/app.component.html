@@ -1,3 +1,7 @@
-<div class="bg-gradient-to-br from-yellow-100 via-yellow-300 to-yellow-500">
-    <router-outlet />
+<router-outlet />
+
+<div *ngIf="loading" class="loading-container flex-content-center">
+    <div>
+        <ng-lottie [options]="options" width="300px" height="300px" />
+    </div>
 </div>

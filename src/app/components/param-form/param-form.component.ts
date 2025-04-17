@@ -17,7 +17,6 @@ export class ParamFormComponent {
       date: [new Date(), Validators.required],
       product: ['', Validators.required],
       userid: [2, Validators.required],
-      runType: [null, Validators.required]
     })
   }
 

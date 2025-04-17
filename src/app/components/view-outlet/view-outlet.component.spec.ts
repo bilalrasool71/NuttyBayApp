@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { AfterLoginPageComponent } from './after-login-page.component';
+import { ViewOutletComponent } from './view-outlet.component';
 
-describe('AfterLoginPageComponent', () => {
-  let component: AfterLoginPageComponent;
-  let fixture: ComponentFixture<AfterLoginPageComponent>;
+describe('ViewOutletComponent', () => {
+  let component: ViewOutletComponent;
+  let fixture: ComponentFixture<ViewOutletComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [AfterLoginPageComponent]
+      imports: [ViewOutletComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(AfterLoginPageComponent);
+    fixture = TestBed.createComponent(ViewOutletComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

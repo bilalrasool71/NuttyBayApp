@@ -21,6 +21,6 @@ export class LoginComponent {
 
   onLogin() {
     console.log(this.loginForm.value);
-    this.router.navigate(['/param']);
+    this.router.navigate(['/post-login']);
   }
 }

@@ -1,1 +1,61 @@
-<p>pre-packing-checklist works!</p>
+<div class="p-4 w-full mx-auto">
+    <p-tag value="Pre Packing Checklist" styleClass="uppercase w-full !text-xl"></p-tag>
+    <div class="mb-6 pb-4">
+        <p class="text-sm font-bold text-gray-700">Please ensure the pH Meter has been calibrated before each use.</p>
+        <div class="grid md:grid-cols-1 sm:grid-cols-1 grid-cols-1 gap-4 mt-4 text-gray-700">
+            <p-card class="shadow-lg">
+                <ng-template #header>
+                    <div class="flex justify-between items-center p-3">
+                        <h3 class="text-xl font-bold">Cheese Chadder</h3>
+                        <p-tag [value]="'28-02-2025'"></p-tag>
+                    </div>
+                </ng-template>
+                <ng-template #content>
+                    <div class="grid lg:grid-cols-3 md:grid-cols-3 grid-cols-1 gap-4">
+                        <p-floatlabel variant="on">
+                            <input pInputText id="phlevel" autocomplete="off" />
+                            <label for="phlevel">PH Level</label>
+                        </p-floatlabel>
+
+                        <p-floatlabel variant="on">
+                            <input pInputText id="temperature" autocomplete="off" />
+                            <label for="temperature">Temperature</label>
+                        </p-floatlabel>
+
+                        <p-floatlabel variant="on">
+                            <p-datepicker inputId="calendar-timeonly" [timeOnly]="true" [showIcon]="true" icon="pi pi-clock" />
+                            <label for="time">Time</label>
+                        </p-floatlabel>
+                    </div>
+                </ng-template>
+            </p-card>
+
+            <p-card class="shadow-lg">
+                <ng-template #header>
+                    <div class="flex justify-between items-center p-3">
+                        <h3 class="text-xl font-bold">Cheese Extra Chadder</h3>
+                        <p-tag [value]="'28-02-2025'"></p-tag>
+                    </div>
+                </ng-template>
+                <ng-template #content>
+                    <div class="grid lg:grid-cols-3 md:grid-cols-3 grid-cols-1 gap-4">
+                        <p-floatlabel variant="on">
+                            <input pInputText id="phlevel" autocomplete="off" />
+                            <label for="phlevel">PH Level</label>
+                        </p-floatlabel>
+
+                        <p-floatlabel variant="on">
+                            <input pInputText id="temperature" autocomplete="off" />
+                            <label for="temperature">Temperature</label>
+                        </p-floatlabel>
+
+                        <p-floatlabel variant="on">
+                            <p-datepicker inputId="calendar-timeonly" [timeOnly]="true" [showIcon]="true" icon="pi pi-clock" />
+                            <label for="time">Time</label>
+                        </p-floatlabel>
+                    </div>
+                </ng-template>
+            </p-card>
+        </div>
+    </div>
+</div>

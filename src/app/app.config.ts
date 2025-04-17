@@ -1,13 +1,25 @@
-import { ApplicationConfig, provideZoneChangeDetection, isDevMode } from '@angular/core';
+import { ApplicationConfig, provideZoneChangeDetection, isDevMode, importProvidersFrom } from '@angular/core';
 import { provideRouter } from '@angular/router';
 
 import { routes } from './app.routes';
 import { provideServiceWorker } from '@angular/service-worker';
 
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { providePrimeNG } from 'primeng/config';
 import Aura from '@primeng/themes/aura';
 
+import { CookieService } from 'ngx-cookie-service';
+import { provideLottieOptions } from 'ngx-lottie';
+import player from 'lottie-web';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { callInterceptor } from './core/interceptors/call.interceptor';
+import { LoadingService } from './core/services/loading-service/loading.service';
+
+
+export function playerFactory () {
+  return import(/* webpackChunkName: 'lottie-web' */ "lottie-web");
+}
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -26,6 +38,13 @@ export const appConfig: ApplicationConfig = {
         }
       },
       ripple: true
-    })
+    }),
+    importProvidersFrom([BrowserAnimationsModule]),
+    CookieService,
+    LoadingService,
+    provideLottieOptions({
+      player: () => player,
+    }),
+    provideHttpClient(withInterceptors([callInterceptor])),  
   ]
 };

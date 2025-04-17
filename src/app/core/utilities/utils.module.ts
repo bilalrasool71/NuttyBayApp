@@ -13,12 +13,14 @@ import { CheckboxModule } from 'primeng/checkbox';
 import { TabsModule } from 'primeng/tabs';
 import { TagModule } from 'primeng/tag';
 import { CardModule } from 'primeng/card';
+import { Menubar } from 'primeng/menubar';
 
 
 @NgModule({
   declarations: [],
   imports: [
-    CommonModule
+    CommonModule,
+    Menubar
   ],
   exports: [
     ButtonModule,
@@ -30,6 +32,7 @@ import { CardModule } from 'primeng/card';
     SelectButtonModule,
     TableModule,
     TabsModule,
+    Menubar,
     CheckboxModule,
     TagModule,
     CardModule,

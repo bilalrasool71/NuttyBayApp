@@ -1,11 +1,26 @@
 @use "tailwindcss";
 @import "primeicons/primeicons.css";
+@font-face {
+    font-family: 'Outfit';
+    src: url('../public/fonts/outfit/Outfit-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
 
 
-.p-inputtext, .p-password,.p-datepicker, .p-select, .p-selectbutton, p-togglebutton, .p-selectbutton, .p-togglebutton {
+html,
+body {
+    font-family: 'Outfit';
+}
+
+.p-inputtext, .p-password,.p-datepicker, .p-select, .p-selectbutton{
     @apply w-full;
 }
 
 .p-datatable-tbody > tr > td {
     @apply text-xs
+}
+
+.p-menubar {
+    border-radius: 0 !important;
 }
