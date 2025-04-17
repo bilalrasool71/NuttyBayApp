@@ -2,6 +2,10 @@
 @import "primeicons/primeicons.css";
 
 
-.p-inputtext, .p-password,.p-datepicker, .p-select {
+.p-inputtext, .p-password,.p-datepicker, .p-select, .p-selectbutton, p-togglebutton, .p-selectbutton, .p-togglebutton {
     @apply w-full;
+}
+
+.p-datatable-tbody > tr > td {
+    @apply text-xs
 }

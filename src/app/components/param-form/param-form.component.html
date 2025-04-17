@@ -1,9 +1,8 @@
 <div class="min-h-screen flex items-center justify-center px-4">
     <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md">
         <div class="text-center mb-6">
-            <i class="pi pi-user text-yellow-500" style="font-size: 2.5rem;"></i>
-            <h2 class="text-2xl font-bold mt-2">One Step</h2>
-            <p class="text-sm text-gray-500">Param Forms</p>
+            <i class="pi pi-cog pi-spin text-yellow-500" style="font-size: 2.5rem;"></i>
+            <h2 class="text-2xl font-bold mt-2">Production Run</h2>
         </div>
 
         <form [formGroup]="paramForm" (ngSubmit)="onParamSave()">
@@ -14,10 +13,11 @@
                 </p-floatlabel>
 
                 <p-floatlabel variant="on">
-                    <p-select [options]="cities" formControlName="product" optionLabel="name" optionValue="code" placeholder="Select Product" [filter]="true" />
+                    <p-select [options]="products" formControlName="product" optionLabel="name" optionValue="code" placeholder="Select Product" [filter]="true" />
                     <label for="password">Product</label>
                 </p-floatlabel>
 
+                <p-selectbutton formControlName="runType" [options]="options" size="small"/>
                 <p-button label="Proceed" type="submit" class="text-right" [disabled]="paramForm.invalid"></p-button>
             </div>
         </form>
