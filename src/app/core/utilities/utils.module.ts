@@ -14,8 +14,12 @@ import { TabsModule } from 'primeng/tabs';
 import { TagModule } from 'primeng/tag';
 import { CardModule } from 'primeng/card';
 import { Menubar } from 'primeng/menubar';
-
-
+import { ProgressBarModule } from 'primeng/progressbar';
+import { InputNumberModule } from 'primeng/inputnumber';
+import { MultiSelectModule } from 'primeng/multiselect';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { StepperModule } from 'primeng/stepper';
+import { ToastModule } from 'primeng/toast';
 @NgModule({
   declarations: [],
   imports: [
@@ -36,9 +40,15 @@ import { Menubar } from 'primeng/menubar';
     CheckboxModule,
     TagModule,
     CardModule,
-    CommonModule,
+    ProgressBarModule,
+    InputNumberModule,
+    MultiSelectModule,
+    ProgressSpinnerModule,
+    StepperModule,
+    ToastModule,
     ReactiveFormsModule,
-    FormsModule
+    FormsModule,
+    CommonModule
   ]
 })
 export class UtilsModule { }

@@ -15,6 +15,8 @@ import player from 'lottie-web';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { callInterceptor } from './core/interceptors/call.interceptor';
 import { LoadingService } from './core/services/loading-service/loading.service';
+import { tokenInterceptor } from './core/interceptors/token.interceptor';
+import { MessageService } from 'primeng/api';
 
 
 export function playerFactory () {
@@ -42,9 +44,10 @@ export const appConfig: ApplicationConfig = {
     importProvidersFrom([BrowserAnimationsModule]),
     CookieService,
     LoadingService,
+    MessageService,
     provideLottieOptions({
       player: () => player,
     }),
-    provideHttpClient(withInterceptors([callInterceptor])),  
+    provideHttpClient(withInterceptors([callInterceptor, tokenInterceptor])),  
   ]
 };

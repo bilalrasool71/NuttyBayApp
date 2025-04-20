@@ -13,12 +13,13 @@ body {
     font-family: 'Outfit';
 }
 
-.p-inputtext, .p-password,.p-datepicker, .p-select, .p-selectbutton{
+.p-inputtext, .p-password,.p-datepicker, .p-select, .p-selectbutton, .p-inputnumber, .p-multiselect {
     @apply w-full;
 }
 
 .p-datatable-tbody > tr > td {
-    @apply text-xs
+    @apply text-xs;
+    padding: 0.50rem 0.25rem !important;
 }
 
 .p-menubar {
