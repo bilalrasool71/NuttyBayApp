@@ -5,67 +5,70 @@
         </p-tablist>
         <p-tabpanels>
             <p-tabpanel value="1">
+                @if(inProgressRuns.length > 0) {
                 <p-table [value]="inProgressRuns" [loading]="loading">
                     <ng-template pTemplate="header">
-                      <tr>
-                        <th>Run ID</th>
-                        <th>Product</th>
-                        <th>Start Time</th>
-                        <th>Progress</th>
-                        <th>Actions</th>
-                      </tr>
+                        <tr>
+                            <th>Run ID</th>
+                            <th>Product</th>
+                            <th>Start Time</th>
+                            <th>Progress</th>
+                            <th>Actions</th>
+                        </tr>
                     </ng-template>
                     <ng-template pTemplate="body" let-run>
-                      <tr>
-                        <td>{{run.productionRunId}}</td>
-                        <td>{{run.productName}}</td>
-                        <td>{{run.startTime | date:'medium'}}</td>
-                        <td>
-                          <p-progressBar 
-                            [value]="(run.CompletedChecklists / run.TotalChecklists) * 100"
-                            [showValue]="false">
-                          </p-progressBar>
-                        </td>
-                        <td>
-                          <p-button size="small"
-                            icon="pi pi-play" 
-                            label="Continue" 
-                            (onClick)="navigateToChecklist(run)">
-                          </p-button>
-                        </td>
-                      </tr>
+                        <tr>
+                            <td>{{run.productionRunId}}</td>
+                            <td>{{run.productName}}</td>
+                            <td>{{run.startTime | date:'medium'}}</td>
+                            <td>
+                                <p-progressBar [value]="(run.CompletedChecklists / run.TotalChecklists) * 100"
+                                    [showValue]="false">
+                                </p-progressBar>
+                            </td>
+                            <td>
+                                <p-button size="small" icon="pi pi-play" label="Continue"
+                                    (onClick)="navigateToChecklist(run)">
+                                </p-button>
+                            </td>
+                        </tr>
                     </ng-template>
-                  </p-table>
+                </p-table>
+                } @else {
+                <div class="text-4xl font-black text-center">No Production Run found</div>
+                }
             </p-tabpanel>
             <p-tabpanel value="2">
+                @if(completedRuns.length > 0) {
                 <p-table [value]="completedRuns" [loading]="loading">
                     <ng-template pTemplate="header">
-                      <tr>
-                        <th>Run ID</th>
-                        <th>Product</th>
-                        <th>Start Time</th>
-                        <th>End Time</th>
-                        <th>Checklists</th>
-                        <th>Details</th>
-                      </tr>
+                        <tr>
+                            <th>Run ID</th>
+                            <th>Product</th>
+                            <th>Start Time</th>
+                            <th>End Time</th>
+                            <th>Checklists</th>
+                            <th>Details</th>
+                        </tr>
                     </ng-template>
                     <ng-template pTemplate="body" let-run>
-                      <tr>
-                        <td>{{run.runId}}</td>
-                        <td>{{run.productName}}</td>
-                        <td>{{run.startTime | date:'medium'}}</td>
-                        <td>{{run.endTime | date:'medium'}}</td>
-                        <td>{{getChecklistCompletion(run)}}</td>
-                        <td>
-                          <p-button 
-                            icon="pi pi-info-circle" 
-                            label="View" 
-                            (onClick)="viewRunDetails(run.RunId)">
-                          </p-button>
-                        </td>
-                      </tr>
+                        <tr>
+                            <td>{{run.runId}}</td>
+                            <td>{{run.productName}}</td>
+                            <td>{{run.startTime | date:'medium'}}</td>
+                            <td>{{run.endTime | date:'medium'}}</td>
+                            <td>{{getChecklistCompletion(run)}}</td>
+                            <td>
+                                <p-button icon="pi pi-info-circle" label="View" (onClick)="viewRunDetails(run.RunId)">
+                                </p-button>
+                            </td>
+                        </tr>
                     </ng-template>
-                  </p-table>
+                </p-table>
+                } @else {
+                <div class="text-4xl font-black text-center">No Production Run found</div>
+
+                }
             </p-tabpanel>
             <p-tabpanel value="3">
                 <div class="grid grid-cols-1 gap-6 p-6">
@@ -73,20 +76,18 @@
                         <p-date-picker id="datePicker" [(ngModel)]="selectedDate" dateFormat="dd/mm/yy"></p-date-picker>
                         <label for="datePicker">Select Date</label>
                     </p-floatlabel>
-    
+
                     <p-floatlabel variant="on">
                         <p-select id="productSelect" [(ngModel)]="selectedProductId" [options]="products"
-                            optionLabel="productName" optionValue="productId" [filter]="true" [showClear]="true"></p-select>
+                            optionLabel="productName" optionValue="productId" [filter]="true"
+                            [showClear]="true"></p-select>
                         <label for="productSelect">Select Product</label>
                     </p-floatlabel>
-    
-                    <p-button label="Run Production" styleClass="float-right" (onClick)="onCreateProductionRun()"></p-button>
+
+                    <p-button label="Run Production" styleClass="float-right"
+                        (onClick)="onCreateProductionRun()"></p-button>
                 </div>
             </p-tabpanel>
         </p-tabpanels>
     </p-tabs>
 </div>
-
-<ng-template #notFound>
-    <div class="text-4xl font-black text-center">No Production Run found</div>
-</ng-template>
