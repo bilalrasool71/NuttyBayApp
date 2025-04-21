@@ -12,6 +12,7 @@ import {
   IPrePackingData,
   UpdateTaskStatusRequest
 } from '../../core/interfaces/domain.interface';
+import { NBProductionRunTaskUpdateDto, ProductionRunDetailResponse, SavePrePackingRequest } from '../../core/interfaces/production-run-detail.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -31,32 +32,26 @@ export class RestService {
     return this.http.get<INBChecklist[]>(`${this.baseUrl}/GetNBChecklists`);
   }
 
-  getTasksByChecklist(checklistId: number): Observable<INBChecklistTasks[]> {
-    return this.http.get<INBChecklistTasks[]>(
-      `${this.baseUrl}/GetTasksOfCheckList?checklistId=${checklistId}`
-    );
-  }
-
   // Production Run methods
   createProductionRun(payload: IProductionRunRequest): Observable<IProductionRun> {
     return this.http.post<IProductionRun>(`${this.baseUrl}/CreateProductionRun`, payload);
   }
 
-  getProductionRunDetails(productionRunId: number): Observable<any> {
-    return this.http.get(`${this.baseUrl}/GetProductionRunDetails/${productionRunId}`);
+  getProductionRunDetails(productionRunId: number): Observable<ProductionRunDetailResponse> {
+    return this.http.get<ProductionRunDetailResponse>(`${this.baseUrl}/GetProductionRunDetails?productionRunId=${productionRunId}`);
   }
 
-  // Task methods
-  updateTaskStatus(taskId: number, payload: UpdateTaskStatusRequest): Observable<any> {
-    return this.http.put(`${this.baseUrl}/UpdateTask/${taskId}`, payload);
+  updateTaskStatus(payload: NBProductionRunTaskUpdateDto[]): Observable<any> {
+    return this.http.post(`${this.baseUrl}/UpdateTaskStatuses`, payload);
   }
 
-  completeChecklist(checklistId: number, payload: IPrePackingData): Observable<any> {
-    return this.http.put(`${this.baseUrl}/CompleteChecklist/${checklistId}`, payload);
+  savePrePackingData(request: SavePrePackingRequest): Observable<any> {
+    return this.http.post(`${this.baseUrl}/SavePrePackingData`, request);
   }
 
-  getUserProductionRuns(userId: number, status: 'InProgress' | 'Completed'): Observable<any> {
-    return this.http.get(`${this.baseUrl}/GetUserProductionRuns/${userId}/${status}`);
+  
+  getUserProductionRuns(userId: number): Observable<any> {
+    return this.http.get<any>(`${this.baseUrl}/GetUserProductionSummary?userId=${userId}`);
   }
   
 }

@@ -1,0 +1,86 @@
+export interface ProductionRunDetailResponse {
+    productionRunId: number;
+    productionDate: string;
+    products: ProductBasicInfo[];
+    sharedChecklists: ChecklistInfo[];
+    prePackingList: ProductPrePackingInfo[];
+}
+
+export interface ProductBasicInfo {
+    productId: number;
+    productName: string;
+}
+
+export interface ChecklistInfo {
+    checklistId: number;
+    checklistName: string;
+    checklistType: number;
+    tasks: TaskInfo[];
+}
+
+export interface ProductPrePackingInfo {
+    productId: number;
+    productName: string;
+    prePackingData: PrePackingInfo;
+}
+
+export interface PrePackingInfo {
+    temperature: number | null;
+    ph: number | null;
+    time: Date | string | null;
+    isCompleted: boolean;
+    completedAt: string | null;
+}
+
+export interface TaskInfo {
+    taskId: number;
+    taskDescription: string;
+    isCompleted: boolean;
+    completedAt: string | null;
+}
+
+export interface NBProductionRunTaskUpdateDto {
+    productionRunId: number;
+    checklistId: number;
+    taskId: number;
+    productId: number;
+    isCompleted: boolean;
+}
+export interface SavePrePackingRequest {
+    productionRunId: number;
+    productId: number;
+    temperature: number | null;
+    time: Date | string | null;
+    pH: number | null;
+    isCompleted: boolean;
+};
+
+
+export interface UserProductionRunSummaryResponse {
+    inProgress: ProductionRunSummary[];
+    completed: ProductionRunSummary[];
+}
+
+export interface ProductionRunSummary {
+    productionRunId: number;
+    productionDate: string;
+    isPreMakingCompleted: boolean;
+    isMakingCompleted: boolean;
+    isPrePackingCompleted: boolean;
+    isPackingCompleted: boolean;
+    products: ProductStatus[];
+}
+
+export interface ProductStatus {
+    productId: number;
+    productName: string;
+    prePacking: PrePackingDetail;
+}
+
+export interface PrePackingDetail {
+    temperature: number | null;
+    pH: number | null;
+    time: string | null;
+    isCompleted: boolean;
+    completedAt: string | null;
+}

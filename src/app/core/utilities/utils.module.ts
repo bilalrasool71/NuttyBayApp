@@ -20,6 +20,9 @@ import { MultiSelectModule } from 'primeng/multiselect';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { StepperModule } from 'primeng/stepper';
 import { ToastModule } from 'primeng/toast';
+import { AvatarModule } from 'primeng/avatar';
+import { MenuModule } from 'primeng/menu';
+
 @NgModule({
   declarations: [],
   imports: [
@@ -46,6 +49,8 @@ import { ToastModule } from 'primeng/toast';
     ProgressSpinnerModule,
     StepperModule,
     ToastModule,
+    AvatarModule,
+    MenuModule,
     ReactiveFormsModule,
     FormsModule,
     CommonModule
