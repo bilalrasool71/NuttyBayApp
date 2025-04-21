@@ -40,10 +40,9 @@
             <p-tabpanel value="2">
                 <ng-container *ngIf="summaryForUser.completed.length > 0 then loadedCompleted; else noRecord"></ng-container>
                 <ng-template #loadedCompleted>
-                    <div class="border-2 border-dashed border-gray-400 p-4 rounded">
-                        <div class="grid grid-cols-1 gap-3">
-                            <p-card [header]="(run.productionDate | date : 'mediumDate')?.toString()" *ngFor="let run of summaryForUser.completed" class="shadow-md">
-                                <div class="space-x-2 mb-3">
+                    <div class="grid grid-cols-1 gap-3">
+                        <p-card *ngFor="let run of summaryForUser.completed" class="shadow-md">
+                            <!-- <div class="space-x-2 mb-3">
                                     <p-tag value="Pre-Making" [severity]="run.isPreMakingCompleted ? 'success' : 'warn'">
                                     </p-tag>
                                     <p-tag value="Making" [severity]="run.isMakingCompleted ? 'success' : 'warn'">
@@ -60,9 +59,31 @@
                                 </div>
                                 <div class="flex justify-end mt-2">
                                     <p-button (onClick)="null" severity="info" icon="pi pi-file" size="small" label="View PDF" [disabled]="true"></p-button>
+                                </div> -->
+                            <div class="flex items-center w-full">
+                                <div class="basis-27/30">
+                                    <div class="font-bold">
+                                        {{(run.productionDate | date : 'mediumDate')?.toString()}}
+                                    </div>
+                                    <span class="font-bold" *ngFor="let product of run.products; let j = index">
+                                        {{product.productName}} {{ j === run.products.length - 1 ? '' : '|' }}
+                                    </span>
+                                    <div class="space-x-2">
+                                        <p-tag value="Pre-Making" [severity]="run.isPreMakingCompleted ? 'success' : 'warn'">
+                                        </p-tag>
+                                        <p-tag value="Making" [severity]="run.isMakingCompleted ? 'success' : 'warn'">
+                                        </p-tag>
+                                        <p-tag value="Pre-Packing" [severity]="run.isPrePackingCompleted ? 'success' : 'warn'">
+                                        </p-tag>
+                                        <p-tag value="Packing" [severity]="run.isPackingCompleted ? 'success' : 'warn'">
+                                        </p-tag>
+                                    </div>
                                 </div>
-                            </p-card>
-                        </div>
+                                <div class="basis-1/10 flex items-center justify-end">
+                                    <i class="pi pi-file-pdf text-gray-400 hover:text-gray-700 cursor-pointer" style="font-size: 2.5rem;"></i>
+                                </div>
+                            </div>
+                        </p-card>
                     </div>
                 </ng-template>
             </p-tabpanel>
