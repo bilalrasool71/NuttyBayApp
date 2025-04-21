@@ -54,7 +54,12 @@ export class ChecklistStepperComponent implements OnInit, OnDestroy {
         this.restService.getProductionRunDetails(Number(this.productionId)).subscribe({
             next: (data) => {
                 this.productionRunData = data;
-                console.log(this.productionRunData);
+                this.productionRunData.prePackingList?.forEach(item => {
+                    if(item.prePackingData.time) {
+                        const date = new Date(item.prePackingData.time);
+                        item.prePackingData.time = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    }
+                })
             },
             error: (err) => {
                 console.error('Error loading production run data:', err);
@@ -94,12 +99,22 @@ export class ChecklistStepperComponent implements OnInit, OnDestroy {
     }
 
     onSavePrePacking(preObj: ProductPrePackingInfo): void {
+        let formattedTime = preObj.prePackingData.time;
+    
+        // If it's a Date object, convert to ISO string or your preferred format
+        if (preObj.prePackingData.time instanceof Date) {
+            formattedTime = preObj.prePackingData.time.toISOString();
+            // Or use a specific format:
+            // formattedTime = this.formatTime(preObj.prePackingData.time);
+        }
+
+        
         const payload: SavePrePackingRequest = {
             productionRunId: this.productionRunData.productionRunId,
             productId: preObj.productId,
             temperature: preObj.prePackingData.temperature,
             pH: preObj.prePackingData.ph,
-            time:preObj.prePackingData.time,
+            time:formattedTime,
             isCompleted: true
         };
 
@@ -111,5 +126,24 @@ export class ChecklistStepperComponent implements OnInit, OnDestroy {
 
     goToExit() {
         this.router.navigate(['/app'])
+    }
+
+    validateValue(value: any, type: string) {
+        console.log(value)
+        if(value) {
+            if (type =='temperature') {
+                 if (value >= 0 && value <= 100) {
+                    value = value;
+                 } else {
+                    value = 0;
+                 }
+            } else if (type == 'ph') {
+                if (value >= 0 && value <= 14) {
+                    value = value;
+                } else {
+                    value = 0;
+                }
+            }
+        }
     }
 }

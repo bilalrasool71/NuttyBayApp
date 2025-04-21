@@ -1,13 +1,13 @@
 <div class="min-h-full">
     <p-menubar [model]="menuItems" styleClass="!border-b-2">
         <ng-template #end>
-            <p-avatar [label]="userAlias" shape="circle" (click)="menu.toggle($event)"/>
+            <p-avatar [label]="userAlias" shape="circle" (click)="menu.toggle($event)" />
         </ng-template>
     </p-menubar>
     <p-menu [popup]="true" #menu [model]="items"></p-menu>
     <main>
         <div class="mx-auto">
             <router-outlet />
-    </div>
+        </div>
     </main>
 </div>
