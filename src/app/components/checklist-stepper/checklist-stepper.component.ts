@@ -54,7 +54,11 @@ export class ChecklistStepperComponent implements OnInit, OnDestroy {
         this.restService.getProductionRunDetails(Number(this.productionId)).subscribe({
             next: (data) => {
                 this.productionRunData = data;
-                console.log(this.productionRunData);
+                if(this.productionRunData.prePackingList.length>0){
+                    this.productionRunData.prePackingList.forEach(x=> {
+                        x.prePackingData.time = new Date(x.prePackingData.time)
+                    })
+                }
             },
             error: (err) => {
                 console.error('Error loading production run data:', err);
@@ -94,22 +98,30 @@ export class ChecklistStepperComponent implements OnInit, OnDestroy {
     }
 
     onSavePrePacking(preObj: ProductPrePackingInfo): void {
+        // let formattedTime = preObj.prePackingData.time;
+        // if (preObj.prePackingData.time instanceof Date) {
+        //     formattedTime = preObj.prePackingData.time.toISOString();
+        // }
+
+
         const payload: SavePrePackingRequest = {
             productionRunId: this.productionRunData.productionRunId,
             productId: preObj.productId,
             temperature: preObj.prePackingData.temperature,
             pH: preObj.prePackingData.ph,
-            time:preObj.prePackingData.time,
+            time: preObj.prePackingData.time,
+            batchNo: preObj.prePackingData.batchNo,
             isCompleted: true
         };
 
         this.restService.savePrePackingData(payload).subscribe({
-            // next: () => this.messageService.add({ severity: 'success', summary: 'Saved successfully' }),
-            // error: () => this.messageService.add({ severity: 'error', summary: 'Save failed' })
+            next: () => console.log('Saved Successfully'),
+            error: () => console.error('Save Failed')
         });
     }
 
     goToExit() {
         this.router.navigate(['/app'])
     }
+    
 }
