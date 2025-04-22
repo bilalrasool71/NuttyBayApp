@@ -27,9 +27,10 @@ export interface ProductPrePackingInfo {
 export interface PrePackingInfo {
     temperature: number | null;
     ph: number | null;
-    time: Date | string | null;
+    time: Date | any | null;
     isCompleted: boolean;
     completedAt: string | null;
+    batchNo: string | null;
 }
 
 export interface TaskInfo {
@@ -52,6 +53,7 @@ export interface SavePrePackingRequest {
     temperature: number | null;
     time: Date | string | null;
     pH: number | null;
+    batchNo: string | null;
     isCompleted: boolean;
 };
 
@@ -83,4 +85,5 @@ export interface PrePackingDetail {
     time: string | null;
     isCompleted: boolean;
     completedAt: string | null;
+    batchNo: string | null;
 }

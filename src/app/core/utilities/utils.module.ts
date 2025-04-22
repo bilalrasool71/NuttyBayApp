@@ -22,6 +22,7 @@ import { StepperModule } from 'primeng/stepper';
 import { ToastModule } from 'primeng/toast';
 import { AvatarModule } from 'primeng/avatar';
 import { MenuModule } from 'primeng/menu';
+import { ChipModule } from 'primeng/chip';
 
 @NgModule({
   declarations: [],
@@ -51,6 +52,7 @@ import { MenuModule } from 'primeng/menu';
     ToastModule,
     AvatarModule,
     MenuModule,
+    ChipModule,
     ReactiveFormsModule,
     FormsModule,
     CommonModule

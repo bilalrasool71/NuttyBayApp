@@ -5,8 +5,9 @@ import { UtilsModule } from '../../core/utilities/utils.module';
 import { IListOfValue } from '../../core/interfaces/common.interface';
 import { IUser } from '../../core/interfaces/user.interface';
 import { RestService } from '../../services/rest-service/rest.service';
-import { UserProductionRunSummaryResponse } from '../../core/interfaces/production-run-detail.interface';
+import { ProductionRunDetailResponse, UserProductionRunSummaryResponse } from '../../core/interfaces/production-run-detail.interface';
 import { INBProduct, IProductionRunRequest } from '../../core/interfaces/domain.interface';
+import { PdfService } from '../../core/services/pdf.service';
 
 @Component({
   selector: 'app-home',
@@ -20,6 +21,8 @@ export class HomeComponent implements OnInit {
   selectedProductIds: number[] = [];
   selectedDate: Date = new Date();
   products: INBProduct[] = [];
+  productionRunData!: ProductionRunDetailResponse;
+  
   summaryForUser: UserProductionRunSummaryResponse = { completed: [], inProgress: [] };
   tabs: IListOfValue[] = [
     { value: 1, viewValue: 'In Progress' },
@@ -29,7 +32,8 @@ export class HomeComponent implements OnInit {
   constructor(
     private authService: AuthService,
     private router: Router,
-    private restService: RestService
+    private restService: RestService,
+    private pdfService: PdfService
   ) {
     this.loggedInUser = this.authService.getUserData();
   }
@@ -81,4 +85,26 @@ export class HomeComponent implements OnInit {
     });
   }
 
+  async generatePdfReport(run: any) {
+    this.loadProductionRunData(run);
+    try {
+      const pdfUrl = await this.pdfService.generateProductionPdf(this.productionRunData);
+      window.open(pdfUrl, '_blank');
+    } catch (error) {
+    }
+  }
+
+  private loadProductionRunData(run:any): void {
+    this.restService.getProductionRunDetails(Number(run.productionRunId)).subscribe({
+        next: (data) => {
+            this.productionRunData = data;
+            if(this.productionRunData) {
+              
+            }
+        },
+        error: (err) => {
+            console.error('Error loading production run data:', err);
+        }
+    });
+}
 }

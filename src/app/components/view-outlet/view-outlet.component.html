@@ -1,5 +1,8 @@
 <div class="min-h-full">
     <p-menubar [model]="menuItems" styleClass="!border-b-2">
+        <ng-template #start>
+            <img class="w-15" src="web-assets/logo.webp" alt="">
+        </ng-template>
         <ng-template #end>
             <p-avatar [label]="userAlias" shape="circle" (click)="menu.toggle($event)" />
         </ng-template>
