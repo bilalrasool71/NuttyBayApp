@@ -23,7 +23,7 @@ import { ToastModule } from 'primeng/toast';
 import { AvatarModule } from 'primeng/avatar';
 import { MenuModule } from 'primeng/menu';
 import { ChipModule } from 'primeng/chip';
-
+import { DividerModule } from 'primeng/divider';
 @NgModule({
   declarations: [],
   imports: [
@@ -53,6 +53,7 @@ import { ChipModule } from 'primeng/chip';
     AvatarModule,
     MenuModule,
     ChipModule,
+    DividerModule,
     ReactiveFormsModule,
     FormsModule,
     CommonModule

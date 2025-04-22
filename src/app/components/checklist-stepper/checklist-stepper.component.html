@@ -1,6 +1,6 @@
 <div class="p-6">
-    <div *ngIf="productionId && productionRunData" class="mb-2">
-        <p-card>
+    <div *ngIf="productionId && productionRunData">
+        <div class="border border-gray-300 rounded-lg p-3 shadow-[0_2px_10px_-4px_rgba(93,96,127,0.2)]">
             <div class="grid xl:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 grid-cols-1">
                 <h4 class="font-bold float-right">Producion Run&nbsp;(<span *ngFor="let product of productionRunData.products; let j = index">
                         {{product.productName}} {{ j === productionRunData.products.length - 1 ? '' : '|' }}
@@ -8,15 +8,19 @@
                 <h4 class="md:text-right lg:text-right text-left font-bold">Start Time:&nbsp;<span class="font-normal">{{ productionRunData.productionDate |
                         date:'dd-MM-yyyy | hh:mm a' }}</span></h4>
             </div>
-        </p-card>
+        </div>
     </div>
-    <p-stepper [value]="currentValue">
+    <p-divider *ngIf="productionRunData" type="dotted">
+        <div class="font-bold">
+            {{currentValue == 1 ? 'Pre Making' : currentValue === 2 ? 'Making' : currentValue === 3 ? 'Pre Packing' : currentValue === 4 ? 'Packing' : ''}}
+        </div>
+    </p-divider>
+    <p-stepper [value]="currentValue" (valueChange)="ngStepChange($event)">
         <p-step-panels>
             <p-step-panel *ngFor="let checklist of allChecklists" [value]="checklist.checklistId">
                 <ng-container *ngIf="checklist.checklistType === 1">
                     <ng-template #content let-activateCallback="activateCallback">
-                        <ng-container
-                            *ngIf="productionRunData && productionRunData.sharedChecklists && productionRunData.sharedChecklists.length>0">
+                        <ng-container *ngIf="productionRunData && productionRunData.sharedChecklists && productionRunData.sharedChecklists.length>0">
                             <ng-container *ngFor="let obj of productionRunData.sharedChecklists">
                                 <ng-container *ngIf="obj.checklistId == checklist.checklistId">
                                     <div class="border-2 border-dashed border-gray-400 p-4 rounded">
@@ -29,9 +33,7 @@
                                             <ng-template #body let-task>
                                                 <tr>
                                                     <td class="flex items-center gap-2">
-                                                        <p-checkbox class="!align-top"
-                                                            (onChange)="onChange(task, obj.checklistId)"
-                                                            [(ngModel)]="task.isCompleted" [binary]="true"></p-checkbox>
+                                                        <p-checkbox class="!align-top" (onChange)="onChange(task, obj.checklistId)" [(ngModel)]="task.isCompleted" [binary]="true"></p-checkbox>
                                                         <div class="text-xs text-gray-600">
                                                             {{task.taskDescription}}
                                                         </div>
@@ -44,15 +46,10 @@
                             </ng-container>
                         </ng-container>
                         <div class="flex justify-end items-center gap-2 mt-6">
-                            <p-button label="Back" severity="warn" *ngIf="checklist.checklistOrder > 1"
-                                (onClick)="activateCallback(checklist.checklistOrder - 1)"></p-button>
-                            <p-button label="Save & Continue" *ngIf="checklist.checklistOrder < 3"
-                                (onClick)="activateCallback(checklist.checklistId+1)"></p-button>
-                            <p-button severity="contrast" (onClick)="goToExit()" label="Save & Exit"
-                                *ngIf="checklist.checklistOrder < 3"
-                                (onClick)="activateCallback(checklist.checklistId+1)"></p-button>
-                            <p-button label="Save & Complete" (onClick)="goToExit()"
-                                *ngIf="checklist.checklistOrder > 3" (onClick)="null"></p-button>
+                            <p-button label="Back" severity="warn" *ngIf="checklist.checklistOrder > 1" (onClick)="activateCallback(checklist.checklistOrder - 1)"></p-button>
+                            <p-button label="Save & Continue" *ngIf="checklist.checklistOrder < 3" (onClick)="activateCallback(checklist.checklistId+1)"></p-button>
+                            <p-button severity="contrast" (onClick)="goToExit()" label="Save & Exit" *ngIf="checklist.checklistOrder < 3" (onClick)="activateCallback(checklist.checklistId+1)"></p-button>
+                            <p-button label="Save & Complete" (onClick)="goToExit()" *ngIf="checklist.checklistOrder > 3" (onClick)="null"></p-button>
                         </div>
                     </ng-template>
                 </ng-container>
@@ -64,37 +61,26 @@
                                     <ng-template #header>
                                         <div class="flex items-center justify-between p-3">
                                             <h3 class="text-xl font-bold">{{preObj.productName}}</h3>
-                                            <p-button label="Save" (onClick)="onSavePrePacking(preObj)"
-                                                [disabled]="!preObj.prePackingData.batchNo || !preObj.prePackingData.temperature || !preObj.prePackingData.ph || !preObj.prePackingData.time" />
+                                            <p-button label="Save" (onClick)="onSavePrePacking(preObj)" [disabled]="!preObj.prePackingData.batchNo || !preObj.prePackingData.temperature || !preObj.prePackingData.ph || !preObj.prePackingData.time" />
 
                                         </div>
                                     </ng-template>
                                     <div class="border-2 border-dashed border-gray-400 p-4 rounded">
                                         <div class="grid grid-cols-1 gap-3">
                                             <p-floatlabel variant="on">
-                                                <p-inputnumber [showButtons]="true" [step]="0.0"
-                                                    buttonLayout="horizontal" inputId="temperature"
-                                                    [(ngModel)]="preObj.prePackingData.temperature" [allowEmpty]="false"
-                                                    mode="decimal" suffix=" ℃" [min]="0" [max]="99" />
+                                                <p-inputnumber [showButtons]="true" [step]="0.0" buttonLayout="horizontal" inputId="temperature" [(ngModel)]="preObj.prePackingData.temperature" [allowEmpty]="false" mode="decimal" suffix=" ℃" [min]="0" [max]="99" />
                                                 <label for="temperature">Temperature</label>
                                             </p-floatlabel>
                                             <p-floatlabel variant="on">
-                                                <p-inputnumber [showButtons]="true" [step]="0.0"
-                                                    buttonLayout="horizontal" [(ngModel)]="preObj.prePackingData.ph"
-                                                    inputId="temperature" [allowEmpty]="false" mode="decimal"
-                                                    suffix=" pH" [min]="1" [max]="14" mode="decimal"
-                                                    [minFractionDigits]="1" [maxFractionDigits]="2" />
+                                                <p-inputnumber [showButtons]="true" [step]="0.0" buttonLayout="horizontal" [(ngModel)]="preObj.prePackingData.ph" inputId="temperature" [allowEmpty]="false" mode="decimal" suffix=" pH" [min]="1" [max]="14" mode="decimal" [minFractionDigits]="1" [maxFractionDigits]="2" />
                                                 <label for="ph">PH</label>
                                             </p-floatlabel>
                                             <p-floatlabel variant="on">
-                                                <p-datepicker [showIcon]="true" icon="pi pi-clock"
-                                                    [(ngModel)]="preObj.prePackingData.time" [showTime]="true"
-                                                    hourFormat="12"></p-datepicker>
+                                                <p-datepicker [showIcon]="true" icon="pi pi-clock" [(ngModel)]="preObj.prePackingData.time" [showTime]="true" hourFormat="12"></p-datepicker>
                                                 <label for="time">Time</label>
                                             </p-floatlabel>
                                             <p-floatlabel variant="on">
-                                                <input type="text" pInputText id="bathcNo"
-                                                    [(ngModel)]="preObj.prePackingData.batchNo">
+                                                <input type="text" pInputText id="bathcNo" [(ngModel)]="preObj.prePackingData.batchNo">
                                                 <label for="batchNo">Batch #</label>
                                             </p-floatlabel>
                                         </div>

@@ -123,5 +123,9 @@ export class ChecklistStepperComponent implements OnInit, OnDestroy {
     goToExit() {
         this.router.navigate(['/app'])
     }
+
+    ngStepChange(event: any) {
+        this.currentValue = event;
+    }
     
 }
