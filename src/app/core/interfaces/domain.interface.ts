@@ -2,6 +2,7 @@
 export interface INBProduct {
     productId: number;
     productName: string;
+    batchNo: string;
   }
   
   export interface INBChecklist {
@@ -25,7 +26,7 @@ export interface INBProduct {
   export interface IProductionRunRequest {
     userId: number;
     productIds: number[];
-    productionDate: Date;
+    productionDate: Date | string;
   }
   
   export interface IProductionRun {

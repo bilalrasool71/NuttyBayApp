@@ -5,14 +5,12 @@ import { apiBaseURL } from '../../core/constant/constant';
 import { Observable } from 'rxjs';
 import { 
   INBChecklist, 
-  INBChecklistTasks, 
   INBProduct, 
   IProductionRunRequest,
   IProductionRun,
-  IPrePackingData,
-  UpdateTaskStatusRequest
 } from '../../core/interfaces/domain.interface';
-import { NBProductionRunTaskUpdateDto, ProductionRunDetailResponse, SavePrePackingRequest } from '../../core/interfaces/production-run-detail.interface';
+
+import { NBProductionRunPdf, NBProductionRunTaskUpdateDto, ProductionRunDetailResponse, SavePrePackingRequest } from '../../core/interfaces/production-run-detail.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -53,5 +51,10 @@ export class RestService {
   getUserProductionRuns(userId: number): Observable<any> {
     return this.http.get<any>(`${this.baseUrl}/GetUserProductionSummary?userId=${userId}`);
   }
+
+  getPdfByProductionRunId(productionRunId: number): Observable<NBProductionRunPdf> {
+    return this.http.get<NBProductionRunPdf>(`${this.baseUrl}/GetPdfByProductionRunId?productionRunId=${productionRunId}`);
+  }
+  
   
 }

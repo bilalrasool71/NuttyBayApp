@@ -1,9 +1,9 @@
 <div class="p-4">
     <p-tabs value="1" scrollable="true" showNavigators="true">
         <p-tablist>
-            <p-tab *ngFor="let tab of tabs; let i = index" [value]="tab.value.toString()" class="!text-sm !py-1">{{ tab.viewValue }}</p-tab>
+            <p-tab *ngFor="let tab of tabs; let i = index" [value]="tab.value.toString()" class="!text-sm">{{ tab.viewValue }}</p-tab>
         </p-tablist>
-        <p-tabpanels class="!px-0 !py-2">
+        <p-tabpanels>
             <p-tabpanel value="1">
                 <ng-container *ngIf="summaryForUser.inProgress.length > 0 then loadedInProgress; else noRecord"></ng-container>
                 <ng-template #loadedInProgress>
@@ -12,7 +12,7 @@
                             <div class="flex items-center w-full">
                                 <div class="basis-95/100">
                                     <div class="font-bold">
-                                        {{(run.productionDate | date : 'mediumDate')?.toString()}}
+                                        {{(run.productionDate | date : 'longDate')?.toString()}}
                                     </div>
                                     <span class="font-bold" *ngFor="let product of run.products; let j = index">
                                         {{product.productName}} {{ j === run.products.length - 1 ? '' : '|' }}
@@ -42,7 +42,7 @@
                 <ng-container *ngIf="summaryForUser.completed.length > 0 then loadedCompleted; else noRecord"></ng-container>
                 <ng-template #loadedCompleted>
                     <div class="grid grid-cols-1 gap-3">
-                        <p-card *ngFor="let run of summaryForUser.completed" class="shadow-md">
+                        <div *ngFor="let run of summaryForUser.completed" class="border border-gray-300 rounded-lg p-3 shadow-[0_2px_22px_-4px_rgba(93,96,127,0.2)]">
                             <div class="flex items-center w-full">
                                 <div class="basis-95/100">
                                     <div class="font-bold">
@@ -62,18 +62,19 @@
                                         </p-tag>
                                     </div>
                                 </div>
-                                <div class="basis-5/100 flex items-center justify-end">
-                                    <i class="pi pi-file-pdf text-gray-400 hover:text-gray-700 cursor-pointer" style="font-size: 2.5rem;" (click)="generatePdfReport(run)"></i>
+
+                                <div class="basis-5/100 min-h-full flex items-center justify-end">
+                                    <p-button [rounded]="true" icon="pi pi-file" size="large" severity="secondary" (onClick)="generatePdfReport(run)"/>
                                 </div>
                             </div>
-                        </p-card>
+                        </div>
                     </div>
                 </ng-template>
             </p-tabpanel>
 
             <!-- Create Production Run Tab -->
             <p-tabpanel value="3">
-                <div class="border border-gray-300 rounded-lg p-3 shadow-[0_2px_22px_-4px_rgba(93,96,127,0.2)]">
+                <div class="border-2 border-dashed border-gray-400 p-3 rounded">
                     <div class="grid grid-cols-1 gap-5">
                         <p-floatlabel variant="on">
                             <p-date-picker id="datePicker" [showTime]="true" hourFormat="12" [(ngModel)]="selectedDate" dateFormat="dd/mm/yy"></p-date-picker>

@@ -54,8 +54,8 @@ export class ChecklistStepperComponent implements OnInit, OnDestroy {
         this.restService.getProductionRunDetails(Number(this.productionId)).subscribe({
             next: (data) => {
                 this.productionRunData = data;
-                if(this.productionRunData.prePackingList.length>0){
-                    this.productionRunData.prePackingList.forEach(x=> {
+                if (this.productionRunData.prePackingList.length > 0) {
+                    this.productionRunData.prePackingList.forEach(x => {
                         x.prePackingData.time = new Date(x.prePackingData.time)
                     })
                 }
@@ -98,19 +98,12 @@ export class ChecklistStepperComponent implements OnInit, OnDestroy {
     }
 
     onSavePrePacking(preObj: ProductPrePackingInfo): void {
-        // let formattedTime = preObj.prePackingData.time;
-        // if (preObj.prePackingData.time instanceof Date) {
-        //     formattedTime = preObj.prePackingData.time.toISOString();
-        // }
-
-
         const payload: SavePrePackingRequest = {
             productionRunId: this.productionRunData.productionRunId,
             productId: preObj.productId,
             temperature: preObj.prePackingData.temperature,
             pH: preObj.prePackingData.ph,
-            time: preObj.prePackingData.time,
-            batchNo: preObj.prePackingData.batchNo,
+            time: this.formatLocalTime(new Date(preObj.prePackingData.time)),
             isCompleted: true
         };
 
@@ -127,5 +120,29 @@ export class ChecklistStepperComponent implements OnInit, OnDestroy {
     ngStepChange(event: any) {
         this.currentValue = event;
     }
-    
+
+
+    validateTemperature(prePackingData: any, event: any) {
+        let rawValue = parseFloat(event.value);
+        if (isNaN(rawValue) || rawValue < 0 || rawValue > 99) {
+          rawValue = 0; 
+        }
+        prePackingData.temperature = rawValue;
+        event.value = rawValue;
+      }
+      
+    validatePH(prePackingData: any, event: any) {
+        let rawValue = parseFloat(event.value);
+        if (isNaN(rawValue) || rawValue < 0 || rawValue > 14) {
+            rawValue = 0;
+        }
+        const rounded = Math.round(rawValue * 10) / 10;
+        prePackingData.ph = rounded;
+        event.value = rounded;
+    }
+
+    formatLocalTime = (date: Date): string => {
+        const pad = (n: number) => n.toString().padStart(2, '0');
+        return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
+    };
 }

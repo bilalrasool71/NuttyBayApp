@@ -24,6 +24,8 @@ import { AvatarModule } from 'primeng/avatar';
 import { MenuModule } from 'primeng/menu';
 import { ChipModule } from 'primeng/chip';
 import { DividerModule } from 'primeng/divider';
+import { SliderModule } from 'primeng/slider';
+
 @NgModule({
   declarations: [],
   imports: [
@@ -54,6 +56,7 @@ import { DividerModule } from 'primeng/divider';
     MenuModule,
     ChipModule,
     DividerModule,
+    SliderModule,
     ReactiveFormsModule,
     FormsModule,
     CommonModule

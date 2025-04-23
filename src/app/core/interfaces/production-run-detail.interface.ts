@@ -9,6 +9,8 @@ export interface ProductionRunDetailResponse {
 export interface ProductBasicInfo {
     productId: number;
     productName: string;
+    batchNo: string;
+    batchNoDate: string;
 }
 
 export interface ChecklistInfo {
@@ -21,16 +23,17 @@ export interface ChecklistInfo {
 export interface ProductPrePackingInfo {
     productId: number;
     productName: string;
+    batchNo: string;
+    batchNoDate: string;
     prePackingData: PrePackingInfo;
 }
 
 export interface PrePackingInfo {
     temperature: number | null;
     ph: number | null;
-    time: Date | any | null;
+    time: Date;
     isCompleted: boolean;
     completedAt: string | null;
-    batchNo: string | null;
 }
 
 export interface TaskInfo {
@@ -53,7 +56,6 @@ export interface SavePrePackingRequest {
     temperature: number | null;
     time: Date | string | null;
     pH: number | null;
-    batchNo: string | null;
     isCompleted: boolean;
 };
 
@@ -86,4 +88,23 @@ export interface PrePackingDetail {
     isCompleted: boolean;
     completedAt: string | null;
     batchNo: string | null;
+}
+export interface NBProductionRunPdf {
+    productionRunPdfId: number;
+    productionRunId: number;
+    fileName: string;
+    fileUrl: string;
+    contentType: string;
+    size: number;
+    addedDate: string;
+}
+
+export interface NBProductionRunPdf {
+    productionRunPdfId: number;
+    productionRunId: number;
+    fileName: string;
+    fileUrl: string;
+    contentType: string;
+    size: number;
+    addedDate: string;
 }

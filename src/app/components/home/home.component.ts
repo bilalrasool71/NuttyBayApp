@@ -5,9 +5,10 @@ import { UtilsModule } from '../../core/utilities/utils.module';
 import { IListOfValue } from '../../core/interfaces/common.interface';
 import { IUser } from '../../core/interfaces/user.interface';
 import { RestService } from '../../services/rest-service/rest.service';
-import { ProductionRunDetailResponse, UserProductionRunSummaryResponse } from '../../core/interfaces/production-run-detail.interface';
+import { NBProductionRunPdf, ProductionRunDetailResponse, UserProductionRunSummaryResponse } from '../../core/interfaces/production-run-detail.interface';
 import { INBProduct, IProductionRunRequest } from '../../core/interfaces/domain.interface';
 import { PdfService } from '../../core/services/pdf.service';
+import { s3ProductionPdfpath } from '../../core/constant/constant';
 
 @Component({
   selector: 'app-home',
@@ -22,7 +23,8 @@ export class HomeComponent implements OnInit {
   selectedDate: Date = new Date();
   products: INBProduct[] = [];
   productionRunData!: ProductionRunDetailResponse;
-  
+  pdfUrl: string = '';
+
   summaryForUser: UserProductionRunSummaryResponse = { completed: [], inProgress: [] };
   tabs: IListOfValue[] = [
     { value: 1, viewValue: 'In Progress' },
@@ -52,7 +54,7 @@ export class HomeComponent implements OnInit {
     const payload: IProductionRunRequest = {
       userId: this.loggedInUser.userId!,
       productIds: this.selectedProductIds,
-      productionDate: this.selectedDate
+      productionDate: this.formatLocalTime(new Date(this.selectedDate))
     };
 
     this.restService.createProductionRun(payload).subscribe({
@@ -85,26 +87,79 @@ export class HomeComponent implements OnInit {
     });
   }
 
-  async generatePdfReport(run: any) {
-    this.loadProductionRunData(run);
-    try {
-      const pdfUrl = await this.pdfService.generateProductionPdf(this.productionRunData);
-      window.open(pdfUrl, '_blank');
-    } catch (error) {
-    }
+  generatePdfReport(run: any) {
+    this.restService.getPdfByProductionRunId(Number(run.productionRunId)).subscribe({
+      next: (existingPdf: NBProductionRunPdf) => {
+        if (existingPdf != null && existingPdf.fileUrl) {
+          window.open(s3ProductionPdfpath + existingPdf.fileUrl, '_blank');
+        } else {
+          this.generateAndOpenNewPdf(run);
+        }
+      },
+      error: (err) => {
+        console.error('Error checking for existing PDF:', err);
+      }
+    });
+  }
+  
+
+  private generateAndOpenNewPdf(run: any) {
+    this.restService.getProductionRunDetails(Number(run.productionRunId)).subscribe({
+      next: (data) => {
+        if (data) {
+          this.productionRunData = data;
+          this.pdfService.generateAndUploadProductionPdf(this.productionRunData)
+            .then((result) => {
+              window.open(result.pdfUrl, '_blank');
+            })
+            .catch((error) => {
+              console.error('PDF generation/upload failed:', error);
+            });
+        } else {
+          console.error('No production run data received.');
+        }
+      },
+      error: (err) => {
+        console.error('Error loading production run data:', err.message || err);
+      }
+    });
+  }
+  
+
+  openExistingPdf(run: any) {
+    this.restService.getPdfByProductionRunId(Number(run.productionRunId)).subscribe({
+      next: (data: NBProductionRunPdf) => {
+        if (data && data.fileUrl) {
+          window.open(s3ProductionPdfpath + data.fileUrl, '_blank');
+        }
+      }
+    });
+  }
+  generateAndOpenNewPdfLocal(run: any) {
+    this.restService.getProductionRunDetails(Number(run.productionRunId)).subscribe({
+      next: (data) => {
+        this.productionRunData = data;
+        this.pdfService.generateProductionPdf(this.productionRunData).subscribe({
+          next: (response: any) => {
+            if (response.Success) {
+              window.open(response.FileUrl, '_blank');
+            } else {
+              console.error('Failed to generate PDF:', response.error);
+            }
+          },
+          error: (error: any) => {
+            console.error('Error generating PDF:', error);
+          }
+        });
+      },
+      error: (err) => {
+        console.error('Error loading production run data:', err);
+      }
+    });
   }
 
-  private loadProductionRunData(run:any): void {
-    this.restService.getProductionRunDetails(Number(run.productionRunId)).subscribe({
-        next: (data) => {
-            this.productionRunData = data;
-            if(this.productionRunData) {
-              
-            }
-        },
-        error: (err) => {
-            console.error('Error loading production run data:', err);
-        }
-    });
-}
+  formatLocalTime = (date: Date): string => {
+    const pad = (n: number) => n.toString().padStart(2, '0');
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
+};
 }
