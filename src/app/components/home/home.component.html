@@ -4,7 +4,7 @@
             <p-tab *ngFor="let tab of tabs; let i = index" [value]="tab.value.toString()" class="!text-sm">{{ tab.viewValue }}</p-tab>
         </p-tablist>
         <p-tabpanels>
-            <p-tabpanel value="1">
+            <p-tabpanel value="1" class="!px-0">
                 <ng-container *ngIf="summaryForUser.inProgress.length > 0 then loadedInProgress; else noRecord"></ng-container>
                 <ng-template #loadedInProgress>
                     <div class="grid grid-cols-1 gap-3">
@@ -64,7 +64,7 @@
                                 </div>
 
                                 <div class="basis-5/100 min-h-full flex items-center justify-end">
-                                    <p-button [rounded]="true" icon="pi pi-file" size="large" severity="secondary" (onClick)="generatePdfReport(run)"/>
+                                    <p-button [rounded]="true" icon="pi pi-file" size="large" severity="secondary" (onClick)="generatePdfReport(run)" />
                                 </div>
                             </div>
                         </div>

@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { INBChecklist, INBChecklistTasks, IPrePackingData } from '../../core/interfaces/domain.interface';
+import { INBChecklist, INBChecklistTasks, INBProduct, IPrePackingData } from '../../core/interfaces/domain.interface';
 import { RestService } from '../../services/rest-service/rest.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth-service/auth.service';
@@ -25,7 +25,10 @@ export class ChecklistStepperComponent implements OnInit, OnDestroy {
     userId: number;
     currentChecklistId: number | null = null;
     steps = ['Pre-Making', 'Making', 'Pre-Packing', 'Packing'];
-
+    products: INBProduct[] = [];
+    selectedProduct: any;
+    prePackingList: any[] = [];
+    currentPrePacking: any = null;
 
     constructor(
         private restService: RestService,
@@ -97,7 +100,7 @@ export class ChecklistStepperComponent implements OnInit, OnDestroy {
         });
     }
 
-    onSavePrePacking(preObj: ProductPrePackingInfo): void {
+    onSavePrePacking2(preObj: ProductPrePackingInfo): void {
         const payload: SavePrePackingRequest = {
             productionRunId: this.productionRunData.productionRunId,
             productId: preObj.productId,
@@ -119,18 +122,22 @@ export class ChecklistStepperComponent implements OnInit, OnDestroy {
 
     ngStepChange(event: any) {
         this.currentValue = event;
+        if (this.currentValue == 3) {
+            this.loadProducts();
+            console.log(this.products);
+        }
     }
 
 
     validateTemperature(prePackingData: any, event: any) {
         let rawValue = parseFloat(event.value);
         if (isNaN(rawValue) || rawValue < 0 || rawValue > 99) {
-          rawValue = 0; 
+            rawValue = 0;
         }
         prePackingData.temperature = rawValue;
         event.value = rawValue;
-      }
-      
+    }
+
     validatePH(prePackingData: any, event: any) {
         let rawValue = parseFloat(event.value);
         if (isNaN(rawValue) || rawValue < 0 || rawValue > 14) {
@@ -145,4 +152,34 @@ export class ChecklistStepperComponent implements OnInit, OnDestroy {
         const pad = (n: number) => n.toString().padStart(2, '0');
         return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
     };
+
+    loadProducts(): void {
+        this.restService.getAllProducts().subscribe({
+            next: (products) => this.products = products,
+            error: () => alert('Failed to load products.')
+        });
+    }
+
+    onProductSelected() {
+        if (this.selectedProduct) {
+          const newEntry = {
+            productId: this.selectedProduct.productId,
+            productName: this.selectedProduct.productName,
+            isChecked: false,
+            prePackingData: {
+              temperature: null,
+              ph: null,
+              time: null
+            }
+          };
+      
+          this.prePackingList.push(newEntry);
+        }
+      }
+      
+      onSavePrePacking(preObj: any) {
+        this.selectedProduct = null;
+        // You can process the saved entry here (e.g., call backend API)
+        console.log('Saving:', preObj);
+      }
 }

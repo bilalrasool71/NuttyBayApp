@@ -55,8 +55,8 @@
                 </ng-container>
                 <ng-container *ngIf="checklist.checklistType === 2">
                     <ng-template #content let-activateCallback="activateCallback">
-                        <div class="grid grid-cols-1 gap-2 p-2">
-                            <ng-container *ngFor="let preObj of productionRunData.prePackingList; let i = index">
+                        <div class="grid grid-cols-1 gap-2">
+                            <!-- <ng-container *ngFor="let preObj of productionRunData.prePackingList; let i = index">
                                 <div class="border border-gray-300 rounded-lg p-3 shadow-[0_2px_22px_-4px_rgba(93,96,127,0.2)]">
                                         <div class="flex items-center justify-between mb-3">
                                             <h3 class="text-xl font-bold">{{preObj.productName}}</h3>
@@ -80,12 +80,96 @@
                                         </div>
                                     </div>
                                 </div>
-                            </ng-container>
-                            <div class="flex justify-end items-center gap-2 mt-6">
+                            </ng-container> -->
+                            <!-- <div class="border border-gray-300 rounded-lg p-3 shadow-[0_2px_22px_-4px_rgba(93,96,127,0.2)]">
+                                <p-float-label variant="on">
+                                    <p-select id="product" [options]="products" optionLabel="productName" [(ngModel)]="selectedProduct" (onChange)="onProductSelected()" />
+                                    <label id="product">Products</label>
+                                </p-float-label>
+                                <div class="grid grid-cols-1 gap-2 mt-2">
+                                    <div *ngFor="let preObj of prePackingList; let i = index" class="border border-gray-300 rounded-lg p-3 shadow-[0_2px_22px_-4px_rgba(93,96,127,0.2)]">
+
+                                        <div class="flex items-center justify-between mb-3">
+                                            <h3 class="text-xl font-bold">{{ preObj.productName }}</h3>
+                                            <p-button label="Save" (onClick)="onSavePrePacking(preObj)" [disabled]="!preObj.prePackingData.temperature || !preObj.prePackingData.ph || !preObj.prePackingData.time">
+                                            </p-button>
+                                        </div>
+
+                                        <div class="border-2 border-dashed border-gray-400 p-4 rounded grid gap-3">
+                                            <div class="flex items-center gap-3">
+                                                <p-checkbox [binary]="true" [(ngModel)]="preObj.isChecked" [id]="'id'+preObj.productId" />
+                                                <label [attr.for]="'id'+preObj.productId">PH measurer has been calibrated</label>
+                                            </div>
+                                            <p-float-label variant="on">
+                                                <p-input-number [disabled]="!preObj.isChecked" [id]="'temperature'+i" [(ngModel)]="preObj.prePackingData.temperature" [min]="0" [max]="99" [step]="1" [mode]="'decimal'" [useGrouping]="false" [maxFractionDigits]="0">
+                                                </p-input-number>
+                                                <label [attr.for]="'temperature'+i">Temperature</label>
+                                            </p-float-label>
+
+                                            <p-float-label variant="on">
+                                                <p-input-number [disabled]="!preObj.isChecked" [id]="'ph'+i" [(ngModel)]="preObj.prePackingData.ph" [min]="0" [max]="14" [step]="0.1" [mode]="'decimal'" [useGrouping]="false" [maxFractionDigits]="1">
+                                                </p-input-number>
+                                                <label [attr.for]="'ph'+i">pH</label>
+                                            </p-float-label>
+
+                                            <p-float-label variant="on">
+                                                <p-datepicker [disabled]="!preObj.isChecked" [showIcon]="true" icon="pi pi-clock" [id]="'time'+i" [(ngModel)]="preObj.prePackingData.time" [showTime]="true" hourFormat="12">
+                                                </p-datepicker>
+                                                <label [attr.for]="'time'+i">Time</label>
+                                            </p-float-label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div> -->
+                            <div class="border border-gray-300 rounded-lg p-3 shadow-[0_2px_22px_-4px_rgba(93,96,127,0.2)]">
+                                <!-- Product Dropdown (Single Selection) -->
+                                <p-float-label variant="on">
+                                    <p-select id="product" [options]="products" optionLabel="productName" [(ngModel)]="selectedProduct" (onChange)="onProductSelected()">
+                                    </p-select>
+                                    <label for="product">Select Product</label>
+                                </p-float-label>
+
+                                <!-- PrePacking Form if a product is selected -->
+                                <div class="grid grid-cols-1 gap-2 mt-2">
+                                    <div *ngFor="let preObj of prePackingList; let i = index" class="border border-gray-300 rounded-lg p-3 shadow-[0_2px_22px_-4px_rgba(93,96,127,0.2)]">
+                                        <div class="flex items-center justify-between mb-3">
+                                            <h3 class="text-xl font-bold">{{ preObj.productName }}</h3>
+                                            <p-button label="Save" (onClick)="onSavePrePacking(preObj)" [disabled]="!preObj.prePackingData.temperature || !preObj.prePackingData.ph || !preObj.prePackingData.time || !preObj.isChecked">
+                                            </p-button>
+                                        </div>
+
+                                        <div class="border-2 border-dashed border-gray-400 p-4 rounded grid gap-3">
+                                            <div class="flex items-center gap-3">
+                                                <p-checkbox [binary]="true" [(ngModel)]="preObj.isChecked" [inputId]="'phCheck'+i" />
+                                                <label [attr.for]="'phCheck'+i">PH measurer has been calibrated</label>
+                                            </div>
+                                            <p-float-label variant="on">
+                                                <p-input-number [disabled]="!preObj.isChecked" [id]="'temperature'+i" [(ngModel)]="preObj.prePackingData.temperature" [min]="0" [max]="99" [step]="1" [mode]="'decimal'" [useGrouping]="false" [maxFractionDigits]="0">
+                                                </p-input-number>
+                                                <label [attr.for]="'temperature'+i">Temperature</label>
+                                            </p-float-label>
+
+                                            <p-float-label variant="on">
+                                                <p-input-number [disabled]="!preObj.isChecked" [id]="'ph'+i" [(ngModel)]="preObj.prePackingData.ph" [min]="0" [max]="14" [step]="0.1" [mode]="'decimal'" [useGrouping]="false" [maxFractionDigits]="1">
+                                                </p-input-number>
+                                                <label [attr.for]="'ph'+i">pH</label>
+                                            </p-float-label>
+
+                                            <p-float-label variant="on">
+                                                <p-datepicker [disabled]="!preObj.isChecked" [showIcon]="true" icon="pi pi-clock" [id]="'time'+i" [(ngModel)]="preObj.prePackingData.time" [showTime]="true" hourFormat="12">
+                                                </p-datepicker>
+                                                <label [attr.for]="'time'+i">Time</label>
+                                            </p-float-label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- <div class="flex justify-end items-center gap-2 mt-6">
                                 <p-button label="Back" severity="warn" (onClick)="activateCallback(2)"></p-button>
                                 <p-button label="Save & Continue" (onClick)="activateCallback(4)"></p-button>
                                 <p-button severity="contrast" (onClick)="goToExit()" label="Save & Exit"></p-button>
-                            </div>
+                            </div> -->
                         </div>
                     </ng-template>
                 </ng-container>
