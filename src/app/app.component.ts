@@ -20,7 +20,7 @@ export class AppComponent implements OnInit {
   options: AnimationOptions = {
     path: '/anims/loading.json'
   }
-  title = 'Nutty Bays';
+  title = 'Nutty Bay';
 
   ngOnInit(): void {
     this.listenToLoading();

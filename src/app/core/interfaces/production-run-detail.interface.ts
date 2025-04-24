@@ -9,6 +9,7 @@ export interface ProductionRunDetailResponse {
 export interface ProductBasicInfo {
     productId: number;
     productName: string;
+    unit :number;
     batchNo: string;
     batchNoDate: string;
     numberOfBoxes: number;

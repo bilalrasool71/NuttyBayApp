@@ -23,14 +23,9 @@ export class HomeComponent implements OnInit {
   selectedDate: Date = new Date();
   products: INBProduct[] = [];
   productionRunData!: ProductionRunDetailResponse;
-  pdfUrl: string = '';
+  activeView: 'in-progress' | 'completed' | 'new' = 'in-progress';
 
   summaryForUser: UserProductionRunSummaryResponse = { completed: [], inProgress: [] };
-  tabs: IListOfValue[] = [
-    { value: 1, viewValue: 'Start New' },
-    { value: 2, viewValue: 'In Progress' },
-    { value: 3, viewValue: 'Completed' },
-  ];
   constructor(
     private authService: AuthService,
     private router: Router,
@@ -75,9 +70,9 @@ export class HomeComponent implements OnInit {
     });
   }
 
-  loadUserSummary(): void {
+  async loadUserSummary(): Promise<void> {
     this.restService.getUserProductionRuns(Number(this.loggedInUser.userId)).subscribe({
-      next: (data) => this.summaryForUser = data,
+      next: (data) => this.summaryForUser = data, 
       error: () => console.error('Error loading production run data.')
     });
   }
@@ -163,9 +158,4 @@ export class HomeComponent implements OnInit {
     const pad = (n: number) => n.toString().padStart(2, '0');
     return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
   };
-
-  generateName(product: ProductStatus): string {
-    return `${product.productName} - (${product.batchNoDate} ${product.numberOfBoxes} Boxes x ${product.unit} Units = ${product.numberOfBoxes * product.unit} Jars)`;
-  }
-
 }

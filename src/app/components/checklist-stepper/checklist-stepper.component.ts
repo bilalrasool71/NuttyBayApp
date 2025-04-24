@@ -6,7 +6,7 @@ import { AuthService } from '../../core/services/auth-service/auth.service';
 import { Subject, takeUntil } from 'rxjs';
 import { MessageService } from 'primeng/api';
 import { UtilsModule } from '../../core/utilities/utils.module';
-import { ProductionRunDetailResponse, ProductPrePackingInfo, SavePrePackingRequest, TaskInfo, UpdateBoxCountRequest } from '../../core/interfaces/production-run-detail.interface';
+import { ProductBasicInfo, ProductionRunDetailResponse, ProductPrePackingInfo, ProductStatus, SavePrePackingRequest, TaskInfo, UpdateBoxCountRequest } from '../../core/interfaces/production-run-detail.interface';
 
 @Component({
     selector: 'app-checklist-stepper',
@@ -24,8 +24,7 @@ export class ChecklistStepperComponent implements OnInit, OnDestroy {
     saveInProgress = false;
     userId: number;
     currentChecklistId: number | null = null;
-    steps = ['Pre-Making', 'Making', 'Pre-Packing', 'Packing'];
-    selectedProduct!: INBProduct;
+    selectedProduct!: ProductBasicInfo;
     currentPrePacking!: ProductPrePackingInfo;
     showPrePackingForm: boolean = false;
 
@@ -175,17 +174,16 @@ export class ChecklistStepperComponent implements OnInit, OnDestroy {
     afterSave() {
         this.loadProductionRunData();
         this.currentPrePacking = {} as ProductPrePackingInfo;
-        this.selectedProduct = {} as INBProduct;
+        this.selectedProduct = {} as ProductStatus;
         this.showPrePackingForm = false;
     }
 
     updateProductBoxCount(product: any) {
         if(product.numberOfBoxes < 0) {
-            this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Box count cannot be negative' });
+            product.numberOfBoxes = 0;
             return;
         }
         if(product.numberOfBoxes > 99) {
-            this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Box count cannot more than 99' });
             product.numberOfBoxes = 0;
             return;
         }
@@ -201,4 +199,56 @@ export class ChecklistStepperComponent implements OnInit, OnDestroy {
         });
     }
 
+
+    tabs = [
+        { id: 1, label: 'Pre Making', icon: 'pi pi-list-check' },
+        { id: 2, label: 'Making', icon: 'pi pi-cog' },
+        { id: 3, label: 'Pre Packing', icon: 'pi pi-box' },
+        { id: 4, label: 'Packing', icon: 'pi pi-gift' }
+      ];
+      
+      activeTab = 1;
+      isMenuOpen: boolean=false;
+      showMenu: boolean=false;
+      getChecklistTasks(checklistId: number) {
+        const checklist = this.productionRunData.sharedChecklists.find(c => c.checklistId === checklistId);
+        return checklist ? checklist.tasks : [];
+      }
+
+      
+      goBack(): void {
+        this.router.navigate(['/app']);
+      }
+    
+      toggleMenu(): void {
+        this.isMenuOpen = !this.isMenuOpen;
+      }
+    
+    
+      exportAsPDF(): void {
+        this.isMenuOpen = false;
+        // Implement export logic
+        this.messageService.add({severity: 'info', summary: 'Export', detail: 'PDF export initiated'});
+      }
+
+      canSavePrePacking(): boolean {
+        if (!this.currentPrePacking) return false;
+        const data = this.currentPrePacking.prePackingData;
+        return data.isPhCalibrated && data.temperature !== null && data.ph !== null && data.time !== null;
+      }
+    
+     
+    
+      onCompleteProduction(): void {
+        // Implement completion logic
+        this.messageService.add({severity: 'success', summary: 'Completed', detail: 'Production run completed'});
+        this.router.navigate(['/app']);
+      }
+    
+      onSaveAndExit(): void {
+        // Implement save and exit logic
+        this.messageService.add({severity: 'info', summary: 'Saved', detail: 'Progress saved'});
+        this.router.navigate(['/app']);
+      }
+    
 }    
