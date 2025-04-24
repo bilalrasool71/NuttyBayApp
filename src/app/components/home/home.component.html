@@ -232,7 +232,7 @@
 
                         <!-- Completed Runs List -->
                         <div class="divide-y divide-gray-100">
-                            <div *ngFor="let run of summaryForUser.completed" class="p-4 hover:bg-gray-50 transition-colors cursor-pointer" (click)="generateAndOpenNewPdfLocal(run)">
+                            <div *ngFor="let run of summaryForUser.completed" class="p-4 hover:bg-gray-50 transition-colors cursor-pointer" (click)="generatePdfReport(run)">
 
                                 <!-- Run Header -->
                                 <div class="flex items-center justify-between mb-3">
@@ -322,7 +322,7 @@
                     <div class="p-4">
                         <div class="grid grid-cols-1 gap-3 mt-6">
                             <p-floatLabel variant="on">
-                                <p-date-picker appendTo="body" [(ngModel)]="selectedDate" [showTime]="true" inputId="date" styleClass="w-full"></p-date-picker>
+                                <p-date-picker dateFormat="dd/mm/yy" appendTo="body" [(ngModel)]="selectedDate" [showTime]="true" inputId="date" styleClass="w-full"></p-date-picker>
                                 <label for="date">Production Date</label>
                             </p-floatLabel>
 
