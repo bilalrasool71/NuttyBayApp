@@ -5,7 +5,7 @@ import { UtilsModule } from '../../core/utilities/utils.module';
 import { IListOfValue } from '../../core/interfaces/common.interface';
 import { IUser } from '../../core/interfaces/user.interface';
 import { RestService } from '../../services/rest-service/rest.service';
-import { NBProductionRunPdf, ProductionRunDetailResponse, UserProductionRunSummaryResponse } from '../../core/interfaces/production-run-detail.interface';
+import { NBProductionRunPdf, ProductionRunDetailResponse, ProductStatus, UserProductionRunSummaryResponse } from '../../core/interfaces/production-run-detail.interface';
 import { INBProduct, IProductionRunRequest } from '../../core/interfaces/domain.interface';
 import { PdfService } from '../../core/services/pdf.service';
 import { s3ProductionPdfpath } from '../../core/constant/constant';
@@ -27,9 +27,9 @@ export class HomeComponent implements OnInit {
 
   summaryForUser: UserProductionRunSummaryResponse = { completed: [], inProgress: [] };
   tabs: IListOfValue[] = [
-    { value: 1, viewValue: 'In Progress' },
-    { value: 2, viewValue: 'Completed' },
-    { value: 3, viewValue: 'Create Production Run' }
+    { value: 1, viewValue: 'Start New' },
+    { value: 2, viewValue: 'In Progress' },
+    { value: 3, viewValue: 'Completed' },
   ];
   constructor(
     private authService: AuthService,
@@ -43,6 +43,7 @@ export class HomeComponent implements OnInit {
   ngOnInit(): void {
     this.loadProducts();
     this.loadUserSummary();
+    
   }
 
   onCreateProductionRun(): void {
@@ -101,7 +102,7 @@ export class HomeComponent implements OnInit {
       }
     });
   }
-  
+
 
   private generateAndOpenNewPdf(run: any) {
     this.restService.getProductionRunDetails(Number(run.productionRunId)).subscribe({
@@ -124,7 +125,7 @@ export class HomeComponent implements OnInit {
       }
     });
   }
-  
+
 
   openExistingPdf(run: any) {
     this.restService.getPdfByProductionRunId(Number(run.productionRunId)).subscribe({
@@ -161,5 +162,10 @@ export class HomeComponent implements OnInit {
   formatLocalTime = (date: Date): string => {
     const pad = (n: number) => n.toString().padStart(2, '0');
     return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
-};
+  };
+
+  generateName(product: ProductStatus): string {
+    return `${product.productName} - (${product.batchNoDate} ${product.numberOfBoxes} Boxes x ${product.unit} Units = ${product.numberOfBoxes * product.unit} Jars)`;
+  }
+
 }

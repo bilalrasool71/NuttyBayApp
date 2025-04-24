@@ -11,6 +11,7 @@ export interface ProductBasicInfo {
     productName: string;
     batchNo: string;
     batchNoDate: string;
+    numberOfBoxes: number;
 }
 
 export interface ChecklistInfo {
@@ -79,6 +80,10 @@ export interface ProductionRunSummary {
 export interface ProductStatus {
     productId: number;
     productName: string;
+    unit: number;
+    batchNo: string;
+    batchNoDate: string;
+    numberOfBoxes: number;
     prePacking: PrePackingDetail;
 }
 
@@ -108,4 +113,10 @@ export interface NBProductionRunPdf {
     contentType: string;
     size: number;
     addedDate: string;
+}
+
+export interface UpdateBoxCountRequest {
+    productionRunId: number;
+    productId: number;
+    numberOfBoxes: number;
 }

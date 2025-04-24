@@ -25,6 +25,7 @@ import { MenuModule } from 'primeng/menu';
 import { ChipModule } from 'primeng/chip';
 import { DividerModule } from 'primeng/divider';
 import { SliderModule } from 'primeng/slider';
+import { AccordionModule } from 'primeng/accordion';
 
 @NgModule({
   declarations: [],
@@ -57,6 +58,7 @@ import { SliderModule } from 'primeng/slider';
     ChipModule,
     DividerModule,
     SliderModule,
+    AccordionModule,
     ReactiveFormsModule,
     FormsModule,
     CommonModule

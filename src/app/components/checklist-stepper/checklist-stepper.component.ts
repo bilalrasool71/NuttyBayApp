@@ -6,7 +6,7 @@ import { AuthService } from '../../core/services/auth-service/auth.service';
 import { Subject, takeUntil } from 'rxjs';
 import { MessageService } from 'primeng/api';
 import { UtilsModule } from '../../core/utilities/utils.module';
-import { ProductionRunDetailResponse, ProductPrePackingInfo, SavePrePackingRequest, TaskInfo } from '../../core/interfaces/production-run-detail.interface';
+import { ProductionRunDetailResponse, ProductPrePackingInfo, SavePrePackingRequest, TaskInfo, UpdateBoxCountRequest } from '../../core/interfaces/production-run-detail.interface';
 
 @Component({
     selector: 'app-checklist-stepper',
@@ -27,7 +27,7 @@ export class ChecklistStepperComponent implements OnInit, OnDestroy {
     steps = ['Pre-Making', 'Making', 'Pre-Packing', 'Packing'];
     selectedProduct!: INBProduct;
     currentPrePacking!: ProductPrePackingInfo;
-    showPrePackingForm : boolean = false;
+    showPrePackingForm: boolean = false;
 
 
     constructor(
@@ -124,7 +124,6 @@ export class ChecklistStepperComponent implements OnInit, OnDestroy {
 
     ngStepChange(event: any) {
         this.currentValue = event;
-        console.log(this.productionRunData)
     }
 
 
@@ -172,12 +171,34 @@ export class ChecklistStepperComponent implements OnInit, OnDestroy {
             this.showPrePackingForm = true;
         }
     }
-    
+
     afterSave() {
         this.loadProductionRunData();
         this.currentPrePacking = {} as ProductPrePackingInfo;
         this.selectedProduct = {} as INBProduct;
         this.showPrePackingForm = false;
     }
-    
+
+    updateProductBoxCount(product: any) {
+        if(product.numberOfBoxes < 0) {
+            this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Box count cannot be negative' });
+            return;
+        }
+        if(product.numberOfBoxes > 99) {
+            this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Box count cannot more than 99' });
+            product.numberOfBoxes = 0;
+            return;
+        }
+        const request: UpdateBoxCountRequest = {
+            productionRunId: this.productionId!,
+            productId: product.productId,
+            numberOfBoxes: product.numberOfBoxes
+        };
+
+        this.restService.updateBoxCount(request).subscribe({
+            next: () => console.log('Box count updated'),
+            error: (err) => console.log(err)
+        });
+    }
+
 }    

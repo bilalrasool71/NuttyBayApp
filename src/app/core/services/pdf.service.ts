@@ -542,8 +542,7 @@ export class PdfService {
                 <th>Temperature</th>
                 <th>ph</th>
                 <th>Date & Time</th>
-                <th class="col-status">Status</th>
-                <th class="col-date">Completed At</th>
+                
               </tr>
             </thead>
             <tbody>
@@ -554,14 +553,7 @@ export class PdfService {
                   <td>${item.prePackingData.temperature || 'N/A'} ℃</td>
                   <td>${item.prePackingData.ph || 'N/A'}</td>
                   <td>${item.prePackingData.time ? this.formatDateTime(new Date(item.prePackingData.time)) : 'N/A'}</td>
-                  <td class="${item.prePackingData.isCompleted ? 'checkmark' : 'cross'}">
-                    ${item.prePackingData.isCompleted ? '✓' : '✗'}
-                  </td>
-                  <td class="col-date">
-                    ${item.prePackingData.completedAt ?
-                      `${this.formatDate(new Date(item.prePackingData.completedAt))} ${this.formatTime(new Date(item.prePackingData.completedAt))}` : 
-                      '-'}
-                  </td>
+                
                 </tr>
               `).join('')}
             </tbody>

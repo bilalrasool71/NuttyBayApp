@@ -10,7 +10,7 @@ import {
   IProductionRun,
 } from '../../core/interfaces/domain.interface';
 
-import { NBProductionRunPdf, NBProductionRunTaskUpdateDto, ProductionRunDetailResponse, SavePrePackingRequest } from '../../core/interfaces/production-run-detail.interface';
+import { NBProductionRunPdf, NBProductionRunTaskUpdateDto, ProductionRunDetailResponse, SavePrePackingRequest, UpdateBoxCountRequest } from '../../core/interfaces/production-run-detail.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -55,6 +55,11 @@ export class RestService {
   getPdfByProductionRunId(productionRunId: number): Observable<NBProductionRunPdf> {
     return this.http.get<NBProductionRunPdf>(`${this.baseUrl}/GetPdfByProductionRunId?productionRunId=${productionRunId}`);
   }
-  
+  updateBoxCount(request: UpdateBoxCountRequest): Observable<void> {
+    return this.http.put<void>(
+      `${this.baseUrl}/UpdateBoxCount`, 
+      request
+    );
+  }
   
 }
