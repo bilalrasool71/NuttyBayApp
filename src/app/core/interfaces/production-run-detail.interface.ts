@@ -24,18 +24,19 @@ export interface ProductPrePackingInfo {
     productId: number;
     productName: string;
     batchNo: string;
-    batchNoDate: string;
+    batchNoDate: string | null;
     prePackingData: PrePackingInfo;
 }
 
 export interface PrePackingInfo {
     temperature: number | null;
     ph: number | null;
-    time: Date;
+    time: Date | any;
     isCompleted: boolean;
     completedAt: string | null;
+    isPhCalibrated: boolean;
+    detailId: number;
 }
-
 export interface TaskInfo {
     taskId: number;
     taskDescription: string;
@@ -53,12 +54,12 @@ export interface NBProductionRunTaskUpdateDto {
 export interface SavePrePackingRequest {
     productionRunId: number;
     productId: number;
+    detailId: number;
     temperature: number | null;
+    ph: number | null;
     time: Date | string | null;
-    pH: number | null;
-    isCompleted: boolean;
-};
-
+    isPhCalibrated: boolean;
+}
 
 export interface UserProductionRunSummaryResponse {
     inProgress: ProductionRunSummary[];
@@ -83,7 +84,7 @@ export interface ProductStatus {
 
 export interface PrePackingDetail {
     temperature: number | null;
-    pH: number | null;
+    ph: number | null;
     time: string | null;
     isCompleted: boolean;
     completedAt: string | null;

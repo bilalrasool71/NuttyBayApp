@@ -40,13 +40,13 @@ export interface INBProduct {
   
   export interface UpdateTaskStatusRequest {
     isCompleted: boolean;
-    pH?: number;
+    ph?: number;
     time?: string;
     temperature?: number;
   }
   
   export interface IPrePackingData {
     temperature: number | null;
-    pH: number | null ;
+    ph: number | null ;
     time: Date | null;
   }

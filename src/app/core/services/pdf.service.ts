@@ -273,7 +273,7 @@ export class PdfService {
   //               <th>Product</th>
   //               <th>Batch#</th>
   //               <th>Temperature</th>
-  //               <th>pH</th>
+  //               <th>ph</th>
   //               <th>Time</th>
   //               <th class="col-status">Status</th>
   //               <th class="col-date">Completed At</th>
@@ -540,7 +540,7 @@ export class PdfService {
                 <th>Product</th>
                 <th>Batch#</th>
                 <th>Temperature</th>
-                <th>pH</th>
+                <th>ph</th>
                 <th>Date & Time</th>
                 <th class="col-status">Status</th>
                 <th class="col-date">Completed At</th>

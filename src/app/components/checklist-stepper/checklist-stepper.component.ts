@@ -25,10 +25,10 @@ export class ChecklistStepperComponent implements OnInit, OnDestroy {
     userId: number;
     currentChecklistId: number | null = null;
     steps = ['Pre-Making', 'Making', 'Pre-Packing', 'Packing'];
-    products: INBProduct[] = [];
-    selectedProduct: any;
-    prePackingList: any[] = [];
-    currentPrePacking: any = null;
+    selectedProduct!: INBProduct;
+    currentPrePacking!: ProductPrePackingInfo;
+    showPrePackingForm : boolean = false;
+
 
     constructor(
         private restService: RestService,
@@ -100,18 +100,20 @@ export class ChecklistStepperComponent implements OnInit, OnDestroy {
         });
     }
 
-    onSavePrePacking2(preObj: ProductPrePackingInfo): void {
+    onSavePrePacking(preObj: ProductPrePackingInfo): void {
         const payload: SavePrePackingRequest = {
             productionRunId: this.productionRunData.productionRunId,
             productId: preObj.productId,
             temperature: preObj.prePackingData.temperature,
-            pH: preObj.prePackingData.ph,
+            ph: preObj.prePackingData.ph,
             time: this.formatLocalTime(new Date(preObj.prePackingData.time)),
-            isCompleted: true
+            isPhCalibrated: preObj.prePackingData.isPhCalibrated,
+            detailId: preObj.prePackingData.detailId || 0,
+
         };
 
         this.restService.savePrePackingData(payload).subscribe({
-            next: () => console.log('Saved Successfully'),
+            next: () => this.afterSave(),
             error: () => console.error('Save Failed')
         });
     }
@@ -122,10 +124,7 @@ export class ChecklistStepperComponent implements OnInit, OnDestroy {
 
     ngStepChange(event: any) {
         this.currentValue = event;
-        if (this.currentValue == 3) {
-            this.loadProducts();
-            console.log(this.products);
-        }
+        console.log(this.productionRunData)
     }
 
 
@@ -153,33 +152,32 @@ export class ChecklistStepperComponent implements OnInit, OnDestroy {
         return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
     };
 
-    loadProducts(): void {
-        this.restService.getAllProducts().subscribe({
-            next: (products) => this.products = products,
-            error: () => alert('Failed to load products.')
-        });
-    }
-
     onProductSelected() {
         if (this.selectedProduct) {
-          const newEntry = {
-            productId: this.selectedProduct.productId,
-            productName: this.selectedProduct.productName,
-            isChecked: false,
-            prePackingData: {
-              temperature: null,
-              ph: null,
-              time: null
-            }
-          };
-      
-          this.prePackingList.push(newEntry);
+            this.currentPrePacking = {
+                productId: this.selectedProduct.productId,
+                productName: this.selectedProduct.productName,
+                batchNo: this.selectedProduct.batchNo,
+                batchNoDate: null,
+                prePackingData: {
+                    temperature: null,
+                    ph: null,
+                    time: new Date(),
+                    isPhCalibrated: false,
+                    isCompleted: false,
+                    completedAt: null,
+                    detailId: 0
+                },
+            };
+            this.showPrePackingForm = true;
         }
-      }
-      
-      onSavePrePacking(preObj: any) {
-        this.selectedProduct = null;
-        // You can process the saved entry here (e.g., call backend API)
-        console.log('Saving:', preObj);
-      }
-}
+    }
+    
+    afterSave() {
+        this.loadProductionRunData();
+        this.currentPrePacking = {} as ProductPrePackingInfo;
+        this.selectedProduct = {} as INBProduct;
+        this.showPrePackingForm = false;
+    }
+    
+}    
