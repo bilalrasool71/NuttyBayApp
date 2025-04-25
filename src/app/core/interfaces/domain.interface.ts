@@ -25,7 +25,7 @@ export interface INBProduct {
   
   export interface IProductionRunRequest {
     userId: number;
-    productIds: number[];
+    // productIds: number[];
     productionDate: Date | string;
   }
   

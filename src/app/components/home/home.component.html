@@ -274,7 +274,7 @@
     <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-xl z-50">
         <div class="flex justify-around px-2 py-3">
             <!-- New -->
-            <button (click)="activeView = 'new'" class="flex flex-col items-center relative">
+            <button (click)="onCreateProductionRun()" class="flex flex-col items-center relative">
                 <div class="relative">
                     <i class="pi pi-plus-circle text-2xl transition-colors"
                         [ngClass]="{'text-indigo-600': activeView === 'new', 'text-gray-400': activeView !== 'new'}"></i>

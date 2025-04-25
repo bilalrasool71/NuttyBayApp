@@ -42,15 +42,15 @@ export class HomeComponent implements OnInit {
   }
 
   onCreateProductionRun(): void {
-    if (!this.selectedDate || !this.selectedProductIds.length) {
-      alert('Please select both date and product.');
-      return;
-    }
+    // if (!this.selectedDate || !this.selectedProductIds.length) {
+    //   alert('Please select both date and product.');
+    //   return;
+    // }
 
     const payload: IProductionRunRequest = {
       userId: this.loggedInUser.userId!,
-      productIds: this.selectedProductIds,
-      productionDate: this.formatLocalTime(new Date(this.selectedDate))
+      // productIds: this.selectedProductIds,
+      productionDate: this.formatLocalTime(new Date())
     };
 
     this.restService.createProductionRun(payload).subscribe({

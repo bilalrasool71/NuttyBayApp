@@ -81,15 +81,15 @@ export class ChecklistStepperComponent implements OnInit, OnDestroy {
 
     onChange(task: TaskInfo, checklistId: number) {
         const productionRunId = this.productionRunData.productionRunId;
-
-        const updates = this.productionRunData.products.map(product => ({
-            productionRunId,
-            checklistId,
+        var updates=[]
+        const update= {
+            productionRunId:productionRunId,
+            checklistId:checklistId,
             taskId: task.taskId,
-            productId: product.productId,
+            // productId: product.productId,
             isCompleted: task.isCompleted
-        }));
-
+        };
+        updates.push(update);
         this.restService.updateTaskStatus(updates).subscribe({
             next: () => {
             },
@@ -152,6 +152,7 @@ export class ChecklistStepperComponent implements OnInit, OnDestroy {
 
     onProductSelected() {
         if (this.selectedProduct) {
+            debugger;
             this.currentPrePacking = {
                 productId: this.selectedProduct.productId,
                 productName: this.selectedProduct.productName,

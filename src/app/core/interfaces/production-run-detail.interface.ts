@@ -3,6 +3,7 @@ export interface ProductionRunDetailResponse {
     productionDate: string;
     products: ProductBasicInfo[];
     sharedChecklists: ChecklistInfo[];
+    nbProducts:NBProduct[];
     prePackingList: ProductPrePackingInfo[];
 }
 
@@ -14,7 +15,12 @@ export interface ProductBasicInfo {
     batchNoDate: string;
     numberOfBoxes: number;
 }
-
+export interface NBProduct {
+    productId: number;
+    productName: string;
+    unit :number;
+    batchNo: string;
+}
 export interface ChecklistInfo {
     checklistId: number;
     checklistName: string;
@@ -50,7 +56,7 @@ export interface NBProductionRunTaskUpdateDto {
     productionRunId: number;
     checklistId: number;
     taskId: number;
-    productId: number;
+    productId?: number;
     isCompleted: boolean;
 }
 export interface SavePrePackingRequest {
