@@ -26,12 +26,14 @@ import { ChipModule } from 'primeng/chip';
 import { DividerModule } from 'primeng/divider';
 import { SliderModule } from 'primeng/slider';
 import { AccordionModule } from 'primeng/accordion';
+import { ConfirmDialog } from 'primeng/confirmdialog';
 
 @NgModule({
   declarations: [],
   imports: [
     CommonModule,
-    Menubar
+    Menubar,
+    ConfirmDialog,
   ],
   exports: [
     ButtonModule,
@@ -59,6 +61,7 @@ import { AccordionModule } from 'primeng/accordion';
     DividerModule,
     SliderModule,
     AccordionModule,
+    ConfirmDialog,
     ReactiveFormsModule,
     FormsModule,
     CommonModule

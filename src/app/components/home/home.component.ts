@@ -9,6 +9,7 @@ import { NBProductionRunPdf, ProductionRunDetailResponse, ProductStatus, UserPro
 import { INBProduct, IProductionRunRequest } from '../../core/interfaces/domain.interface';
 import { PdfService } from '../../core/services/pdf.service';
 import { s3ProductionPdfpath } from '../../core/constant/constant';
+import { ConfirmationService } from 'primeng/api';
 
 @Component({
   selector: 'app-home',
@@ -30,7 +31,8 @@ export class HomeComponent implements OnInit {
     private authService: AuthService,
     private router: Router,
     private restService: RestService,
-    private pdfService: PdfService
+    private pdfService: PdfService,
+    private confirmationService: ConfirmationService
   ) {
     this.loggedInUser = this.authService.getUserData();
   }
@@ -38,18 +40,11 @@ export class HomeComponent implements OnInit {
   ngOnInit(): void {
     this.loadProducts();
     this.loadUserSummary();
-    
   }
 
   onCreateProductionRun(): void {
-    // if (!this.selectedDate || !this.selectedProductIds.length) {
-    //   alert('Please select both date and product.');
-    //   return;
-    // }
-
     const payload: IProductionRunRequest = {
       userId: this.loggedInUser.userId!,
-      // productIds: this.selectedProductIds,
       productionDate: this.formatLocalTime(new Date())
     };
 
@@ -72,14 +67,24 @@ export class HomeComponent implements OnInit {
 
   async loadUserSummary(): Promise<void> {
     this.restService.getUserProductionRuns(Number(this.loggedInUser.userId)).subscribe({
-      next: (data) => this.summaryForUser = data, 
+      next: (data) => this.summaryForUser = data,
       error: () => console.error('Error loading production run data.')
     });
   }
 
   navigateToChecklist(run: any): void {
+    let activeTab: number = 1;
+    if(!run.isPreMakingCompleted) {
+      activeTab = 1;
+    } else if(!run.isMakingCompleted) {
+      activeTab = 2;
+    } else if(!run.isPrePackingCompleted) {
+      activeTab = 3;
+    } else if(!run.isPackingCompleted) {
+      activeTab = 4;
+    }
     this.router.navigate(['/app/checklist'], {
-      queryParams: { productionId: run.productionRunId }
+      queryParams: { productionId: run.productionRunId, activeTab: activeTab }
     });
   }
 
@@ -158,4 +163,18 @@ export class HomeComponent implements OnInit {
     const pad = (n: number) => n.toString().padStart(2, '0');
     return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
   };
+
+  onNew() {
+    this.confirmationService.confirm({
+      message: ' Do you like to start the Production Run Now?',
+      header: 'Production Start',
+      icon: 'pi pi-exclamation-triangle',
+      accept: () => {
+        this.onCreateProductionRun()
+      },
+      reject: () => {
+      }
+      
+    });
+  }
 }

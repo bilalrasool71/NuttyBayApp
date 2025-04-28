@@ -4,9 +4,9 @@ import { RestService } from '../../services/rest-service/rest.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth-service/auth.service';
 import { Subject, takeUntil } from 'rxjs';
-import { MessageService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
 import { UtilsModule } from '../../core/utilities/utils.module';
-import { ProductBasicInfo, ProductionRunDetailResponse, ProductPrePackingInfo, ProductStatus, SavePrePackingRequest, TaskInfo, UpdateBoxCountRequest } from '../../core/interfaces/production-run-detail.interface';
+import { ProductBasicInfo, ProductionRunDetailResponse, ProductPrePackingInfo, ProductStatus, SavePrePackingRequest, TaskInfo, UpdateBoxCountRequest, UpdateChecklistDateRequest } from '../../core/interfaces/production-run-detail.interface';
 
 @Component({
     selector: 'app-checklist-stepper',
@@ -15,29 +15,39 @@ import { ProductBasicInfo, ProductionRunDetailResponse, ProductPrePackingInfo, P
     imports: [UtilsModule]
 })
 export class ChecklistStepperComponent implements OnInit, OnDestroy {
+    currentStep: number | null = null;
     productionRunData!: ProductionRunDetailResponse;
     allChecklists: INBChecklist[] = [];
     productionId: number | null = null;
-    currentValue: number = 1;
     private destroy$ = new Subject<void>();
     isSaving = false;
     saveInProgress = false;
     userId: number;
     currentChecklistId: number | null = null;
-    selectedProduct!: ProductBasicInfo;
+    selectedProduct!: ProductBasicInfo | undefined;
     currentPrePacking!: ProductPrePackingInfo;
     showPrePackingForm: boolean = false;
-
+    checklistDates = {
+        1: null as Date | string | null,
+        2: null as Date | string | null,
+        4: null as Date | string | null
+    };
 
     constructor(
         private restService: RestService,
         private route: ActivatedRoute,
         private authService: AuthService,
         private messageService: MessageService,
-        private router: Router
+        private router: Router,
+        private confirmationService: ConfirmationService
     ) {
         this.route.queryParams.subscribe((params) => {
             this.productionId = params['productionId'] ? Number(params['productionId']) : null;
+            this.currentStep = params['activeTab'] ? Number(params['activeTab']):null;
+            if(this.currentStep) {
+                this.activeTab = this.currentStep;
+            }
+
         });
         this.userId = this.authService.getUserData().userId ?? 0;
     }
@@ -56,6 +66,9 @@ export class ChecklistStepperComponent implements OnInit, OnDestroy {
         this.restService.getProductionRunDetails(Number(this.productionId)).subscribe({
             next: (data) => {
                 this.productionRunData = data;
+                this.checklistDates[1] = new Date(data.preMakingDate);  // Pre-Making
+                this.checklistDates[2] = new Date(data.makingDate);     // Making
+                this.checklistDates[4] = new Date(data.packingDate);    // Packing
                 if (this.productionRunData.prePackingList.length > 0) {
                     this.productionRunData.prePackingList.forEach(x => {
                         x.prePackingData.time = new Date(x.prePackingData.time)
@@ -81,10 +94,10 @@ export class ChecklistStepperComponent implements OnInit, OnDestroy {
 
     onChange(task: TaskInfo, checklistId: number) {
         const productionRunId = this.productionRunData.productionRunId;
-        var updates=[]
-        const update= {
-            productionRunId:productionRunId,
-            checklistId:checklistId,
+        var updates = []
+        const update = {
+            productionRunId: productionRunId,
+            checklistId: checklistId,
             taskId: task.taskId,
             // productId: product.productId,
             isCompleted: task.isCompleted
@@ -120,11 +133,6 @@ export class ChecklistStepperComponent implements OnInit, OnDestroy {
     goToExit() {
         this.router.navigate(['/app'])
     }
-
-    ngStepChange(event: any) {
-        this.currentValue = event;
-    }
-
 
     validateTemperature(prePackingData: any, event: any) {
         let rawValue = parseFloat(event.value);
@@ -180,11 +188,11 @@ export class ChecklistStepperComponent implements OnInit, OnDestroy {
     }
 
     updateProductBoxCount(product: any) {
-        if(product.numberOfBoxes < 0) {
+        if (product.numberOfBoxes < 0) {
             product.numberOfBoxes = 0;
             return;
         }
-        if(product.numberOfBoxes > 99) {
+        if (product.numberOfBoxes > 99) {
             product.numberOfBoxes = 0;
             return;
         }
@@ -206,50 +214,89 @@ export class ChecklistStepperComponent implements OnInit, OnDestroy {
         { id: 2, label: 'Making', icon: 'pi pi-cog' },
         { id: 3, label: 'Pre Packing', icon: 'pi pi-box' },
         { id: 4, label: 'Packing', icon: 'pi pi-gift' }
-      ];
-      
-      activeTab = 1;
-      isMenuOpen: boolean=false;
-      showMenu: boolean=false;
-      getChecklistTasks(checklistId: number) {
+    ];
+
+    activeTab = 1;
+    isMenuOpen: boolean = false;
+    showMenu: boolean = false;
+    getChecklistTasks(checklistId: number) {
         const checklist = this.productionRunData.sharedChecklists.find(c => c.checklistId === checklistId);
         return checklist ? checklist.tasks : [];
-      }
+    }
 
-      
-      goBack(): void {
+
+    goBack(): void {
         this.router.navigate(['/app']);
-      }
-    
-      toggleMenu(): void {
-        this.isMenuOpen = !this.isMenuOpen;
-      }
-    
-    
-      exportAsPDF(): void {
-        this.isMenuOpen = false;
-        // Implement export logic
-        this.messageService.add({severity: 'info', summary: 'Export', detail: 'PDF export initiated'});
-      }
+    }
 
-      canSavePrePacking(): boolean {
+    toggleMenu(): void {
+        this.isMenuOpen = !this.isMenuOpen;
+    }
+
+
+    exportAsPDF(): void {
+        this.isMenuOpen = false;
+        this.messageService.add({ severity: 'info', summary: 'Export', detail: 'PDF export initiated' });
+    }
+
+    canSavePrePacking(): boolean {
         if (!this.currentPrePacking) return false;
         const data = this.currentPrePacking.prePackingData;
-        return data.isPhCalibrated && data.temperature !== null && data.ph !== null && data.time !== null;
-      }
-    
-     
-    
-      onCompleteProduction(): void {
+        return data.isPhCalibrated && data.temperature !== null && data.time !== null;
+    }
+
+
+
+    onCompleteProduction(): void {
         // Implement completion logic
-        this.messageService.add({severity: 'success', summary: 'Completed', detail: 'Production run completed'});
+        this.messageService.add({ severity: 'success', summary: 'Completed', detail: 'Production run completed' });
         this.router.navigate(['/app']);
-      }
-    
-      onSaveAndExit(): void {
+    }
+
+    onSaveAndExit(): void {
         // Implement save and exit logic
-        this.messageService.add({severity: 'info', summary: 'Saved', detail: 'Progress saved'});
+        this.messageService.add({ severity: 'info', summary: 'Saved', detail: 'Progress saved' });
         this.router.navigate(['/app']);
-      }
-    
+    }
+
+    onDateChanged(checklistId: number, newDate: Date) {
+        const request: UpdateChecklistDateRequest = {
+            productionRunId: this.productionId!,
+            checklistId: checklistId,
+            date: this.formatLocalTime(new Date(newDate)),
+        }
+
+        this.restService.updateChecklistDate(request).subscribe({
+            next: () => console.log('Checklist date updated'),
+            error: (err) => console.log(err)
+        });
+    }
+
+    onDeletePrePacking(detailId: number) {
+        this.confirmationService.confirm({
+            message: 'Are you sure you want to delete this pre-packing record?',
+            header: 'Delete Confirmation',
+            icon: 'pi pi-exclamation-triangle',
+            accept: () => {
+                this.restService.deletePrePackingDetail(this.productionId!, detailId)
+                    .subscribe({
+                        next: () => {
+                            this.messageService.add({
+                                severity: 'success',
+                                summary: 'Success',
+                                detail: 'Pre-packing record deleted'
+                            });
+                            this.loadProductionRunData();
+                        },
+                        error: (err) => {
+                            this.messageService.add({
+                                severity: 'error',
+                                summary: 'Error',
+                                detail: 'Failed to delete pre-packing record'
+                            });
+                        }
+                    });
+            }
+        });
+    }
 }    

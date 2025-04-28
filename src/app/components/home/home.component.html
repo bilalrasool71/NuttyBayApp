@@ -1,3 +1,5 @@
+<p-confirmdialog />
+
 <div
     class="relative bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-b-xl shadow-lg overflow-hidden">
     <div
@@ -28,7 +30,7 @@
                                 <h3 class="text-lg font-bold text-white drop-shadow-sm">In Progress</h3>
                                 <p class="text-xs text-white/90 font-light">Active production batches</p>
                             </div>
-                            <i class="pi pi-spinner text-xl text-white/80"></i>
+                            <i class="pi pi-spinner pi-spin text-xl text-white/80"></i>
                         </div>
                     </div>
                     <div class="divide-y divide-gray-100">
@@ -274,7 +276,7 @@
     <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-xl z-50">
         <div class="flex justify-around px-2 py-3">
             <!-- New -->
-            <button (click)="onCreateProductionRun()" class="flex flex-col items-center relative">
+            <button (click)="onNew()" class="flex flex-col items-center relative">
                 <div class="relative">
                     <i class="pi pi-plus-circle text-2xl transition-colors"
                         [ngClass]="{'text-indigo-600': activeView === 'new', 'text-gray-400': activeView !== 'new'}"></i>

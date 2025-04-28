@@ -82,10 +82,9 @@ export class PdfService {
   private generateHtmlTemplate(data: ProductionRunDetailResponse): string {
     console.log(data)
     const checklistOrder = [
-      { id: 1, name: 'Pre-Making' },
-      { id: 2, name: 'Making' },
-      { id: 3, name: 'Pre-Packing' },
-      { id: 4, name: 'Packing' }
+      { id: 1, name: 'Pre-Making', heading: 'Soaking/Culture', date: data.preMakingDate },
+      { id: 2, name: 'Making', heading: 'Cashew Cheese', date: data.makingDate },
+      { id: 4, name: 'Packing', heading: '', date: data.packingDate }
     ];
 
     const headerTemplate = `
@@ -128,7 +127,6 @@ export class PdfService {
             margin: 0;
             color: #333;
             line-height: 1.4;
-            // padding-top: 120px;
           }
           
           .page-section {
@@ -136,13 +134,30 @@ export class PdfService {
             padding-top: 100px;
           }
           
+          .checklist-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 10px 0 15px 0;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+          }
+          
           .checklist-title {
             font-size: 18px;
             font-weight: bold;
-            margin: 10px 0 15px 0;
             color: #2c3e50;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 5px;
+          }
+          
+          .checklist-subtitle {
+            font-size: 16px;
+            color: #555;
+            margin-left: 10px;
+          }
+          
+          .checklist-date {
+            font-size: 14px;
+            color: #666;
           }
           
           table {
@@ -268,18 +283,28 @@ export class PdfService {
       <body>
         ${headerTemplate}
         
-        <div class="page-section">
-          <div class="checklist-title">Pre-Making</div>
-          ${this.generateChecklistTable(data.sharedChecklists.find(c => c.checklistId === 1))}
-        </div>
+        ${checklistOrder.map(step => `
+          <div class="page-section">
+            <div class="checklist-header">
+              <div>
+                <span class="checklist-title">${step.name}</span>
+                ${step.heading ? `<span class="checklist-subtitle">${step.heading}</span>` : ''}
+              </div>
+              <div class="checklist-date">
+                ${step.date ? this.formatDateTime(new Date(step.date)) : 'Not completed'}
+              </div>
+            </div>
+            ${this.generateChecklistTable(data.sharedChecklists.find(c => c.checklistId === step.id))}
+          </div>
+        `).join('')}
         
         <div class="page-section">
-          <div class="checklist-title">Making</div>
-          ${this.generateChecklistTable(data.sharedChecklists.find(c => c.checklistId === 2))}
-        </div>
-        
-        <div class="page-section">
-          <div class="checklist-title">Pre-Packing</div>
+          <div class="checklist-header">
+            <div>
+              <span class="checklist-title">Pre-Packing</span>
+              <span class="checklist-subtitle">Fermentation</span>
+            </div>
+          </div>
           <table>
             <thead>
               <tr>
@@ -302,11 +327,6 @@ export class PdfService {
               `).join('')}
             </tbody>
           </table>
-        </div>
-        
-        <div class="page-section">
-          <div class="checklist-title">Packing</div>
-          ${this.generateChecklistTable(data.sharedChecklists.find(c => c.checklistId === 4))}
         </div>
         
         <div class="quantities-section">
@@ -346,24 +366,6 @@ export class PdfService {
             </thead>
             <tbody>
               ${checklistOrder.map(step => {
-                if (step.id === 3) {
-                  const hasPrePacking = data.prePackingList && data.prePackingList.length > 0;
-                  const allCompleted = hasPrePacking ? 
-                    data.prePackingList.every(item => item.prePackingData.isCompleted) : 
-                    false;
-                  
-                  return `
-                    <tr>
-                      <td>${step.name}</td>
-                      <td class="${allCompleted ? 'checkmark' : 'cross'}">
-                        ${hasPrePacking ? 
-                          (allCompleted ? '✓ Completed' : '✗ Pending') : 
-                          '✗ Not Started'}
-                      </td>
-                    </tr>
-                  `;
-                }
-                
                 const checklist = data.sharedChecklists.find(c => c.checklistId === step.id);
                 const hasChecklist = checklist && checklist.tasks && checklist.tasks.length > 0;
                 const allCompleted = hasChecklist ? 
@@ -380,7 +382,14 @@ export class PdfService {
                     </td>
                   </tr>
                 `;
-              }).join('')}
+              }).concat(`
+                <tr>
+                  <td>Pre-Packing</td>
+                  <td class="${data.prePackingList.length > 0 ? 'checkmark' : 'cross'}">
+                    ${data.prePackingList.length > 0 ? '✓ Completed' : '✗ Not Started'}
+                  </td>
+                </tr>
+              `).join('')}
             </tbody>
           </table>
         </div>
@@ -398,7 +407,6 @@ export class PdfService {
           <tr>
             <th class="col-task">Task</th>
             <th class="col-status">Status</th>
-            <th class="col-date">Completed At</th>
           </tr>
         </thead>
         <tbody>
@@ -407,11 +415,6 @@ export class PdfService {
               <td class="col-task">${task.taskDescription}</td>
               <td class="col-status ${task.isCompleted ? 'checkmark' : 'cross'}">
                 ${task.isCompleted ? '✓' : '✗'}
-              </td>
-              <td class="col-date">
-                ${task.completedAt ?
-                  `${this.formatDate(new Date(task.completedAt))} ${this.formatTime(new Date(task.completedAt))}` :
-                  '-'}
               </td>
             </tr>
           `).join('')}
