@@ -1,7 +1,7 @@
 // rest.service.ts
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { apiBaseURL } from '../../core/constant/constant';
+import apiBaseURL from '../../core/constant/constant';
 import { Observable } from 'rxjs';
 import { 
   INBChecklist, 

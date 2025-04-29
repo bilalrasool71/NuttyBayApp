@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { apiBaseURL } from '../../constant/constant';
+import apiBaseURL from '../../constant/constant';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { IUser, ILoginResponse } from '../../interfaces/user.interface';

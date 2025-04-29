@@ -87,16 +87,16 @@
                                     'bg-green-100 text-green-800': run.isPostPackingCompleted,
                                     'bg-gray-100 text-gray-800': !(run.isPostPackingCompleted)
                                   }">
-                            <i [class]="run.isPostPackingCompleted ? 'pi pi-check' : 'pi pi-clock'"></i>
-                            Post Packing
-                        </span>
+                                    <i [class]="run.isPostPackingCompleted ? 'pi pi-check' : 'pi pi-clock'"></i>
+                                    Post Packing
+                                </span>
                             </div>
                         </div>
                     </div>
                 </div>
             </ng-container>
         </div>
-        <div *ngSwitchCase="'completed'">
+        <!-- <div *ngSwitchCase="'completed'">
 
             <ng-container *ngIf="summaryForUser.completed.length > 0; else noRecord">
                 <div class="border border-gray-200 rounded-lg overflow-hidden shadow-lg">
@@ -134,7 +134,7 @@
                                             {{product.batchNoDate}}
                                         </p-chip>
                                     </div>
-                                    <div class="grid grid-cols-3 gap-2 mt-2 text-sm">
+                                    <div class="grid grid-cols-4 gap-2 mt-2 text-sm">
                                         <div class="bg-blue-50 p-2 rounded justify-center flex items-center gap-1">
                                             <div class="text-blue-600 font-bold">{{product.numberOfBoxes}}</div>
                                             <div class="text-xs text-blue-500">Boxes</div>
@@ -149,6 +149,10 @@
                                             </div>
                                             <div class="text-xs text-purple-500">Jars</div>
                                         </div>
+                                        <div class="bg-red-50 p-2 rounded justify-center flex items-center gap-1">
+                                            <div class="text-red-600 font-bold">{{product.validBatch}}
+                                            </div>
+                                        </div>
                                     </div>
                                 </li>
                             </ul>
@@ -156,6 +160,73 @@
                     </div>
                 </div>
 
+            </ng-container>
+        </div> -->
+        <div *ngSwitchCase="'completed'">
+            <ng-container *ngIf="summaryForUser.completed.length > 0; else noRecord">
+                <div class="border border-gray-200 rounded-lg overflow-hidden shadow-lg">
+                    <div class="bg-gradient-to-r from-emerald-500 to-teal-600 p-4 relative overflow-hidden">
+                        <div class="absolute inset-0 bg-white/10 backdrop-blur-[1px]"></div>
+                        <div class="relative z-10 flex items-center justify-between">
+                            <div>
+                                <h3 class="text-lg font-bold text-white drop-shadow-sm">Completed Productions</h3>
+                                <p class="text-xs text-white/90 font-light">Finalized batches</p>
+                            </div>
+                            <i class="pi pi-check-circle text-xl text-white/80"></i>
+                        </div>
+                    </div>
+                    <div class="divide-y divide-gray-100">
+                        <div *ngFor="let run of summaryForUser.completed" class="p-4 hover:bg-gray-50 transition-colors">
+                            <div class="flex items-center justify-between mb-3">
+                                <div>
+                                    <h4 class="font-semibold text-gray-800 flex items-center gap-2">
+                                        <span class="bg-teal-100 text-teal-800 text-sm px-2 py-1 rounded-full">
+                                            Production Run ({{run.productionDate | date:'dd/MM/yyyy | hh:mm a'}})
+                                        </span>
+                                    </h4>
+                                </div>
+                                <i class="pi pi-file-pdf text-2xl text-teal-600 hover:text-teal-800 transition-colors cursor-pointer"
+                                    (click)="generateAndOpenNewPdfLocal(run)"></i>
+                            </div>
+                            <ul class="space-y-3">
+                                <li *ngFor="let product of run.products" class="pl-2 border-l-2 border-teal-200">
+                                    <div class="flex justify-between items-baseline">
+                                        <span class="font-medium text-gray-800">{{product.productName}}</span>
+                                        <p-chip class="!text-xs !py-0 !bg-gray-100 !text-gray-700">
+                                            <i class="pi pi-tag mr-1 text-[10px]"></i>
+                                            {{product.batchNoDate}}
+                                        </p-chip>
+                                    </div>
+                                    <div class="grid grid-cols-3 gap-2 mt-2 text-sm">
+                                        <div class="bg-blue-50 p-2 rounded justify-center flex items-center gap-1">
+                                            <div class="text-blue-600 font-bold">{{product.numberOfBoxes}}</div>
+                                            <div class="text-xs text-blue-500">Boxes</div>
+                                        </div>
+                                        <div class="bg-green-50 p-2 rounded justify-center flex items-center gap-1">
+                                            <div class="text-green-600 font-bold">{{product.unit}}</div>
+                                            <div class="text-xs text-green-500">Units</div>
+                                        </div>
+                                        <div class="bg-purple-50 p-2 rounded justify-center flex items-center gap-1">
+                                            <div class="text-purple-600 font-bold">{{product.numberOfBoxes * product.unit}}</div>
+                                            <div class="text-xs text-purple-500">Jars</div>
+                                        </div>
+                                    </div>
+                                    <div class="mt-2">
+                                        <div class="flex justify-between text-xs text-gray-500 mb-1">
+                                            <span>Production: {{run.productionDate | date:'dd/MM/yyyy'}}</span>
+                                            <span>Expiry: {{formatValidBatchDate(product.validBatch) | date :'dd/MM/yyyy'}}</span>
+                                        </div>
+                                        <div class="w-full bg-gray-200 rounded-full h-1.5">
+                                            <div class="bg-amber-400 h-1.5 rounded-full" 
+                                                 [style.width]="getValidityProgress(run.productionDate, product.validBatch) + '%'">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
             </ng-container>
         </div>
 

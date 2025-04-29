@@ -171,6 +171,7 @@ export class ChecklistStepperComponent implements OnInit, OnDestroy {
                 productId: this.selectedProduct.productId,
                 productName: this.selectedProduct.productName,
                 batchNo: this.selectedProduct.batchNo,
+                validBatch: this.selectedProduct.validBatch,
                 batchNoDate: null,
                 prePackingData: {
                     temperature: null,

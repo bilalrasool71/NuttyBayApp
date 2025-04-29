@@ -15,6 +15,8 @@ export interface ProductBasicInfo {
     productId: number;
     productName: string;
     unit :number;
+    validBatch: string;
+    validMonths: number;
     batchNo: string;
     batchNoDate: string;
     numberOfBoxes: number;
@@ -37,6 +39,7 @@ export interface ProductPrePackingInfo {
     productName: string;
     batchNo: string;
     batchNoDate: string | null;
+    validBatch: string | null;
     prePackingData: PrePackingInfo;
 }
 
@@ -95,6 +98,8 @@ export interface ProductStatus {
     unit: number;
     batchNo: string;
     batchNoDate: string;
+    validMonths: number;
+    validBatch: string;
     numberOfBoxes: number;
     prePacking: PrePackingDetail;
 }

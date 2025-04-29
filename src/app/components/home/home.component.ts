@@ -65,9 +65,14 @@ export class HomeComponent implements OnInit {
     });
   }
 
-  async loadUserSummary(): Promise<void> {
+  loadUserSummary(): void {
     this.restService.getUserProductionRuns(Number(this.loggedInUser.userId)).subscribe({
-      next: (data) => this.summaryForUser = data,
+      next: (data) => {
+        this.summaryForUser = data;
+        if (data.completed.length > 0) {
+          this.activeView = 'completed';
+        }
+      },
       error: () => console.error('Error loading production run data.')
     });
   }
@@ -82,11 +87,46 @@ export class HomeComponent implements OnInit {
       activeTab = 3;
     } else if(!run.isPackingCompleted) {
       activeTab = 4;
+    } else if(!run.isPostPackingCompleted) {
+      activeTab = 5;
     }
     this.router.navigate(['/app/checklist'], {
       queryParams: { productionId: run.productionRunId, activeTab: activeTab }
     });
   }
+
+  parseValidBatchDate(validBatch: string): Date {
+    if (!validBatch) return new Date();
+    
+    // Extract date part (last 6 characters)
+    const datePart = validBatch.slice(-6);
+    const day = parseInt(datePart.substring(0, 2));
+    const month = parseInt(datePart.substring(2, 4)) - 1; // Months are 0-indexed
+    const year = 2000 + parseInt(datePart.substring(4, 6)); // Assuming 21st century
+    
+    return new Date(year, month, day);
+}
+
+// Format for display (optional)
+formatValidBatchDate(validBatch: string): Date {
+    return this.parseValidBatchDate(validBatch);
+}
+
+// Calculate progress percentage
+getValidityProgress(productionDate: Date | string, validBatch: string): number {
+    const now = new Date();
+    const start = new Date(productionDate);
+    const end = this.parseValidBatchDate(validBatch);
+    
+    // If dates are invalid or expired
+    if (!start || !end || now >= end) return 100;
+    if (now <= start) return 0;
+    
+    const totalDuration = end.getTime() - start.getTime();
+    const elapsedDuration = now.getTime() - start.getTime();
+    
+    return Math.round((elapsedDuration / totalDuration) * 100);
+}
 
   generatePdfReport(run: any) {
     this.restService.getPdfByProductionRunId(Number(run.productionRunId)).subscribe({
