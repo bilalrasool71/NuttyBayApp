@@ -4,6 +4,10 @@ export interface ProductionRunDetailResponse {
     products: ProductBasicInfo[];
     sharedChecklists: ChecklistInfo[];
     nbProducts:NBProduct[];
+    preMakingDate: Date; 
+    makingDate: Date; 
+    prePackingDate: Date; 
+    postPackingDate: Date;
     prePackingList: ProductPrePackingInfo[];
 }
 
@@ -81,6 +85,7 @@ export interface ProductionRunSummary {
     isMakingCompleted: boolean;
     isPrePackingCompleted: boolean;
     isPackingCompleted: boolean;
+    isPostPackingCompleted: boolean;
     products: ProductStatus[];
 }
 
@@ -126,4 +131,11 @@ export interface UpdateBoxCountRequest {
     productionRunId: number;
     productId: number;
     numberOfBoxes: number;
+}
+
+
+export interface UpdateChecklistDateRequest {
+    productionRunId: number;
+    checklistId: number;
+    date: Date | string | null;
 }

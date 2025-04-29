@@ -10,7 +10,7 @@ import {
   IProductionRun,
 } from '../../core/interfaces/domain.interface';
 
-import { NBProductionRunPdf, NBProductionRunTaskUpdateDto, ProductionRunDetailResponse, SavePrePackingRequest, UpdateBoxCountRequest } from '../../core/interfaces/production-run-detail.interface';
+import { NBProductionRunPdf, NBProductionRunTaskUpdateDto, ProductionRunDetailResponse, SavePrePackingRequest, UpdateBoxCountRequest, UpdateChecklistDateRequest } from '../../core/interfaces/production-run-detail.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -60,6 +60,14 @@ export class RestService {
       `${this.baseUrl}/UpdateBoxCount`, 
       request
     );
+  }
+
+  updateChecklistDate(request: UpdateChecklistDateRequest): Observable<void> {
+    return this.http.put<void>(`${this.baseUrl}/UpdateChecklistDate`, request)
+  }
+
+  deletePrePackingDetail(productionRunId: number, detailId: number): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/DeletePrePackingDetail?productionRunId=${productionRunId}&detailId=${detailId}`)
   }
   
 }

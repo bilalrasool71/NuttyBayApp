@@ -16,7 +16,7 @@ import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { callInterceptor } from './core/interceptors/call.interceptor';
 import { LoadingService } from './core/services/loading-service/loading.service';
 import { tokenInterceptor } from './core/interceptors/token.interceptor';
-import { MessageService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
 
 
 export function playerFactory () {
@@ -45,6 +45,7 @@ export const appConfig: ApplicationConfig = {
     CookieService,
     LoadingService,
     MessageService,
+    ConfirmationService,
     provideLottieOptions({
       player: () => player,
     }),
