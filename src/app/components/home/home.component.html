@@ -11,7 +11,7 @@
         </h1>
         <p class="mt-1 text-sm text-white/90 font-light tracking-wide">
             <span class="inline-block bg-white/20 backdrop-blur-sm px-2 py-1 rounded-full">
-                Manage your daily production workflow with precision
+                Manage your daily production workflow
             </span>
         </p>
     </div>
@@ -23,7 +23,7 @@
 
             <ng-container *ngIf="summaryForUser.inProgress.length > 0; else noRecord">
                 <div class="border border-gray-200 rounded-lg overflow-hidden shadow-lg">
-                    <div class="bg-gradient-to-r from-blue-500 to-indigo-600 p-4 relative overflow-hidden">
+                    <div class="bg-gradient-to-r from-orange-500 to-amber-400 p-4 relative overflow-hidden">
                         <div class="absolute inset-0 bg-white/10 backdrop-blur-[1px]"></div>
                         <div class="relative z-10 flex items-center justify-between">
                             <div>
@@ -40,7 +40,7 @@
                             <div class="flex items-center justify-between mb-3">
                                 <div>
                                     <h4 class="font-semibold text-gray-800 flex items-center gap-2">
-                                        <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">
+                                        <span class="bg-orange-100 text-orange-800 text-sm px-2 py-1 rounded-full">
                                             Production Run ({{run.productionDate | date:'dd/MM/yyyy | hh:mm a'}})
                                         </span>
                                     </h4>
@@ -83,6 +83,13 @@
                                     <i [class]="run.isPackingCompleted ? 'pi pi-check' : 'pi pi-clock'"></i>
                                     Packing
                                 </span>
+                                <span class="flex items-center gap-1 text-xs px-2 py-1 rounded-full" [class]="{
+                                    'bg-green-100 text-green-800': run.isPostPackingCompleted,
+                                    'bg-gray-100 text-gray-800': !(run.isPostPackingCompleted)
+                                  }">
+                            <i [class]="run.isPostPackingCompleted ? 'pi pi-check' : 'pi pi-clock'"></i>
+                            Post Packing
+                        </span>
                             </div>
                         </div>
                     </div>
@@ -103,13 +110,13 @@
                             <i class="pi pi-check-circle text-xl text-white/80"></i>
                         </div>
                     </div>
-                    <div class="divide-y divide-gray-100">
+                    <div class="divide-y divide-gray-400">
                         <div *ngFor="let run of summaryForUser.completed"
                             class="p-4 hover:bg-gray-50 transition-colors">
                             <div class="flex items-center justify-between mb-3">
                                 <div>
                                     <h4 class="font-semibold text-gray-800 flex items-center gap-2">
-                                        <span class="bg-teal-100 text-teal-800 text-xs px-2 py-1 rounded-full">
+                                        <span class="bg-teal-100 text-teal-800 text-sm px-2 py-1 rounded-full">
                                             Production Run ({{run.productionDate | date:'dd/MM/yyyy | hh:mm a'}})
                                         </span>
                                     </h4>
@@ -128,19 +135,19 @@
                                         </p-chip>
                                     </div>
                                     <div class="grid grid-cols-3 gap-2 mt-2 text-sm">
-                                        <div class="bg-blue-50 p-2 rounded text-center">
+                                        <div class="bg-blue-50 p-2 rounded justify-center flex items-center gap-1">
                                             <div class="text-blue-600 font-bold">{{product.numberOfBoxes}}</div>
                                             <div class="text-xs text-blue-500">Boxes</div>
                                         </div>
-                                        <div class="bg-green-50 p-2 rounded text-center">
+                                        <div class="bg-green-50 p-2 rounded justify-center flex items-center gap-1">
                                             <div class="text-green-600 font-bold">{{product.unit}}</div>
                                             <div class="text-xs text-green-500">Units</div>
                                         </div>
-                                        <div class="bg-purple-50 p-2 rounded text-center">
+                                        <div class="bg-purple-50 p-2 rounded justify-center flex items-center gap-1">
                                             <div class="text-purple-600 font-bold">{{product.numberOfBoxes *
                                                 product.unit}}
                                             </div>
-                                            <div class="text-xs text-purple-500">Total Jars</div>
+                                            <div class="text-xs text-purple-500">Jars</div>
                                         </div>
                                     </div>
                                 </li>
@@ -244,7 +251,6 @@
                 </svg>
                 <h2 class="text-center text-black text-base font-semibold leading-relaxed pb-1">There’s no production
                     run
-                    found here
                 </h2>
             </div>
 
@@ -317,9 +323,5 @@
                     [ngClass]="{'bg-indigo-600': activeView === 'completed', 'bg-transparent': activeView !== 'completed'}">
                 </div>
             </button>
-
-
-
-
         </div>
     </div>

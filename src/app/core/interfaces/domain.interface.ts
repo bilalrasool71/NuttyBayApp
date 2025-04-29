@@ -9,8 +9,10 @@ export interface INBProduct {
     checklistId: number;
     checklistName: string;
     checklistOrder: number;
-    checklistType: number; // 1=PreMaking, 2=Making, 3=PrePacking, 4=Packing
+    checklistType: number;
     isCompleted?:boolean;
+    displayName: string;
+    dateRequired: boolean;
   }
   
   export interface INBChecklistTasks {

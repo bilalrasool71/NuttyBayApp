@@ -6,7 +6,8 @@ export interface ProductionRunDetailResponse {
     nbProducts:NBProduct[];
     preMakingDate: Date; 
     makingDate: Date; 
-    packingDate: Date; 
+    prePackingDate: Date; 
+    postPackingDate: Date;
     prePackingList: ProductPrePackingInfo[];
 }
 
@@ -84,6 +85,7 @@ export interface ProductionRunSummary {
     isMakingCompleted: boolean;
     isPrePackingCompleted: boolean;
     isPackingCompleted: boolean;
+    isPostPackingCompleted: boolean;
     products: ProductStatus[];
 }
 

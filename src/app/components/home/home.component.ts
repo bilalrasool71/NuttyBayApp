@@ -166,15 +166,24 @@ export class HomeComponent implements OnInit {
 
   onNew() {
     this.confirmationService.confirm({
-      message: ' Do you like to start the Production Run Now?',
-      header: 'Production Start',
-      icon: 'pi pi-exclamation-triangle',
-      accept: () => {
-        this.onCreateProductionRun()
-      },
-      reject: () => {
-      }
-      
+        message: 'Do you like to start the Production Run Now?',
+        header: 'Production Start',
+        icon: 'pi pi-exclamation-triangle',
+        accept: () => {
+            this.onCreateProductionRun();
+        },
+        reject: () => {
+            // Reject logic if needed
+        },
+        acceptLabel: 'Yes',
+        acceptIcon: 'pi pi-check',
+        acceptButtonStyleClass: 'p-button-primary',
+        rejectLabel: 'No',
+        rejectIcon: 'pi pi-times',
+        rejectButtonStyleClass: 'p-button-contrast',
+        defaultFocus: 'reject'
     });
-  }
+}
+
+  
 }

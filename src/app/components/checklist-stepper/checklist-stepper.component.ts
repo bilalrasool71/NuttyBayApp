@@ -30,7 +30,8 @@ export class ChecklistStepperComponent implements OnInit, OnDestroy {
     checklistDates = {
         1: null as Date | string | null,
         2: null as Date | string | null,
-        4: null as Date | string | null
+        3: null as Date | string | null,
+        5: null as Date | string | null
     };
 
     constructor(
@@ -43,8 +44,8 @@ export class ChecklistStepperComponent implements OnInit, OnDestroy {
     ) {
         this.route.queryParams.subscribe((params) => {
             this.productionId = params['productionId'] ? Number(params['productionId']) : null;
-            this.currentStep = params['activeTab'] ? Number(params['activeTab']):null;
-            if(this.currentStep) {
+            this.currentStep = params['activeTab'] ? Number(params['activeTab']) : null;
+            if (this.currentStep) {
                 this.activeTab = this.currentStep;
             }
 
@@ -66,9 +67,14 @@ export class ChecklistStepperComponent implements OnInit, OnDestroy {
         this.restService.getProductionRunDetails(Number(this.productionId)).subscribe({
             next: (data) => {
                 this.productionRunData = data;
-                this.checklistDates[1] = new Date(data.preMakingDate);  // Pre-Making
-                this.checklistDates[2] = new Date(data.makingDate);     // Making
-                this.checklistDates[4] = new Date(data.packingDate);    // Packing
+                this.checklistDates[1] = new Date(data.preMakingDate);
+                this.onDateChanged(1, this.checklistDates[1])
+                this.checklistDates[2] = new Date(data.makingDate);
+                this.onDateChanged(2, this.checklistDates[2])
+                this.checklistDates[3] = new Date(data.prePackingDate);
+                this.onDateChanged(3, this.checklistDates[3]);
+                this.checklistDates[5] = new Date(data.postPackingDate);
+                this.onDateChanged(5, this.checklistDates[5])
                 if (this.productionRunData.prePackingList.length > 0) {
                     this.productionRunData.prePackingList.forEach(x => {
                         x.prePackingData.time = new Date(x.prePackingData.time)
@@ -213,7 +219,8 @@ export class ChecklistStepperComponent implements OnInit, OnDestroy {
         { id: 1, label: 'Pre Making', icon: 'pi pi-list-check' },
         { id: 2, label: 'Making', icon: 'pi pi-cog' },
         { id: 3, label: 'Pre Packing', icon: 'pi pi-box' },
-        { id: 4, label: 'Packing', icon: 'pi pi-gift' }
+        { id: 4, label: 'Packing', icon: 'pi pi-gift' },
+        { id: 5, label: 'Post Packing', icon: 'pi pi-gift' }
     ];
 
     activeTab = 1;
@@ -298,5 +305,111 @@ export class ChecklistStepperComponent implements OnInit, OnDestroy {
                     });
             }
         });
+    }
+
+    isTabCompleted(tabId: number): boolean {
+        switch (tabId) {
+            case 1: return this.isChecklistCompleted(1);
+            case 2: return this.isChecklistCompleted(2);
+            case 3: return this.isChecklistCompleted(3);
+            case 4: return this.productionRunData?.prePackingList?.length > 0;
+            case 5: return this.isChecklistCompleted(5);
+            default: return false;
+        }
+    }
+    isChecklistCompleted(checklistId: number): boolean {
+        switch(checklistId) {
+            case 4: // Pre-Packing - must have tasks completed AND pre-packing records
+                const prePackingTasks = this.getChecklistTasks(4);
+                const tasksCompleted = prePackingTasks.length > 0 && 
+                                     prePackingTasks.every(task => task.isCompleted);
+                const hasPrePackingRecords = this.productionRunData?.prePackingList?.length > 0;
+                return tasksCompleted && hasPrePackingRecords;
+                
+            case 5: // Post-Packing - must have tasks completed AND all products have boxes
+                const postPackingTasks = this.getChecklistTasks(5);
+                const postTasksCompleted = postPackingTasks.length > 0 && 
+                                         postPackingTasks.every(task => task.isCompleted);
+                return postTasksCompleted && this.allProductsHaveBoxes();
+                
+            default: // Other checklists (1-3) - just check tasks
+                const tasks = this.getChecklistTasks(checklistId);
+                return tasks.length > 0 && tasks.every(task => task.isCompleted);
+        }
+    }
+
+    canProceedToNextTab(): boolean {
+        switch (this.activeTab) {
+            case 1: return this.isChecklistCompleted(1);
+            case 2: return this.isChecklistCompleted(2);
+            case 3: return this.isChecklistCompleted(3);
+            case 4:
+                return this.productionRunData?.prePackingList?.length > 0;
+            case 5: return this.isChecklistCompleted(5);
+            default: return false;
+        }
+    }
+
+    goToNextTab(): void {
+        if (this.canProceedToNextTab()) {
+            this.activeTab += 1;
+        } else {
+            this.messageService.add({
+                severity: 'warn',
+                summary: 'Incomplete Checklist',
+                detail: 'Please complete all tasks in the current checklist before proceeding'
+            });
+        }
+    }
+
+
+    isTabAccessible(tabId: number): boolean {
+        // Always allow going back to previous tabs
+        if (tabId < this.activeTab) return true;
+        
+        // Current tab is always accessible
+        if (tabId === this.activeTab) return true;
+        
+        // For tabs after current, check requirements
+        switch (tabId) {
+            case 2: return this.isTabCompleted(1); // Making requires Pre-Making
+            case 3: return this.isTabCompleted(1) && this.isTabCompleted(2); // Pre-Packing
+            case 4: return this.isTabCompleted(1) && this.isTabCompleted(2) && this.isTabCompleted(3); // Packing
+            case 5: return this.isTabCompleted(4); // Post Packing requires Packing complete
+            default: return false;
+        }
+    }
+    selectTab(tabId: number): void {
+        if (!this.isTabAccessible(tabId)) {
+            const currentTabName = this.tabs.find(t => t.id === this.activeTab)?.label || 'current step';
+            this.messageService.add({
+                severity: 'warn',
+                summary: 'Complete Required Steps',
+                detail: `Please complete ${currentTabName} and all previous steps before proceeding`
+            });
+            return;
+        }
+        this.activeTab = tabId;
+    }
+
+    canCompleteProduction(): boolean {
+        return this.isChecklistCompleted(5);
+    }
+
+    isNextLogicalTab(tabId: number): boolean {
+        // Find first incomplete tab in sequence
+        if (!this.isTabCompleted(1)) return tabId === 1;
+        if (!this.isTabCompleted(2)) return tabId === 2;
+        if (!this.isTabCompleted(3)) return tabId === 3;
+        if (!this.isTabCompleted(4)) return tabId === 4;
+        if (!this.isTabCompleted(5)) return tabId === 5;
+        
+        return false;
+    }
+
+    allProductsHaveBoxes(): boolean {
+        return this.productionRunData?.products?.every(
+            product => product.numberOfBoxes > 0
+        ) ?? false;
     }
 }    

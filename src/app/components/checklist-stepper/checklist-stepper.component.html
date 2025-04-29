@@ -1,339 +1,391 @@
-<p-confirmdialog />
+    <p-confirmdialog />
 
-<div class="relative bg-gradient-to-r from-indigo-600 to-purple-600 rounded-b-xl shadow-lg overflow-hidden">
-    <div
-        class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiPjxkZWZzPjxwYXR0ZXJuIGlkPSJwYXR0ZXJuIiB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHBhdHRlcm5Vbml0cz0idXNlclNwYWNlT25Vc2UiIHBhdHRlcm5UcmFuc2Zvcm09InJvdGF0ZSg0NSkiPjxyZWN0IHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCIgZmlsbD0icmdiYSgyNTUsMjU1LDI1NSwwLjA1KSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3QgZmlsbD0idXJsKCNwYXR0ZXJuKSIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIvPjwvc3ZnPg==')]">
-    </div>
-
-    <div class="relative z-10 px-6 py-4" *ngIf="productionRunData">
-        <div class="flex items-center justify-between">
-            <div>
-                <button class="text-white hover:bg-white/10 p-2 rounded-full transition-colors" (click)="goToExit()">
-                    <i class="pi pi-arrow-left"></i>
-                </button>
-            </div>
-            <div class="text-center">
-                <h1 class="text-xl font-bold text-white tracking-tight drop-shadow-md">
-                    Production Run
-                </h1>
-                <p class="text-xs text-white/90 font-light mt-1">
-                    {{productionRunData.productionDate | date:'dd MMM yyyy | hh:mm a'}}
-                </p>
-            </div>
-            <div class="relative">
-                <!-- <button class="text-white hover:bg-white/10 p-2 rounded-full transition-colors" (click)="toggleMenu()">
-                    <i class="pi pi-ellipsis-v"></i>
-                </button> -->
-            </div>
+    <div class="relative bg-gradient-to-r from-indigo-600 to-purple-600 rounded-b-xl shadow-lg overflow-hidden">
+        <div
+            class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiPjxkZWZzPjxwYXR0ZXJuIGlkPSJwYXR0ZXJuIiB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHBhdHRlcm5Vbml0cz0idXNlclNwYWNlT25Vc2UiIHBhdHRlcm5UcmFuc2Zvcm09InJvdGF0ZSg0NSkiPjxyZWN0IHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCIgZmlsbD0icmdiYSgyNTUsMjU1LDI1NSwwLjA1KSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3QgZmlsbD0idXJsKCNwYXR0ZXJuKSIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIvPjwvc3ZnPg==')]">
         </div>
-    </div>
-</div>
 
-<!-- Tab Navigation -->
-<div class="sticky top-0 z-10 bg-white shadow-sm">
-    <div class="flex border-b border-gray-200">
-        <button *ngFor="let tab of tabs" (click)="activeTab = tab.id"
-            class="flex-1 py-3 px-2 text-center font-medium text-sm transition-colors" [ngClass]="{
-                    'text-indigo-600 border-b-2 border-indigo-600': activeTab === tab.id,
-                    'text-gray-500 hover:text-gray-700 hover:bg-gray-50': activeTab !== tab.id
-                }">
-            <i [class]="tab.icon + ' mr-2'"></i>
-            {{tab.label}}
-        </button>
-    </div>
-</div>
-
-<!-- Main Content -->
-<div class="p-4 pb-24">
-    <!-- Production Info Card -->
-    <div class="bg-white rounded-xl shadow-md overflow-hidden mb-6 border border-gray-100">
-        <div class="p-4">
+        <div class="relative z-10 px-6 py-4" *ngIf="productionRunData">
             <div class="flex items-center justify-between">
-                <h3 class="font-semibold text-gray-800 flex items-center">
-                    <i class="pi pi-box mr-2 text-indigo-600"></i>
-                    Production Details
-                </h3>
-
-            </div>
-
-            <div class="mt-3">
-                <div class="space-y-2">
-                    <div *ngIf="activeTab === 1" class="flex items-center bg-indigo-50/50 p-2 rounded">
-                        <span class="text-sm font-medium text-gray-700">Soaking/Culture</span>
-                    </div>
-                    
-                    <div *ngIf="activeTab === 2" class="flex items-center bg-indigo-50/50 p-2 rounded">
-                        <span class="text-sm font-medium text-gray-700">Cashew Cheese</span>
-                    </div>
-                    
-                    <div *ngIf="activeTab !== 1 && activeTab !== 2">
-                        <div *ngFor="let product of productionRunData?.products" 
-                             class="flex items-center justify-between bg-indigo-50/50 p-2 rounded">
-                            <span class="text-sm font-medium text-gray-700">{{product.productName}}</span>
-                            <span class="text-xs bg-white px-2 py-1 rounded-full text-gray-600">
-                                {{product.batchNoDate}}
-                            </span>
-                        </div>
-                    </div>
+                <div>
+                    <button class="text-white hover:bg-white/10 p-2 rounded-full transition-colors" (click)="goToExit()">
+                        <i class="pi pi-arrow-left"></i>
+                    </button>
+                </div>
+                <div class="text-center">
+                    <h1 class="text-xl font-bold text-white tracking-tight drop-shadow-md">
+                        Production Run
+                    </h1>
+                    <p class="text-xs text-white/90 font-light mt-1">
+                        {{productionRunData.productionDate | date:'dd MMM yyyy | hh:mm a'}}
+                    </p>
+                </div>
+                <div class="relative">
+                    <!-- <button class="text-white hover:bg-white/10 p-2 rounded-full transition-colors" (click)="toggleMenu()">
+                        <i class="pi pi-ellipsis-v"></i>
+                    </button> -->
                 </div>
             </div>
         </div>
     </div>
-
-    <!-- Tab Content -->
-    <div [ngSwitch]="activeTab">
-        <!-- Pre Making -->
-        <div *ngSwitchCase="1" class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100">
+    <!-- Tab Navigation -->
+    <div class="sticky top-0 z-10 bg-white shadow-sm">
+        <div class="flex">
+            <button *ngFor="let checklist of allChecklists" (click)="selectTab(checklist.checklistId)"
+                class="flex-1 py-3 px-2 text-center font-medium text-sm transition-colors relative" [ngClass]="{
+                        'text-indigo-600 border-b-2 border-indigo-600': activeTab === checklist.checklistId,
+                        'text-gray-500 hover:text-gray-700 hover:bg-gray-50 border-transparent': 
+                            activeTab !== checklist.checklistId && isTabCompleted(checklist.checklistId),
+                        'bg-red-50 text-gray-500 border-transparent': 
+                            activeTab !== checklist.checklistId && !isTabAccessible(checklist.checklistId),
+                        'cursor-pointer bg-blue-50 text-blue-600 border-blue-200': 
+                            isNextLogicalTab(checklist.checklistId) && activeTab !== checklist.checklistId,
+                        'cursor-not-allowed': !isTabAccessible(checklist.checklistId) && !isNextLogicalTab(checklist.checklistId)
+                    }" [disabled]="!isTabAccessible(checklist.checklistId) && !isNextLogicalTab(checklist.checklistId)">
+                {{checklist.displayName}}
+            </button>
+        </div>
+    </div>
+    <!-- Main Content -->
+    <div class="p-4 pb-24">
+        <!-- Production Info Card -->
+        <div class="bg-white rounded-xl shadow-md overflow-hidden mb-6 border border-gray-100">
             <div class="p-4">
-                <div class="flex justify-between items-center mb-4">
-                    <h4 class="text-lg font-semibold text-gray-800 flex items-center">
-                        <i class="pi pi-list-check mr-2 text-indigo-600"></i>
-                        Pre Making Checklist
-                    </h4>
-
-                    <p-float-label variant="on">
-                        <p-date-picker [showTime]="true" [(ngModel)]="checklistDates[1]"  (onSelect)="onDateChanged(1, $event)" [showSeconds]="false" hourFormat="12" dateFormat="dd/mm/yy"
-                            styleClass="!w-50" inputStyleClass="text-sm h-10" appendTo="body">
-                        </p-date-picker>
-                        <label>Start Time</label>
-                    </p-float-label>
+                <div class="flex items-center justify-between">
+                    <ng-container *ngIf="activeTab === 1">
+                        <div class="font-semibold text-gray-800 flex items-center justify-between">
+                            Soaking Culture
+                        </div>
+                        <p-float-label variant="on">
+                            <p-date-picker [showTime]="true" [(ngModel)]="checklistDates[1]"
+                                (onSelect)="onDateChanged(1, $event)" [showSeconds]="false" hourFormat="12"
+                                dateFormat="dd/mm/yy" styleClass="!w-50" inputStyleClass="text-sm h-10" appendTo="body">
+                            </p-date-picker>
+                            <label>Start Time</label>
+                        </p-float-label>
+                    </ng-container>
+                    <ng-container *ngIf="activeTab === 2">
+                        <div class="font-semibold text-gray-800 flex items-center justify-between">
+                            Cashew Cheese
+                        </div>
+                        <p-float-label variant="on">
+                            <p-date-picker [showTime]="true" [(ngModel)]="checklistDates[2]"
+                                (onSelect)="onDateChanged(2, $event)" [showSeconds]="false" hourFormat="12"
+                                dateFormat="dd/mm/yy" styleClass="!w-50" inputStyleClass="text-sm h-10" appendTo="body">
+                            </p-date-picker>
+                            <label>Start Time</label>
+                        </p-float-label>
+                    </ng-container>
+                    <ng-container *ngIf="activeTab === 3">
+                        <div class="font-semibold text-gray-800 flex items-center justify-between">
+                            Cashew Cheese
+                        </div>
+                        <p-float-label variant="on">
+                            <p-date-picker [showTime]="true" [(ngModel)]="checklistDates[3]"
+                                (onSelect)="onDateChanged(3, $event)" [showSeconds]="false" hourFormat="12"
+                                dateFormat="dd/mm/yy" styleClass="!w-50" inputStyleClass="text-sm h-10" appendTo="body">
+                            </p-date-picker>
+                            <label>Start Time</label>
+                        </p-float-label>
+                    </ng-container>
+                    <ng-container *ngIf="activeTab === 4">
+                        <div class="font-semibold text-gray-800 flex items-center justify-between">
+                            Fermentation / Quality Checks
+                        </div>
+                    </ng-container>
+                    <ng-container *ngIf="activeTab === 5">
+                        <div class="font-semibold text-gray-800 flex items-center justify-between">
+                            Cashew Cheese
+                        </div>
+                        <p-float-label variant="on">
+                            <p-date-picker [showTime]="true" [(ngModel)]="checklistDates[5]"
+                                (onSelect)="onDateChanged(5, $event)" [showSeconds]="false" hourFormat="12"
+                                dateFormat="dd/mm/yy" styleClass="!w-50" inputStyleClass="text-sm h-10" appendTo="body">
+                            </p-date-picker>
+                            <label>Start Time</label>
+                        </p-float-label>
+                    </ng-container>
                 </div>
 
-                <ng-container *ngIf="productionRunData?.sharedChecklists">
-                    <div class="space-y-3">
-                        <div *ngFor="let task of getChecklistTasks(1)" class="flex items-start">
-                            <p-checkbox [binary]="true" [(ngModel)]="task.isCompleted" (onChange)="onChange(task, 1)"
-                                [inputId]="'premaking-'+task.taskId" class="mt-1"></p-checkbox>
-                            <label [for]="'premaking-'+task.taskId" class="ml-3 text-sm text-gray-700 cursor-pointer">
-                                {{task.taskDescription}}
-                            </label>
+
+
+                <div class="mt-3" *ngIf="activeTab !== 1 && activeTab !== 2">
+                    <div class="space-y-2">
+                        <div *ngIf="activeTab !== 1 && activeTab !== 2">
+                            <div *ngFor="let product of productionRunData?.products"
+                                class="flex items-center justify-between bg-indigo-50/50 p-2 rounded">
+                                <span class="text-sm font-medium text-gray-700">{{product.productName}}</span>
+                                <span class="text-xs bg-white px-2 py-1 rounded-full text-gray-600">
+                                    {{product.batchNoDate}}
+                                </span>
+                            </div>
                         </div>
                     </div>
-                </ng-container>
+                </div>
             </div>
         </div>
 
-        <!-- Making -->
-        <div *ngSwitchCase="2" class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100">
-            <div class="p-4">
-                <div class="flex justify-between items-center mb-4">
-
-                    <h4 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-                        <i class="pi pi-cog mr-2 text-indigo-600"></i>
-                        Making Checklist
-                    </h4>
-                    <p-float-label variant="on">
-                        <p-date-picker [showTime]="true" [(ngModel)]="checklistDates[2]"   (onSelect)="onDateChanged(2, $event)" [showSeconds]="false" hourFormat="12" dateFormat="dd/mm/yy"
-                            styleClass="!w-50" inputStyleClass="text-sm h-10" appendTo="body">
-                        </p-date-picker>
-                        <label>Start Time</label>
-                    </p-float-label>
-                </div>
-                <ng-container *ngIf="productionRunData?.sharedChecklists">
-                    <div class="space-y-3">
-                        <div *ngFor="let task of getChecklistTasks(2)" class="flex items-start">
-                            <p-checkbox [binary]="true" [(ngModel)]="task.isCompleted" (onChange)="onChange(task, 2)"
-                                [inputId]="'making-'+task.taskId" class="mt-1"></p-checkbox>
-                            <label [for]="'making-'+task.taskId" class="ml-3 text-sm text-gray-700 cursor-pointer">
-                                {{task.taskDescription}}
-                            </label>
-                        </div>
+        <!-- Tab Content -->
+        <div [ngSwitch]="activeTab">
+            <!-- Pre Making -->
+            <div *ngSwitchCase="1" class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100">
+                <div class="p-4">
+                    <div class="flex justify-between items-center mb-4">
+                        <h4 class="text-lg font-semibold text-gray-800 flex items-center">
+                            <i class="pi pi-list-check mr-2 text-indigo-600"></i>
+                            Pre Making Checklist
+                        </h4>
                     </div>
-                </ng-container>
-            </div>
-        </div>
 
-        <!-- Pre Packing -->
-        <div *ngSwitchCase="3" class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100">
-            <div class="p-4">
-                <h4 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-                    <i class="pi pi-flask mr-2 text-indigo-600"></i>
-                    Pre Packing Quality Checks
-                </h4>
-
-                <div class="mb-6">
-                    <p-float-label variant="on">
-                        <p-select [options]="productionRunData.nbProducts" appendTo="body" [(ngModel)]="selectedProduct"
-                            optionLabel="productName" (onChange)="onProductSelected()" styleClass="w-full"
-                            [showClear]="true">
-                        </p-select>
-                        <label>Select Product</label>
-                    </p-float-label>
-                </div>
-
-                <div *ngIf="showPrePackingForm && currentPrePacking && selectedProduct" class="space-y-4">
-                    <div class="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
-                        <div class="flex items-center justify-between mb-4">
-                            <h5 class="font-medium text-gray-800 flex items-center">
-                                <i class="pi pi-tag mr-2"></i>
-                                {{ selectedProduct.productName }}
-                            </h5>
-                            <span class="text-xs bg-gray-100 px-2 py-1 rounded-full text-gray-600">
-                                {{selectedProduct.batchNoDate}}
-                            </span>
-                        </div>
-
-                        <div class="space-y-4">
-                            <div class="flex items-center">
-                                <p-checkbox [binary]="true"
-                                    [(ngModel)]="currentPrePacking.prePackingData.isPhCalibrated"
-                                    [inputId]="'calibration-' + selectedProduct.productId" class="mr-3"></p-checkbox>
-                                <label [for]="'calibration-' + selectedProduct.productId" class="text-sm text-gray-700">
-                                    pH measurer calibrated
+                    <ng-container *ngIf="productionRunData?.sharedChecklists">
+                        <div class="space-y-3">
+                            <div *ngFor="let task of getChecklistTasks(1)" class="flex items-start">
+                                <p-checkbox [binary]="true" [(ngModel)]="task.isCompleted" (onChange)="onChange(task, 1)"
+                                    [inputId]="'premaking-'+task.taskId" class="mt-1"></p-checkbox>
+                                <label [for]="'premaking-'+task.taskId" class="ml-3 text-sm text-gray-700 cursor-pointer">
+                                    {{task.taskDescription}}
                                 </label>
+                            </div>
+                        </div>
+                    </ng-container>
+                </div>
+            </div>
+
+            <!-- Making -->
+            <div *ngSwitchCase="2" class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100">
+                <div class="p-4">
+                    <div class="flex justify-between items-center mb-4">
+
+                        <h4 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                            <i class="pi pi-cog mr-2 text-indigo-600"></i>
+                            Making Checklist
+                        </h4>
+                    </div>
+                    <ng-container *ngIf="productionRunData?.sharedChecklists">
+                        <div class="space-y-3">
+                            <div *ngFor="let task of getChecklistTasks(2)" class="flex items-start">
+                                <p-checkbox [binary]="true" [(ngModel)]="task.isCompleted" (onChange)="onChange(task, 2)"
+                                    [inputId]="'making-'+task.taskId" class="mt-1"></p-checkbox>
+                                <label [for]="'making-'+task.taskId" class="ml-3 text-sm text-gray-700 cursor-pointer">
+                                    {{task.taskDescription}}
+                                </label>
+                            </div>
+                        </div>
+                    </ng-container>
+                </div>
+            </div>
+
+            <!-- Pre Packing -->
+
+            <div *ngSwitchCase="3" class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100">
+                <div class="p-4">
+                    <div class="flex justify-between items-center mb-4">
+
+                        <h4 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                            <i class="pi pi-cog mr-2 text-indigo-600"></i>
+                            Pre Packing Checklist
+                        </h4>
+                    </div>
+                    <ng-container *ngIf="productionRunData?.sharedChecklists">
+                        <div class="space-y-3">
+                            <div *ngFor="let task of getChecklistTasks(3)" class="flex items-start">
+                                <p-checkbox [binary]="true" [(ngModel)]="task.isCompleted" (onChange)="onChange(task, 3)"
+                                    [inputId]="'making-'+task.taskId" class="mt-1"></p-checkbox>
+                                <label [for]="'making-'+task.taskId" class="ml-3 text-sm text-gray-700 cursor-pointer">
+                                    {{task.taskDescription}}
+                                </label>
+                            </div>
+                        </div>
+                    </ng-container>
+                </div>
+            </div>
+
+            <!-- Packing -->
+            <div *ngSwitchCase="4" class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100">
+                <div class="p-4">
+                    <h4 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                        <i class="pi pi-flask mr-2 text-indigo-600"></i>
+                        Packing
+                    </h4>
+
+                    <div class="mb-6">
+                        <p-float-label variant="on">
+                            <p-select [options]="productionRunData.nbProducts" appendTo="body" [(ngModel)]="selectedProduct"
+                                optionLabel="productName" (onChange)="onProductSelected()" styleClass="w-full"
+                                [showClear]="true">
+                            </p-select>
+                            <label>Select Product</label>
+                        </p-float-label>
+                    </div>
+
+                    <div *ngIf="showPrePackingForm && currentPrePacking && selectedProduct" class="space-y-4">
+                        <div class="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+                            <div class="flex items-center justify-between mb-4">
+                                <h5 class="font-medium text-gray-800 flex items-center">
+                                    <i class="pi pi-tag mr-2"></i>
+                                    {{ selectedProduct.productName }}
+                                </h5>
+                                <span class="text-xs bg-gray-100 px-2 py-1 rounded-full text-gray-600">
+                                    {{selectedProduct.batchNoDate}}
+                                </span>
+                            </div>
+
+                            <div class="space-y-4">
+                                <div class="flex items-center">
+                                    <p-checkbox [binary]="true"
+                                        [(ngModel)]="currentPrePacking.prePackingData.isPhCalibrated"
+                                        [inputId]="'calibration-' + selectedProduct.productId" class="mr-3"></p-checkbox>
+                                    <label [for]="'calibration-' + selectedProduct.productId" class="text-sm text-gray-700">
+                                        pH measurer calibrated
+                                    </label>
+                                </div>
+
+                                <div class="grid grid-cols-1 gap-4">
+                                    <p-floatlabel variant="on">
+                                        <p-input-number [(ngModel)]="currentPrePacking.prePackingData.temperature"
+                                            [disabled]="!currentPrePacking.prePackingData.isPhCalibrated" [min]="0"
+                                            [max]="100" suffix="°C" styleClass="w-full">
+                                        </p-input-number>
+                                        <label>Temperature</label>
+                                    </p-floatlabel>
+
+                                    <p-floatlabel variant="on">
+                                        <p-input-number [(ngModel)]="currentPrePacking.prePackingData.ph"
+                                            [disabled]="!currentPrePacking.prePackingData.isPhCalibrated" [min]="0"
+                                            [max]="14" [step]="0.1" [mode]="'decimal'" [maxFractionDigits]="1"
+                                            styleClass="w-full">
+                                        </p-input-number>
+                                        <label>pH Level</label>
+                                    </p-floatlabel>
+
+                                    <p-floatlabel variant="on">
+                                        <p-date-picker [(ngModel)]="currentPrePacking.prePackingData.time"
+                                            [disabled]="!currentPrePacking.prePackingData.isPhCalibrated" [showTime]="true"
+                                            [showSeconds]="false" hourFormat="12" styleClass="w-full" dateFormat="dd/mm/yy">
+                                        </p-date-picker>
+                                        <label>Check Time</label>
+                                    </p-floatlabel>
+                                </div>
+
+                                <button (click)="onSavePrePacking(currentPrePacking)" [disabled]="!canSavePrePacking()"
+                                    class="w-full md:w-auto px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors disabled:bg-indigo-300 flex items-center justify-center">
+                                    <i class="pi pi-save mr-2"></i> Save Measurements
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div *ngFor="let preObj of productionRunData.prePackingList; let i = index" class="mt-6">
+                        <div class="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+                            <div class="flex items-center justify-between mb-4">
+                                <div>
+                                    <h5 class="font-medium text-gray-800 flex items-center">
+                                        <i class="pi pi-tag mr-2"></i>
+                                        {{preObj.productName}}
+                                    </h5>
+                                    <span class="text-xs bg-gray-100 px-2 py-1 rounded-full text-gray-600">
+                                        {{preObj.batchNoDate}}
+                                    </span>
+                                </div>
+                                <div class="flex gap-3">
+                                    <button (click)="onDeletePrePacking(preObj.prePackingData.detailId)"
+                                        class="p-2 flex items-center justify-center text-red-600 hover:text-red-800 rounded-full hover:bg-red-50 transition-colors">
+                                        <i class="pi pi-trash"></i>
+                                    </button>
+                                    <button (click)="onSavePrePacking(preObj)"
+                                        class="w-full md:w-auto p-2 bg-indigo-600 text-white rounded-full hover:bg-indigo-700 transition-colors disabled:bg-indigo-300 flex items-center justify-center">
+                                        <i class="pi pi-save"></i>
+                                    </button>
+
+                                </div>
                             </div>
 
                             <div class="grid grid-cols-1 gap-4">
+                                <div class="flex items-center">
+                                    <p-checkbox [binary]="true" [(ngModel)]="preObj.prePackingData.isPhCalibrated"
+                                        [inputId]="'calibration-' + i" class="mr-3"></p-checkbox>
+                                    <label [for]="'calibration-' + i" class="text-sm text-gray-700">
+                                        pH measurer calibrated
+                                    </label>
+                                </div>
+
                                 <p-floatlabel variant="on">
-                                    <p-input-number [(ngModel)]="currentPrePacking.prePackingData.temperature"
-                                        [disabled]="!currentPrePacking.prePackingData.isPhCalibrated" [min]="0"
-                                        [max]="100" suffix="°C" styleClass="w-full">
+                                    <p-input-number [(ngModel)]="preObj.prePackingData.temperature"
+                                        [disabled]="!preObj.prePackingData.isPhCalibrated" [min]="0" [max]="100"
+                                        suffix="°C">
                                     </p-input-number>
                                     <label>Temperature</label>
                                 </p-floatlabel>
 
                                 <p-floatlabel variant="on">
-                                    <p-input-number [(ngModel)]="currentPrePacking.prePackingData.ph"
-                                        [disabled]="!currentPrePacking.prePackingData.isPhCalibrated" [min]="0"
-                                        [max]="14" [step]="0.1" [mode]="'decimal'" [maxFractionDigits]="1"
-                                        styleClass="w-full">
+                                    <p-input-number [(ngModel)]="preObj.prePackingData.ph"
+                                        [disabled]="!preObj.prePackingData.isPhCalibrated" [min]="0" [max]="14" [step]="0.1"
+                                        [mode]="'decimal'" [maxFractionDigits]="1" styleClass="w-full">
                                     </p-input-number>
                                     <label>pH Level</label>
                                 </p-floatlabel>
 
-                                <p-floatlabel variant="on">
-                                    <p-date-picker [(ngModel)]="currentPrePacking.prePackingData.time"
-                                        [disabled]="!currentPrePacking.prePackingData.isPhCalibrated" [showTime]="true"
-                                        [showSeconds]="false" hourFormat="12" styleClass="w-full" dateFormat="dd/mm/yy">
+                                <p-float-label variant="on">
+                                    <p-date-picker [(ngModel)]="preObj.prePackingData.time"
+                                        [disabled]="!preObj.prePackingData.isPhCalibrated" [showTime]="true"
+                                        [showSeconds]="false" hourFormat="12" dateFormat="dd/mm/yy" styleClass="w-full">
                                     </p-date-picker>
                                     <label>Check Time</label>
-                                </p-floatlabel>
+                                </p-float-label>
                             </div>
-
-                            <button (click)="onSavePrePacking(currentPrePacking)" [disabled]="!canSavePrePacking()"
-                                class="w-full md:w-auto px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors disabled:bg-indigo-300 flex items-center justify-center">
-                                <i class="pi pi-save mr-2"></i> Save Measurements
-                            </button>
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <div *ngFor="let preObj of productionRunData.prePackingList; let i = index" class="mt-6">
-                    <div class="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
-                        <div class="flex items-center justify-between mb-4">
-                            <div>
-                                <h5 class="font-medium text-gray-800 flex items-center">
-                                    <i class="pi pi-tag mr-2"></i>
-                                    {{preObj.productName}}
-                                </h5>
-                                <span class="text-xs bg-gray-100 px-2 py-1 rounded-full text-gray-600">
-                                    {{preObj.batchNoDate}}
-                                </span>
-                            </div>
-                            <div class="flex gap-3">
-                                <button (click)="onDeletePrePacking(preObj.prePackingData.detailId)"
-                                    class="p-2 flex items-center justify-center text-red-600 hover:text-red-800 rounded-full hover:bg-red-50 transition-colors">
-                                    <i class="pi pi-trash"></i>
-                                </button>
-                                <button (click)="onSavePrePacking(preObj)"
-                                class="w-full md:w-auto p-2 bg-indigo-600 text-white rounded-full hover:bg-indigo-700 transition-colors disabled:bg-indigo-300 flex items-center justify-center">
-                                <i class="pi pi-save"></i>
-                            </button>
+            <!-- Packing -->
+            <div *ngSwitchCase="5" class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100">
+                <div class="p-4">
+                    <div class="flex justify-between items-center mb-4">
 
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-1 gap-4">
-                            <div class="flex items-center">
-                                <p-checkbox [binary]="true" [(ngModel)]="preObj.prePackingData.isPhCalibrated"
-                                    [inputId]="'calibration-' + i" class="mr-3"></p-checkbox>
-                                <label [for]="'calibration-' + i" class="text-sm text-gray-700">
-                                    pH measurer calibrated
+                        <h4 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                            <i class="pi pi-shopping-bag mr-2 text-indigo-600"></i>
+                            Packing Checklist
+                        </h4>
+                    </div>
+                    <ng-container *ngIf="productionRunData?.sharedChecklists">
+                        <div class="space-y-3">
+                            <div *ngFor="let task of getChecklistTasks(5)" class="flex items-start">
+                                <p-checkbox [binary]="true" [(ngModel)]="task.isCompleted" (onChange)="onChange(task, 5)"
+                                    [inputId]="'packing-'+task.taskId" class="mt-1"></p-checkbox>
+                                <label [for]="'packing-'+task.taskId" class="ml-3 text-sm text-gray-700 cursor-pointer">
+                                    {{task.taskDescription}}
                                 </label>
                             </div>
-
-                            <p-floatlabel variant="on">
-                                <p-input-number [(ngModel)]="preObj.prePackingData.temperature"
-                                    [disabled]="!preObj.prePackingData.isPhCalibrated" [min]="0" [max]="100"
-                                    suffix="°C">
-                                </p-input-number>
-                                <label>Temperature</label>
-                            </p-floatlabel>
-
-                            <p-floatlabel variant="on">
-                                <p-input-number [(ngModel)]="preObj.prePackingData.ph"
-                                    [disabled]="!preObj.prePackingData.isPhCalibrated" [min]="0" [max]="14" [step]="0.1"
-                                    [mode]="'decimal'" [maxFractionDigits]="1" styleClass="w-full">
-                                </p-input-number>
-                                <label>pH Level</label>
-                            </p-floatlabel>
-
-                            <p-float-label variant="on">
-                                <p-date-picker [(ngModel)]="preObj.prePackingData.time"
-                                    [disabled]="!preObj.prePackingData.isPhCalibrated" [showTime]="true"
-                                    [showSeconds]="false" hourFormat="12" dateFormat="dd/mm/yy" styleClass="w-full">
-                                </p-date-picker>
-                                <label>Check Time</label>
-                            </p-float-label>
                         </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+                    </ng-container>
 
-        <!-- Packing -->
-        <div *ngSwitchCase="4" class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100">
-            <div class="p-4">
-                <div class="flex justify-between items-center mb-4">
+                    <!-- Box Count Section -->
+                    <div class="mt-6">
+                        <h5 class="font-medium text-gray-800 mb-3 flex items-center">
+                            <i class="pi pi-chart-bar mr-2 text-indigo-600"></i>
+                            Production Quantities
+                        </h5>
 
-                    <h4 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-                        <i class="pi pi-shopping-bag mr-2 text-indigo-600"></i>
-                        Packing Checklist
-                    </h4>
-                    <p-float-label variant="on">
-                        <p-date-picker [(ngModel)]="checklistDates[4]"  (onSelect)="onDateChanged(4, $event)" [showTime]="true" [showSeconds]="false" hourFormat="12" dateFormat="dd/mm/yy"
-                            styleClass="!w-50" inputStyleClass="text-sm h-10" appendTo="body">
-                        </p-date-picker>
-                        <label>Start Time</label>
-                    </p-float-label>
-                </div>
-                <ng-container *ngIf="productionRunData?.sharedChecklists">
-                    <div class="space-y-3">
-                        <div *ngFor="let task of getChecklistTasks(4)" class="flex items-start">
-                            <p-checkbox [binary]="true" [(ngModel)]="task.isCompleted" (onChange)="onChange(task, 4)"
-                                [inputId]="'packing-'+task.taskId" class="mt-1"></p-checkbox>
-                            <label [for]="'packing-'+task.taskId" class="ml-3 text-sm text-gray-700 cursor-pointer">
-                                {{task.taskDescription}}
-                            </label>
-                        </div>
-                    </div>
-                </ng-container>
-
-                <!-- Box Count Section -->
-                <div class="mt-6">
-                    <h5 class="font-medium text-gray-800 mb-3 flex items-center">
-                        <i class="pi pi-chart-bar mr-2 text-indigo-600"></i>
-                        Production Quantities
-                    </h5>
-
-                    <div class="space-y-4" *ngIf="productionRunData">
-                        <div *ngFor="let product of productionRunData.products" class="bg-gray-50 p-3 rounded-lg">
-                            <div class="flex items-center justify-between mb-2">
-                                <span class="font-medium text-gray-700">{{product.productName}}</span>
-                                <span class="text-xs bg-white px-2 py-1 rounded-full text-gray-600">
-                                    {{product.batchNoDate}}
-                                </span>
-                            </div>
-
-                            <div class="flex items-center justify-between">
-                                <div class="basis-4/5">
-                                    <span class="text-sm text-gray-600">Number of Boxes Produced</span>
+                        <div class="space-y-4" *ngIf="productionRunData">
+                            <div *ngFor="let product of productionRunData.products" class="bg-gray-50 p-3 rounded-lg">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="font-medium text-gray-700">{{product.productName}}</span>
+                                    <span class="text-xs bg-white px-2 py-1 rounded-full text-gray-600">
+                                        {{product.batchNoDate}}
+                                    </span>
                                 </div>
-                                <div class="basis-1/5">
-                                    <p-input-number [(ngModel)]="product.numberOfBoxes"
-                                        (onInput)="updateProductBoxCount(product)" [min]="0" [max]="999" mode="decimal"
-                                        class="w-24" inputStyleClass="text-center h-10">
-                                    </p-input-number>
+
+                                <div class="flex items-center justify-between">
+                                    <div class="basis-4/5">
+                                        <span class="text-sm text-gray-600">Number of Boxes Produced</span>
+                                    </div>
+                                    <div class="basis-1/5">
+                                        <p-input-number [(ngModel)]="product.numberOfBoxes"
+                                            (onInput)="updateProductBoxCount(product)" [min]="0" [max]="999" mode="decimal"
+                                            class="w-24" inputStyleClass="text-center h-10">
+                                        </p-input-number>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -342,28 +394,22 @@
             </div>
         </div>
     </div>
-</div>
 
-<!-- Fixed Action Buttons -->
-<div class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-50 p-3">
-    <div class="flex justify-between items-center max-w-md mx-auto">
-        <button *ngIf="activeTab > 1" (click)="activeTab = activeTab - 1"
-            class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors flex items-center">
-            <i class="pi pi-arrow-left mr-2"></i> Back
-        </button>
-        <button *ngIf="activeTab < 4" (click)="activeTab = activeTab + 1"
-            class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors flex items-center ml-auto">
-            Continue <i class="pi pi-arrow-right ml-2"></i>
-        </button>
-        <button *ngIf="activeTab === 4" (click)="onCompleteProduction()"
-            class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center ml-auto">
-            <i class="pi pi-check mr-2"></i> Complete Production
-        </button>
-        <button *ngIf="activeTab < 4" (click)="onSaveAndExit()"
-            class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors flex items-center ml-2">
-            <i class="pi pi-sign-out mr-2"></i> Save & Exit
-        </button>
+    <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-50 p-3">
+        <div class="flex justify-between items-center max-w-md mx-auto">
+            <button *ngIf="activeTab > 1" (click)="activeTab = activeTab - 1"
+                class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors flex items-center">
+                <i class="pi pi-arrow-left mr-2"></i> Back
+            </button>
+            <button *ngIf="activeTab === 5" (click)="onCompleteProduction()" [disabled]="!canCompleteProduction()"
+                class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:bg-green-300 flex items-center ml-auto">
+                <i class="pi pi-check mr-2"></i> Complete Production
+            </button>
+
+            <button *ngIf="activeTab < 5" (click)="onSaveAndExit()"
+                class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors flex items-center ml-2">
+                <i class="pi pi-sign-out mr-2"></i> Save & Exit
+            </button>
+        </div>
     </div>
-</div>
-
-<p-toast></p-toast>
+    <p-toast></p-toast>
