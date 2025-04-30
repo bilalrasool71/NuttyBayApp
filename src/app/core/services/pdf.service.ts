@@ -82,26 +82,25 @@ export class PdfService {
   private generateHtmlTemplate(data: ProductionRunDetailResponse): string {
     const headerTemplate = `
       <header style="position: fixed; top: -30px; width: 100%; background: white; z-index: 100; padding-top: 30px;">
-        <div class="header-container" style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 15px; border-bottom: 1px solid #e0e0e0;">
-          <div class="logo-container" style="width: 120px;">
-            <img src="https://nuttybay.com.au/cdn/shop/files/Layer_4_600x200.png" class="logo" alt="Company Logo" style="height: 60px; width: auto;">
+        <div class="header-container" style="display: flex; justify-content: space-between; align-items: flex-start; padding-bottom: 15px; border-bottom: 1px solid #e0e0e0;">
+          <div class="logo-container" style="width: 200px;">
+            <img src="https://nuttybay.com.au/cdn/shop/files/Layer_4_600x200.png" class="logo" alt="Company Logo" style="height: 80px; width: auto;">
           </div>
           
-          <div class="title-container" style="flex-grow: 1; text-align: center;">
-            <div class="document-title" style="font-size: 24px; font-weight: bold; color: #2c3e50;">Production Report</div>
-          </div>
-          
-          <div class="user-container" style="text-align: right; width: 200px;">
-            <div class="user-info" style="font-size: 14px; color: #666;">
-              ${this.loggedInUser.firstName} ${this.loggedInUser.lastName}
+          <div class="title-container" style="text-align: right;">
+            <div class="document-title" style="font-size: 40px; font-weight: bold; color: #2c3e50; margin-bottom: 5px;">
+              Production Report
             </div>
-            <div class="user-info" style="font-size: 14px; color: #666;">
-              ${this.formatDateTime(new Date(data.productionDate))}
+            <div class="created-by" style="font-size: 14px; color: #666;">
+              Created by: ${this.loggedInUser.firstName} ${this.loggedInUser.lastName}
             </div>
           </div>
         </div>
       </header>
     `;
+
+    // Group packing items by product and batch
+    const groupedPackingItems = this.groupPackingItems(data.prePackingList);
 
     return `
       <!DOCTYPE html>
@@ -118,13 +117,13 @@ export class PdfService {
           
           .page-section {
             page-break-after: always;
-            padding-top: 100px;
+            padding-top: 120px;
             min-height: 80vh;
           }
           
           .summary-page {
             page-break-before: always;
-            padding-top: 100px;
+            padding-top: 120px;
           }
           
           .checklist-header {
@@ -145,7 +144,7 @@ export class PdfService {
           .checklist-subtitle {
             font-size: 16px;
             color: #555;
-            margin-left: 10px;
+            margin-left: 0px;
           }
           
           .checklist-date {
@@ -227,7 +226,7 @@ export class PdfService {
           
           .quantities-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: repeat(2, 1fr);
             gap: 15px;
           }
           
@@ -285,6 +284,34 @@ export class PdfService {
             font-weight: 500;
             display: inline-block;
           }
+          
+          .product-group {
+            margin-bottom: 15px;
+            border: 1px solid #eee;
+            border-radius: 4px;
+            overflow: hidden;
+          }
+          
+          .product-group-header {
+            background-color: #f5f5f5;
+            padding: 8px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+          }
+          
+          .product-group-content {
+            padding: 0;
+          }
+          
+          .product-group-table {
+            margin: 0;
+            border: none;
+          }
+          
+          .product-group-table th {
+            background-color: #f9f9f9;
+          }
         </style>
       </head>
       <body>
@@ -294,11 +321,11 @@ export class PdfService {
         <div class="page-section">
           <div class="checklist-header">
             <div>
-              <span class="checklist-title">Pre-Making</span>
-              <span class="checklist-subtitle">Soaking/Culture</span>
+              <span class="checklist-title">Pre Making</span>
+              <span class="checklist-subtitle">- Soaking Culture</span>
             </div>
             <div class="checklist-date">
-              ${data.preMakingDate ? this.formatDateTime(new Date(data.preMakingDate)) : 'Not completed'}
+              Date: ${data.preMakingDate ? this.formatDateTime(new Date(data.preMakingDate)) : 'Not completed'}
             </div>
           </div>
           ${this.generateChecklistTable(data.sharedChecklists.find(c => c.checklistId === 1))}
@@ -309,10 +336,10 @@ export class PdfService {
           <div class="checklist-header">
             <div>
               <span class="checklist-title">Making</span>
-              <span class="checklist-subtitle">Cashew Cheese</span>
+              <span class="checklist-subtitle">- Cashew Cheese</span>
             </div>
             <div class="checklist-date">
-              ${data.makingDate ? this.formatDateTime(new Date(data.makingDate)) : 'Not completed'}
+              Date: ${data.makingDate ? this.formatDateTime(new Date(data.makingDate)) : 'Not completed'}
             </div>
           </div>
           ${this.generateChecklistTable(data.sharedChecklists.find(c => c.checklistId === 2))}
@@ -322,11 +349,11 @@ export class PdfService {
         <div class="page-section">
           <div class="checklist-header">
             <div>
-              <span class="checklist-title">Pre-Packing</span>
-              <span class="checklist-subtitle">Fermentation</span>
+              <span class="checklist-title">Pre Packing</span>
+              <span class="checklist-subtitle">- Cashew Cheese</span>
             </div>
             <div class="checklist-date">
-              ${data.prePackingDate ? this.formatDateTime(new Date(data.prePackingDate)) : 'Not completed'}
+              Date: ${data.prePackingDate ? this.formatDateTime(new Date(data.prePackingDate)) : 'Not completed'}
             </div>
           </div>
           ${this.generateChecklistTable(data.sharedChecklists.find(c => c.checklistId === 3))}
@@ -337,49 +364,54 @@ export class PdfService {
           <div class="checklist-header">
             <div>
               <span class="checklist-title">Packing</span>
-              <span class="checklist-subtitle">Quality Checks</span>
+              <span class="checklist-subtitle">- Flavours Quality Checks</span>
             </div>
             <div class="checklist-date">
-              ${data.postPackingDate ? this.formatDateTime(new Date(data.postPackingDate)) : 'Not completed'}
+              Date: ${data.postPackingDate ? this.formatDateTime(new Date(data.postPackingDate)) : 'Not completed'}
             </div>
           </div>
-          <table>
-            <thead>
-              <tr>
-                <th class="left-align">Product</th>
-                <th class="left-align">Batch#</th>
-                <th class="center-align">Temperature</th>
-                <th class="center-align">pH</th>
-                <th class="center-align">Date & Time</th>
-                <th class="center-align">pH Calibrated</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${data.prePackingList.map(item => {
-                const validBatchDate = this.parseValidBatchDate(item.validBatch);
-                return `
-                <tr>
-                  <td class="left-align">${item.productName}</td>
-                  <td class="left-align">${item.batchNoDate || 'N/A'}</td>
-                  <td class="center-align">${item.prePackingData.temperature || 'N/A'} ℃</td>
-                  <td class="center-align">${item.prePackingData.ph || 'N/A'}</td>
-                  <td class="center-align">${item.prePackingData.time ? this.formatDateTime(new Date(item.prePackingData.time)) : 'N/A'}</td>
-                  <td class="center-align">${item.prePackingData.isPhCalibrated ? '✓' : '✗'}</td>
-                </tr>
-              `}).join('')}
-            </tbody>
-          </table>
+          
+          ${groupedPackingItems.map(group => `
+            <div class="product-group">
+              <div class="product-group-header">
+                <span>${group.productName}</span>
+                <span>Batch: ${group.batchNoDate || 'N/A'}</span>
+              </div>
+              <div class="product-group-content">
+                <table class="product-group-table">
+                  <thead>
+                    <tr>
+                      <th class="center-align">Temperature</th>
+                      <th class="center-align">pH</th>
+                      <th class="center-align">Date & Time</th>
+                      <th class="center-align">pH Calibrated</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${group.items.map((item:any) => `
+                      <tr>
+                        <td class="center-align">${item.prePackingData.temperature || 'N/A'} ℃</td>
+                        <td class="center-align">${item.prePackingData.ph || 'N/A'}</td>
+                        <td class="center-align">${item.prePackingData.time ? this.formatDateTime(new Date(item.prePackingData.time)) : 'N/A'}</td>
+                        <td class="center-align">${item.prePackingData.isPhCalibrated ? '✓' : '✗'}</td>
+                      </tr>
+                    `).join('')}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          `).join('')}
         </div>
         
         <!-- 5. Post-Packing Section -->
         <div class="page-section">
           <div class="checklist-header">
             <div>
-              <span class="checklist-title">Post-Packing</span>
-              <span class="checklist-subtitle">Final Checks</span>
+              <span class="checklist-title">Post Packing</span>
+              <span class="checklist-subtitle">- Flavours</span>
             </div>
             <div class="checklist-date">
-              ${data.postPackingDate ? this.formatDateTime(new Date(data.postPackingDate)) : 'Not completed'}
+              Date: ${data.postPackingDate ? this.formatDateTime(new Date(data.postPackingDate)) : 'Not completed'}
             </div>
           </div>
           ${this.generateChecklistTable(data.sharedChecklists.find(c => c.checklistId === 5))}
@@ -394,24 +426,22 @@ export class PdfService {
               ${data.products.map(product => `
                 <div class="product-quantity">
                   <div class="product-name">${product.productName}</div>
-                  <div>
-                    <div>Batch Number</div>
-                    <div class="batch-number">${product.batchNoDate || 'N/A'}</div>
+                  <div class="quantity-row">
+                    <span class="quantity-label">Batch Number:</span>
+                    <span class="quantity-value">${product.batchNoDate || 'N/A'}</span>
                   </div>
-                  <div>
-                    <div>Best Before Date</div>
-                    <div>${this.parseValidBatchDate(product.validBatch)}
+                  <div class="quantity-row">
+                    <span class="quantity-label">Best Before Date:</span>
+                    <span class="quantity-value">${this.formatValidBatchDate(product.validBatch) || 'N/A'}</span>
                   </div>
                   <div class="quantity-row">
                     <span class="quantity-label">Boxes Produced:</span>
                     <span class="quantity-value">${product.numberOfBoxes || 0}</span>
                   </div>
-                  
                   <div class="quantity-row">
                     <span class="quantity-label">Units per Box:</span>
                     <span class="quantity-value">${product.unit || 0}</span>
                   </div>
-                  
                   <div class="total-jars">
                     Total Jars: ${(product.numberOfBoxes || 0) * (product.unit || 0)}
                   </div>
@@ -432,7 +462,7 @@ export class PdfService {
               </thead>
               <tbody>
                 <tr>
-                  <td>Pre-Making</td>
+                  <td>Pre Making</td>
                   <td class="${data.sharedChecklists.find(c => c.checklistId === 1)?.tasks.every(t => t.isCompleted) ? 'checkmark' : 'cross'}">
                     ${data.sharedChecklists.find(c => c.checklistId === 1)?.tasks.every(t => t.isCompleted) ? '✓' : '✗'}
                   </td>
@@ -444,7 +474,7 @@ export class PdfService {
                   </td>
                 </tr>
                 <tr>
-                  <td>Pre-Packing</td>
+                  <td>Pre Packing</td>
                   <td class="${data.sharedChecklists.find(c => c.checklistId === 3)?.tasks.every(t => t.isCompleted) ? 'checkmark' : 'cross'}">
                     ${data.sharedChecklists.find(c => c.checklistId === 3)?.tasks.every(t => t.isCompleted) ? '✓' : '✗'}
                   </td>
@@ -456,7 +486,7 @@ export class PdfService {
                   </td>
                 </tr>
                 <tr>
-                  <td>Post-Packing</td>
+                  <td>Post Packing</td>
                   <td class="${data.sharedChecklists.find(c => c.checklistId === 5)?.tasks.every(t => t.isCompleted) ? 'checkmark' : 'cross'}">
                     ${data.sharedChecklists.find(c => c.checklistId === 5)?.tasks.every(t => t.isCompleted) ? '✓' : '✗'}
                   </td>
@@ -470,16 +500,37 @@ export class PdfService {
     `;
   }
 
-  public parseValidBatchDate(validBatch: string | null): Date | null {
+  private groupPackingItems(items: any[]): any[] {
+    const groups: any[] = [];
+    const groupMap = new Map<string, any>();
+    
+    items.forEach(item => {
+      const key = `${item.productName}_${item.batchNoDate}`;
+      if (!groupMap.has(key)) {
+        const group = {
+          productName: item.productName,
+          batchNoDate: item.batchNoDate,
+          items: []
+        };
+        groupMap.set(key, group);
+        groups.push(group);
+      }
+      groupMap.get(key).items.push(item);
+    });
+    
+    return groups;
+  }
+
+  private formatValidBatchDate(validBatch: string | null): string | null {
     if (!validBatch || validBatch.length < 6) return null;
 
     try {
       const datePart = validBatch.slice(-6);
-      const day = parseInt(datePart.substring(0, 2));
-      const month = parseInt(datePart.substring(2, 4)) - 1;
+      const day = datePart.substring(0, 2);
+      const month = datePart.substring(2, 4);
       const year = 2000 + parseInt(datePart.substring(4, 6));
 
-      return new Date(year, month, day);
+      return `${day}/${month}/${year}`;
     } catch {
       return null;
     }
@@ -529,6 +580,4 @@ export class PdfService {
   private formatDateTime(date: Date): string {
     return `${this.formatDate(date)}, ${this.formatTime(date)}`;
   }
-
-  
 }

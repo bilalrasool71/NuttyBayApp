@@ -256,15 +256,15 @@ export class ChecklistStepperComponent implements OnInit, OnDestroy {
 
 
     onCompleteProduction(): void {
-        // Implement completion logic
-        this.messageService.add({ severity: 'success', summary: 'Completed', detail: 'Production run completed' });
-        this.router.navigate(['/app']);
+        this.router.navigate(['/app'], {
+            queryParams: { view: 'completed' }
+        });
     }
 
     onSaveAndExit(): void {
-        // Implement save and exit logic
-        this.messageService.add({ severity: 'info', summary: 'Saved', detail: 'Progress saved' });
-        this.router.navigate(['/app']);
+        this.router.navigate(['/app'], {
+            queryParams: { view: 'in-progress' }
+        });
     }
 
     onDateChanged(checklistId: number, newDate: Date) {

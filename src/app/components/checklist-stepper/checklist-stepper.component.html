@@ -54,7 +54,7 @@
                 <div class="flex items-center justify-between">
                     <ng-container *ngIf="activeTab === 1">
                         <div class="font-semibold text-gray-800 flex items-center justify-between">
-                            Soaking Culture
+                            Pre Making - Soaking Culture
                         </div>
                         <p-float-label variant="on">
                             <p-date-picker [showTime]="true" [(ngModel)]="checklistDates[1]"
@@ -66,7 +66,7 @@
                     </ng-container>
                     <ng-container *ngIf="activeTab === 2">
                         <div class="font-semibold text-gray-800 flex items-center justify-between">
-                            Cashew Cheese
+                            Making - Cashew Cheese
                         </div>
                         <p-float-label variant="on">
                             <p-date-picker [showTime]="true" [(ngModel)]="checklistDates[2]"
@@ -78,7 +78,7 @@
                     </ng-container>
                     <ng-container *ngIf="activeTab === 3">
                         <div class="font-semibold text-gray-800 flex items-center justify-between">
-                            Cashew Cheese
+                            Pre Packing - Cashew Cheese
                         </div>
                         <p-float-label variant="on">
                             <p-date-picker [showTime]="true" [(ngModel)]="checklistDates[3]"
@@ -90,28 +90,28 @@
                     </ng-container>
                     <ng-container *ngIf="activeTab === 4">
                         <div class="font-semibold text-gray-800 flex items-center justify-between">
-                            Fermentation / Quality Checks
+                            Packing - Flavours Quality Checks
                         </div>
                     </ng-container>
                     <ng-container *ngIf="activeTab === 5">
                         <div class="font-semibold text-gray-800 flex items-center justify-between">
-                            Cashew Cheese
+                            Post Packing - Flavours
                         </div>
-                        <p-float-label variant="on">
+                        <!-- <p-float-label variant="on">
                             <p-date-picker [showTime]="true" [(ngModel)]="checklistDates[5]"
                                 (onSelect)="onDateChanged(5, $event)" [showSeconds]="false" hourFormat="12"
                                 dateFormat="dd/mm/yy" styleClass="!w-50" inputStyleClass="text-sm h-10" appendTo="body">
                             </p-date-picker>
                             <label>Start Time</label>
-                        </p-float-label>
+                        </p-float-label> -->
                     </ng-container>
                 </div>
 
 
 
-                <div class="mt-3" *ngIf="activeTab !== 1 && activeTab !== 2">
+                <div class="mt-3" *ngIf="activeTab !== 1 && activeTab !== 2 && activeTab != 3">
                     <div class="space-y-2">
-                        <div *ngIf="activeTab !== 1 && activeTab !== 2">
+                        <div *ngIf="activeTab !== 1 && activeTab !== 2  && activeTab != 3">
                             <div *ngFor="let product of productionRunData?.products"
                                 class="flex items-center justify-between bg-indigo-50/50 p-2 rounded">
                                 <span class="text-sm font-medium text-gray-700">{{product.productName}}</span>
@@ -132,8 +132,7 @@
                 <div class="p-4">
                     <div class="flex justify-between items-center mb-4">
                         <h4 class="text-lg font-semibold text-gray-800 flex items-center">
-                            <i class="pi pi-list-check mr-2 text-indigo-600"></i>
-                            Pre Making Checklist
+                            Task required for compliance
                         </h4>
                     </div>
 
@@ -157,8 +156,7 @@
                     <div class="flex justify-between items-center mb-4">
 
                         <h4 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-                            <i class="pi pi-cog mr-2 text-indigo-600"></i>
-                            Making Checklist
+                            Task required for compliance
                         </h4>
                     </div>
                     <ng-container *ngIf="productionRunData?.sharedChecklists">
@@ -182,9 +180,8 @@
                     <div class="flex justify-between items-center mb-4">
 
                         <h4 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-                            <i class="pi pi-cog mr-2 text-indigo-600"></i>
-                            Pre Packing Checklist
-                        </h4>
+                            Task required for compliance
+                                                </h4>
                     </div>
                     <ng-container *ngIf="productionRunData?.sharedChecklists">
                         <div class="space-y-3">
@@ -204,8 +201,7 @@
             <div *ngSwitchCase="4" class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100">
                 <div class="p-4">
                     <h4 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-                        <i class="pi pi-flask mr-2 text-indigo-600"></i>
-                        Packing
+                        Task required for compliance
                     </h4>
 
                     <div class="mb-6">
@@ -344,8 +340,7 @@
                     <div class="flex justify-between items-center mb-4">
 
                         <h4 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-                            <i class="pi pi-shopping-bag mr-2 text-indigo-600"></i>
-                            Post Packing Checklist
+                            Task required for compliance
                         </h4>
                     </div>
                     <ng-container *ngIf="productionRunData?.sharedChecklists">

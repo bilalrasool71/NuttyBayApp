@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth-service/auth.service';
 import { UtilsModule } from '../../core/utilities/utils.module';
 import { IListOfValue } from '../../core/interfaces/common.interface';
@@ -24,7 +24,8 @@ export class HomeComponent implements OnInit {
   selectedDate: Date = new Date();
   products: INBProduct[] = [];
   productionRunData!: ProductionRunDetailResponse;
-  activeView: 'in-progress' | 'completed' | 'new' = 'in-progress';
+  activeView !: 'in-progress' | 'completed' | 'new';
+  params: any;
 
   summaryForUser: UserProductionRunSummaryResponse = { completed: [], inProgress: [] };
   constructor(
@@ -32,7 +33,8 @@ export class HomeComponent implements OnInit {
     private router: Router,
     private restService: RestService,
     private pdfService: PdfService,
-    private confirmationService: ConfirmationService
+    private confirmationService: ConfirmationService,
+    private route: ActivatedRoute
   ) {
     this.loggedInUser = this.authService.getUserData();
   }
@@ -40,6 +42,9 @@ export class HomeComponent implements OnInit {
   ngOnInit(): void {
     this.loadProducts();
     this.loadUserSummary();
+    this.route.queryParams.subscribe(params => {
+      this.params = params;
+    });
   }
 
   onCreateProductionRun(): void {
@@ -69,8 +74,19 @@ export class HomeComponent implements OnInit {
     this.restService.getUserProductionRuns(Number(this.loggedInUser.userId)).subscribe({
       next: (data) => {
         this.summaryForUser = data;
-        if (data.completed.length > 0) {
+        if (this.route.snapshot.queryParams['view']) {
+          this.activeView = this.route.snapshot.queryParams['view'] as 'in-progress' | 'completed';
+          return;
+        }
+
+        // If no query parameter, determine view based on data
+        if (data.completed.length > 0 && data.inProgress.length > 0) {
+          // If both have data, default to completed
           this.activeView = 'completed';
+        } else if (data.completed.length > 0) {
+          this.activeView = 'completed';
+        } else if (data.inProgress.length > 0) {
+          this.activeView = 'in-progress';
         }
       },
       error: () => console.error('Error loading production run data.')
@@ -79,15 +95,15 @@ export class HomeComponent implements OnInit {
 
   navigateToChecklist(run: any): void {
     let activeTab: number = 1;
-    if(!run.isPreMakingCompleted) {
+    if (!run.isPreMakingCompleted) {
       activeTab = 1;
-    } else if(!run.isMakingCompleted) {
+    } else if (!run.isMakingCompleted) {
       activeTab = 2;
-    } else if(!run.isPrePackingCompleted) {
+    } else if (!run.isPrePackingCompleted) {
       activeTab = 3;
-    } else if(!run.isPackingCompleted) {
+    } else if (!run.isPackingCompleted) {
       activeTab = 4;
-    } else if(!run.isPostPackingCompleted) {
+    } else if (!run.isPostPackingCompleted) {
       activeTab = 5;
     }
     this.router.navigate(['/app/checklist'], {
@@ -97,36 +113,36 @@ export class HomeComponent implements OnInit {
 
   parseValidBatchDate(validBatch: string): Date {
     if (!validBatch) return new Date();
-    
+
     // Extract date part (last 6 characters)
     const datePart = validBatch.slice(-6);
     const day = parseInt(datePart.substring(0, 2));
     const month = parseInt(datePart.substring(2, 4)) - 1; // Months are 0-indexed
     const year = 2000 + parseInt(datePart.substring(4, 6)); // Assuming 21st century
-    
+
     return new Date(year, month, day);
-}
+  }
 
-// Format for display (optional)
-formatValidBatchDate(validBatch: string): Date {
+  // Format for display (optional)
+  formatValidBatchDate(validBatch: string): Date {
     return this.parseValidBatchDate(validBatch);
-}
+  }
 
-// Calculate progress percentage
-getValidityProgress(productionDate: Date | string, validBatch: string): number {
+  // Calculate progress percentage
+  getValidityProgress(productionDate: Date | string, validBatch: string): number {
     const now = new Date();
     const start = new Date(productionDate);
     const end = this.parseValidBatchDate(validBatch);
-    
+
     // If dates are invalid or expired
     if (!start || !end || now >= end) return 100;
     if (now <= start) return 0;
-    
+
     const totalDuration = end.getTime() - start.getTime();
     const elapsedDuration = now.getTime() - start.getTime();
-    
+
     return Math.round((elapsedDuration / totalDuration) * 100);
-}
+  }
 
   generatePdfReport(run: any) {
     this.restService.getPdfByProductionRunId(Number(run.productionRunId)).subscribe({
@@ -206,24 +222,24 @@ getValidityProgress(productionDate: Date | string, validBatch: string): number {
 
   onNew() {
     this.confirmationService.confirm({
-        message: 'Do you like to start the Production Run Now?',
-        header: 'Production Start',
-        icon: 'pi pi-exclamation-triangle',
-        accept: () => {
-            this.onCreateProductionRun();
-        },
-        reject: () => {
-            // Reject logic if needed
-        },
-        acceptLabel: 'Yes',
-        acceptIcon: 'pi pi-check',
-        acceptButtonStyleClass: 'p-button-primary',
-        rejectLabel: 'No',
-        rejectIcon: 'pi pi-times',
-        rejectButtonStyleClass: 'p-button-contrast',
-        defaultFocus: 'reject'
+      message: 'Do you like to start the Production Run Now?',
+      header: 'Production Start',
+      icon: 'pi pi-exclamation-triangle',
+      accept: () => {
+        this.onCreateProductionRun();
+      },
+      reject: () => {
+        // Reject logic if needed
+      },
+      acceptLabel: 'Yes',
+      acceptIcon: 'pi pi-check',
+      acceptButtonStyleClass: 'p-button-primary',
+      rejectLabel: 'No',
+      rejectIcon: 'pi pi-times',
+      rejectButtonStyleClass: 'p-button-contrast',
+      defaultFocus: 'reject'
     });
-}
+  }
 
-  
+
 }
