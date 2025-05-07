@@ -79,6 +79,7 @@ export interface SavePrePackingRequest {
 export interface UserProductionRunSummaryResponse {
     inProgress: ProductionRunSummary[];
     completed: ProductionRunSummary[];
+    forDeletion: ProductionRunSummary[];
 }
 
 export interface ProductionRunSummary {

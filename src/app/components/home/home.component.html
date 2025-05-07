@@ -1,5 +1,4 @@
 <p-confirmdialog />
-
 <div
     class="relative bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-b-xl shadow-lg overflow-hidden">
     <div
@@ -176,7 +175,8 @@
                         </div>
                     </div>
                     <div class="divide-y divide-gray-100">
-                        <div *ngFor="let run of summaryForUser.completed" class="p-4 hover:bg-gray-50 transition-colors">
+                        <div *ngFor="let run of summaryForUser.completed"
+                            class="p-4 hover:bg-gray-50 transition-colors">
                             <div class="flex items-center justify-between mb-3">
                                 <div>
                                     <h4 class="font-semibold text-gray-800 flex items-center gap-2">
@@ -186,7 +186,7 @@
                                     </h4>
                                 </div>
                                 <i class="pi pi-file-pdf text-2xl text-teal-600 hover:text-teal-800 transition-colors cursor-pointer"
-                                    (click)="generatePdfReport(run)"></i>
+                                    (click)="downloadPdf(run)"></i>
                             </div>
                             <ul class="space-y-3">
                                 <li *ngFor="let product of run.products" class="pl-2 border-l-2 border-teal-200">
@@ -207,18 +207,20 @@
                                             <div class="text-xs text-green-500">Units</div>
                                         </div>
                                         <div class="bg-purple-50 p-2 rounded justify-center flex items-center gap-1">
-                                            <div class="text-purple-600 font-bold">{{product.numberOfBoxes * product.unit}}</div>
+                                            <div class="text-purple-600 font-bold">{{product.numberOfBoxes *
+                                                product.unit}}</div>
                                             <div class="text-xs text-purple-500">Jars</div>
                                         </div>
                                     </div>
                                     <div class="mt-2">
                                         <div class="flex justify-between text-xs text-gray-500 mb-1">
                                             <span>Production: {{run.productionDate | date:'dd/MM/yyyy'}}</span>
-                                            <span>Expiry: {{formatValidBatchDate(product.validBatch) | date :'dd/MM/yyyy'}}</span>
+                                            <span>Expiry: {{formatValidBatchDate(product.validBatch) | date
+                                                :'dd/MM/yyyy'}}</span>
                                         </div>
                                         <div class="w-full bg-gray-200 rounded-full h-1.5">
-                                            <div class="bg-amber-400 h-1.5 rounded-full" 
-                                                 [style.width]="getValidityProgress(run.productionDate, product.validBatch) + '%'">
+                                            <div class="bg-amber-400 h-1.5 rounded-full"
+                                                [style.width]="getValidityProgress(run.productionDate, product.validBatch) + '%'">
                                             </div>
                                         </div>
                                     </div>
@@ -279,6 +281,49 @@
                 </div>
             </div>
 
+        </div>
+        <div *ngSwitchCase="'delete'">
+            <div class="border border-gray-200 rounded-lg overflow-hidden shadow-lg">
+                <div class="bg-gradient-to-r from-red-700 to-red-500 p-4 relative overflow-hidden">
+                    <div class="absolute inset-0 bg-white/10 backdrop-blur-[1px]"></div>
+                    <div class="relative z-10 flex items-center justify-between">
+                        <div>
+                            <h3 class="text-lg font-bold text-white drop-shadow-sm">Delete Productions</h3>
+                            <p class="text-xs text-white/90 font-light">Only last 3 days of production are permitted for deletion</p>
+                        </div>
+                        <i class="pi pi-check-circle text-xl text-white/80"></i>
+                    </div>
+                </div>
+                <div class="p-4 bg-white grid grid-cols-1 gap-2">
+                    <p-floatlabel variant="on">
+                        <p-select id="production" [options]="summaryForUser.forDeletion" appendTo="body"
+                            optionLabel="productionRunId" #dt optionValue="productionRunId" [(ngModel)]="selectedProductionRunId">
+                            <ng-template #item let-production>
+                                <div class="grid grid-cols-1 w-full">
+                                    <div class="flex items-center justify-between">
+                                        <div class="text-sm font-bold">Production Run # </div>
+                                        <div class="text-sm">{{production.productionRunId}}</div>
+                                    </div>
+                                    <div class="flex items-center justify-between">
+                                        <div class="text-sm font-bold">Date: </div>
+                                        <div class="text-sm">{{production.productionDate | date: 'dd/MM/yyyy'}}</div>
+                                    </div>
+                                    <div class="flex items-center gap-1">
+                                        <ng-container *ngFor="let product of production.products">
+                                            <div class="text-xs">{{product.productName}}</div>
+                                        </ng-container>
+                                    </div>
+                                </div>
+                            </ng-template>
+                        </p-select>
+                        <label for="production">Select Production</label>
+                    </p-floatlabel>
+                    <button [disabled]="!selectedProductionRunId" (click)="onDelete()"
+                        class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 cursor-pointer transition-colors disabled:bg-red-300 flex items-center ml-auto">
+                        <i class="pi pi-trash mr-2"></i> Delete Production
+                    </button>
+                </div>
+            </div>
         </div>
     </ng-container>
 
@@ -392,6 +437,21 @@
                     [ngClass]="{'text-indigo-600': activeView === 'completed', 'text-gray-500': activeView !== 'completed'}">Completed</span>
                 <div class="h-1 w-8 mt-2 rounded-full"
                     [ngClass]="{'bg-indigo-600': activeView === 'completed', 'bg-transparent': activeView !== 'completed'}">
+                </div>
+            </button>
+
+            <!-- Deleted -->
+            <button (click)="activeView = 'delete'" class="flex flex-col items-center relative">
+                <div class="relative">
+                    <i class="pi pi-trash text-2xl transition-colors"
+                        [ngClass]="{'text-indigo-600': activeView === 'delete', 'text-gray-400': activeView !== 'delete'}"></i>
+                    <span *ngIf="activeView === 'delete'"
+                        class="absolute -top-1 -right-1 h-3 w-3 bg-indigo-600 rounded-full border-2 border-white"></span>
+                </div>
+                <span class="text-xs mt-1 font-medium"
+                    [ngClass]="{'text-indigo-600': activeView === 'delete', 'text-gray-500': activeView !== 'delete'}">Delete</span>
+                <div class="h-1 w-8 mt-2 rounded-full"
+                    [ngClass]="{'bg-indigo-600': activeView === 'delete', 'bg-transparent': activeView !== 'delete'}">
                 </div>
             </button>
         </div>

@@ -27,6 +27,7 @@ import { DividerModule } from 'primeng/divider';
 import { SliderModule } from 'primeng/slider';
 import { AccordionModule } from 'primeng/accordion';
 import { ConfirmDialog } from 'primeng/confirmdialog';
+import { MessageModule } from 'primeng/message';
 
 @NgModule({
   declarations: [],
@@ -62,6 +63,7 @@ import { ConfirmDialog } from 'primeng/confirmdialog';
     SliderModule,
     AccordionModule,
     ConfirmDialog,
+    MessageModule,
     ReactiveFormsModule,
     FormsModule,
     CommonModule

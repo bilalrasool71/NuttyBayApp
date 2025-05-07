@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth-service/auth.service';
 import { UtilsModule } from '../../core/utilities/utils.module';
-import { IListOfValue } from '../../core/interfaces/common.interface';
 import { IUser } from '../../core/interfaces/user.interface';
 import { RestService } from '../../services/rest-service/rest.service';
 import { NBProductionRunPdf, ProductionRunDetailResponse, ProductStatus, UserProductionRunSummaryResponse } from '../../core/interfaces/production-run-detail.interface';
@@ -24,10 +23,11 @@ export class HomeComponent implements OnInit {
   selectedDate: Date = new Date();
   products: INBProduct[] = [];
   productionRunData!: ProductionRunDetailResponse;
-  activeView !: 'in-progress' | 'completed' | 'new';
+  activeView !: 'in-progress' | 'completed' | 'new' | 'delete';
+  selectedProductionRunId: number | undefined;
   params: any;
 
-  summaryForUser: UserProductionRunSummaryResponse = { completed: [], inProgress: [] };
+  summaryForUser: UserProductionRunSummaryResponse = { completed: [], inProgress: [], forDeletion: [] };
   constructor(
     private authService: AuthService,
     private router: Router,
@@ -42,6 +42,7 @@ export class HomeComponent implements OnInit {
   ngOnInit(): void {
     this.loadProducts();
     this.loadUserSummary();
+    this.params = null;
     this.route.queryParams.subscribe(params => {
       this.params = params;
     });
@@ -158,6 +159,29 @@ export class HomeComponent implements OnInit {
       }
     });
   }
+  downloadPdf(run: any) {
+    this.restService.getPdfByProductionRunId(Number(run.productionRunId)).subscribe({
+      next: (pdfRecord: NBProductionRunPdf) => {
+        if (pdfRecord && pdfRecord.fileUrl) {
+          // Create download link
+          const downloadLink = document.createElement('a');
+          downloadLink.href = s3ProductionPdfpath + pdfRecord.fileUrl;
+          downloadLink.download = pdfRecord.fileName || 'production_report.pdf';
+
+          // Trigger download
+          document.body.appendChild(downloadLink);
+          downloadLink.click();
+          document.body.removeChild(downloadLink);
+        } else {
+          console.error('No PDF record found');
+        }
+      },
+      error: (err) => {
+        console.error('Error fetching PDF:', err);
+      }
+    });
+  }
+
 
 
   private generateAndOpenNewPdf(run: any) {
@@ -241,5 +265,33 @@ export class HomeComponent implements OnInit {
     });
   }
 
+
+  onDelete() {
+    this.confirmationService.confirm({
+      message: `Do you really want to delete this production run?<br/> You won’t be able to undo once deleted?`,
+      header: 'Delete Production Run',
+      icon: 'pi pi-exclamation-triangle',
+
+      accept: () => {
+        this.restService.deleteProductionRun(Number(this.selectedProductionRunId)).subscribe({
+          next: () => {
+            this.loadUserSummary();
+          },
+          error: (err) => {
+          }
+        });
+      },
+      reject: () => {
+        // Reject logic if needed
+      },
+      acceptLabel: 'Delete',
+      acceptIcon: 'pi pi-trash',
+      acceptButtonStyleClass: 'p-button-danger',
+      rejectLabel: 'Cancel',
+      rejectIcon: 'pi pi-times',
+      rejectButtonStyleClass: 'p-button-contrast',
+      defaultFocus: 'reject'
+    });
+  }
 
 }

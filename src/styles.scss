@@ -17,6 +17,10 @@ body {
     @apply w-full;
 }
 
+.p-datatable-thead > tr > th{
+    padding: 0.25rem 0.25rem !important;
+}
+
 .p-datatable-tbody > tr > td {
     padding: 0.50rem 0.25rem !important;
 }

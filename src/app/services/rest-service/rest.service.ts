@@ -69,5 +69,8 @@ export class RestService {
   deletePrePackingDetail(productionRunId: number, detailId: number): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/DeletePrePackingDetail?productionRunId=${productionRunId}&detailId=${detailId}`)
   }
-  
+
+  deleteProductionRun(productionRunId: number): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/DeleteProductionRun?productionRunId=${productionRunId}`);
+  }
 }

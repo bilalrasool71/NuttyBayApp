@@ -1,5 +1,5 @@
     <p-confirmdialog />
-
+    <p-toast/>
     <div class="relative bg-gradient-to-r from-indigo-600 to-purple-600 rounded-b-xl shadow-lg overflow-hidden">
         <div
             class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiPjxkZWZzPjxwYXR0ZXJuIGlkPSJwYXR0ZXJuIiB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHBhdHRlcm5Vbml0cz0idXNlclNwYWNlT25Vc2UiIHBhdHRlcm5UcmFuc2Zvcm09InJvdGF0ZSg0NSkiPjxyZWN0IHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCIgZmlsbD0icmdiYSgyNTUsMjU1LDI1NSwwLjA1KSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3QgZmlsbD0idXJsKCNwYXR0ZXJuKSIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIvPjwvc3ZnPg==')]">
@@ -57,7 +57,7 @@
                             Pre Making - Soaking Culture
                         </div>
                         <p-float-label variant="on">
-                            <p-date-picker [showTime]="true" [(ngModel)]="checklistDates[1]"
+                            <p-date-picker [showTime]="true" [(ngModel)]="checklistDates[1]" [disabled]="isChecklistCompleted(1)"
                                 (onSelect)="onDateChanged(1, $event)" [showSeconds]="false" hourFormat="12"
                                 dateFormat="dd/mm/yy" styleClass="!w-50" inputStyleClass="text-sm h-10" appendTo="body">
                             </p-date-picker>
@@ -69,7 +69,7 @@
                             Making - Cashew Cheese
                         </div>
                         <p-float-label variant="on">
-                            <p-date-picker [showTime]="true" [(ngModel)]="checklistDates[2]"
+                            <p-date-picker [showTime]="true" [(ngModel)]="checklistDates[2]" [disabled]="isChecklistCompleted(2)"
                                 (onSelect)="onDateChanged(2, $event)" [showSeconds]="false" hourFormat="12"
                                 dateFormat="dd/mm/yy" styleClass="!w-50" inputStyleClass="text-sm h-10" appendTo="body">
                             </p-date-picker>
@@ -81,7 +81,7 @@
                             Pre Packing - Cashew Cheese
                         </div>
                         <p-float-label variant="on">
-                            <p-date-picker [showTime]="true" [(ngModel)]="checklistDates[3]"
+                            <p-date-picker [showTime]="true" [(ngModel)]="checklistDates[3]" [disabled]="isChecklistCompleted(3)"
                                 (onSelect)="onDateChanged(3, $event)" [showSeconds]="false" hourFormat="12"
                                 dateFormat="dd/mm/yy" styleClass="!w-50" inputStyleClass="text-sm h-10" appendTo="body">
                             </p-date-picker>
@@ -396,9 +396,9 @@
                 class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors flex items-center">
                 <i class="pi pi-arrow-left mr-2"></i> Back
             </button>
-            <button *ngIf="activeTab === 5" (click)="onCompleteProduction()" [disabled]="!canCompleteProduction()"
+            <button *ngIf="activeTab === 5" (click)="generateAndOpenNewPdf()" [disabled]="!canCompleteProduction() || pdfGenerating"
                 class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:bg-green-300 flex items-center ml-auto">
-                <i class="pi pi-check mr-2"></i> Complete Production
+                <i [class]="pdfGenerating ? 'pi pi-spin mr-2': 'pi pi-check mr-2'"></i> {{pdfGenerating ? 'Generating PDF' : 'Complete Production'}}
             </button>
 
             <button *ngIf="activeTab < 5" (click)="onSaveAndExit()"
