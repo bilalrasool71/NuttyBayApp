@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { ProductionRunDetailResponse } from '../interfaces/production-run-detail.interface';
-import apiBaseURL, { baseURL, pdfKey } from '../constant/constant';
+import { apiBaseURL, pdfKey } from '../constant/constant';
 import { AuthService } from './auth-service/auth.service';
 import { IUser } from '../interfaces/user.interface';
 import { switchMap } from 'rxjs';

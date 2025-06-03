@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import { baseURL } from '../../constant/constant';
+import { apiBaseURL } from '../../constant/constant';
 
 @Injectable({
   providedIn: 'root'
@@ -10,7 +10,7 @@ export class LoadingService {
   loadingMap: Map<string, boolean> = new Map<string, boolean>();
   constructor() { }
 
-  baseUrl: string = baseURL;
+  baseUrl: string = apiBaseURL;
   private CallExclusionList: string[] = [
     'UpdateTaskStatuses',
   ];

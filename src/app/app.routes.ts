@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { AddSaleOrderComponent } from './components/web/add-sale-order/add-sale-order.component';
 
 export const routes: Routes = [
     {
@@ -18,5 +19,9 @@ export const routes: Routes = [
                 loadComponent: () => import('./components/checklist-stepper/checklist-stepper.component').then(m => m.ChecklistStepperComponent)
             }
         ]
+    },
+    {
+        path: 'new-sales-order',
+        component: AddSaleOrderComponent
     }
 ];

@@ -28,6 +28,9 @@ import { SliderModule } from 'primeng/slider';
 import { AccordionModule } from 'primeng/accordion';
 import { ConfirmDialog } from 'primeng/confirmdialog';
 import { MessageModule } from 'primeng/message';
+import { MessageService } from 'primeng/api';
+import { DialogModule } from 'primeng/dialog';
+import { FieldsetModule } from 'primeng/fieldset';
 
 @NgModule({
   declarations: [],
@@ -64,9 +67,12 @@ import { MessageModule } from 'primeng/message';
     AccordionModule,
     ConfirmDialog,
     MessageModule,
+    DialogModule,
+    FieldsetModule,
     ReactiveFormsModule,
     FormsModule,
     CommonModule
-  ]
+  ],
+  providers: [MessageService]
 })
 export class UtilsModule { }

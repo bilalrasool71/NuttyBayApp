@@ -2,7 +2,7 @@ import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
 import { AuthService } from '../services/auth-service/auth.service';
 import { inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { baseURL } from '../constant/constant';
+import { apiBaseURL } from '../constant/constant';
 import { catchError, throwError } from 'rxjs';
 
 export const tokenInterceptor: HttpInterceptorFn = (req, next) => {
@@ -11,7 +11,7 @@ export const tokenInterceptor: HttpInterceptorFn = (req, next) => {
   
   let token = authService.isAuthenticated();
   const headers = {
-    ...(token && req.url.startsWith(baseURL) ? { Authorization: `Bearer ${token}` } : {})
+    ...(token && req.url.startsWith(apiBaseURL) ? { Authorization: `Bearer ${token}` } : {})
   };
   
   const clonedReq = req.clone({

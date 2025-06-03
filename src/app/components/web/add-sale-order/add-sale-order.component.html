@@ -1,0 +1,305 @@
+<div class="p-6">
+    <h1 class="text-3xl font-bold mb-6">New Sales Order</h1>
+    <div class="max-w-7xl mx-auto">
+        <div class="grid lg:grid-cols-2 gap-8 max-w-7xl">
+            <!-- Left Column - Order Details -->
+            <p-card styleClass="!shadow-lg">
+                <div class="grid grid-cols-1 gap-6">
+                    <p-floatlabel variant="on">
+                        <p-select id="ddlStoreType" [options]="storeTypes" [(ngModel)]="storeType"
+                            (onChange)="loadCompaniesByBannerId()" optionLabel="label" optionValue="value">
+                        </p-select>
+                        <label for="ddlStoreType">Store Type</label>
+                    </p-floatlabel>
+    
+                    <p-floatlabel variant="on">
+                        <p-select id="ddlStore" [options]="storeOptions" [(ngModel)]="selectedStore"
+                            (onChange)="onStoreChange($event)" optionLabel="label" [filter]="true">
+                        </p-select>
+                        <label for="ddlStore">Store</label>
+                    </p-floatlabel>
+    
+                    <p-floatlabel variant="on">
+                        <input type="text" pInputText id="txtCusotmerPoNumber" [(ngModel)]="customerPoNumber">
+                        <label for="txtCusotmerPoNumber">PO Number</label>
+                    </p-floatlabel>
+    
+                    <p-floatlabel variant="on">
+                        <p-datepicker id="txtCreatedDate" [(ngModel)]="createdDate" [showIcon]="true"
+                            dateFormat="yy-mm-dd"></p-datepicker>
+                        <label for="txtCreatedDate">Created Date</label>
+                    </p-floatlabel>
+    
+                    <p-floatlabel variant="on">
+                        <p-datepicker id="txtEDD" [(ngModel)]="deliveryDate" [showIcon]="true"
+                            dateFormat="yy-mm-dd"></p-datepicker>
+                        <label for="txtEDD">Delivery Date</label>
+                    </p-floatlabel>
+                </div>
+            </p-card>
+    
+            <!-- Right Column - Store Details -->
+            <p-card styleClass="!shadow-lg" *ngIf="isShowStoreDetails && store">
+                <div class="space-y-1">
+                    <div><b>Provida Number:</b> {{store?.accountNumber}}</div>
+                    <div><b>Packing Slip:</b> {{store?.packingSlip}}</div>
+                    <div><b>Delivery Address:</b> {{store.address1}} {{store?.city}} {{store?.state}} {{store?.postCode}}
+                        {{store?.country}}</div>
+                    <div><b>Billing Address:</b> {{store?.postalAddress1}} {{store?.postalCity}} {{store?.postalState}}
+                        {{store?.postalPostCode}} {{store?.postalCountry}}</div>
+                    <div><b>Email Address:</b> {{store?.email}}</div>
+                        <div><b>Price Tier:</b> {{store?.priceColumn}}</div>
+                    <div><b>Product Category:</b> {{store?.productCategory}}</div>
+                    <div><b>Minimum Order Quantity:</b> {{store?.minOrderQty}} Carton(s)</div>
+                    <p-button label="Update" (click)="showUpdateModal()" severity="contrast" class="mt-3"></p-button>
+                </div>
+            </p-card>
+        </div>
+    
+        <p-divider type="dotted" class="my-6"></p-divider>
+    
+        <!-- Product Selection -->
+        <div class="grid grid-cols-1 gap-6">
+            <p-card styleClass="!shadow-lg">
+                <div class="grid lg:grid-cols-3 gap-6">
+                    <p-floatlabel variant="on">
+                        <p-select id="ddlProductId" [options]="ddlProducts" [(ngModel)]="selectedProduct"
+                            optionLabel="name" [filter]="true">
+                        </p-select>
+                        <label for="ddlProductId">Product</label>
+                    </p-floatlabel>
+    
+                    <p-floatlabel variant="on">
+                        <p-inputNumber id="txtQty" [(ngModel)]="quantity" [showButtons]="true" [min]="1"></p-inputNumber>
+                        <label for="txtQty">Carton Qty</label>
+                    </p-floatlabel>
+    
+                    <div class="flex items-end">
+                        <p-button label="Add Item" icon="pi pi-plus" (click)="AddItem()" severity="contrast"></p-button>
+                    </div>
+                </div>
+            </p-card>
+    
+            <!-- Order Items Table -->
+            <p-card styleClass="!shadow-lg">
+                <p-table [value]="salesOrderItems" [responsive]="true">
+                    <ng-template pTemplate="header">
+                        <tr>
+                            <th>Code</th>
+                            <th>Name</th>
+                            <th>Carton Qty</th>
+                            <th>Carton Price</th>
+                            <th>Total</th>
+                            <th>Action</th>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-item>
+                        <tr>
+                            <td>{{item.code}}</td>
+                            <td>{{item.name}} x {{item.qtyInCarton}}</td>
+                            <td>{{item.uomQtyOrdered}}</td>
+                            <td>
+                                <p-inputNumber [(ngModel)]="item.uomPrice" (onInput)="updateItemTotal(item)" mode="decimal"
+                                    [minFractionDigits]="2"></p-inputNumber>
+                            </td>
+                            <td>${{item.total?.toFixed(2)}}</td>
+                            <td>
+                                <p-button icon="pi pi-trash" (click)="removeItem(item.uniqueId)" severity="danger"
+                                    styleClass="p-button-sm"></p-button>
+                            </td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+            </p-card>
+    
+            <!-- Order Options -->
+            <p-card styleClass="!shadow-lg">
+                <div class="space-y-4">
+                    <div class="flex items-center">
+                        <p-checkbox [(ngModel)]="isSendEmail" [binary]="true" inputId="chk_IsSendEmail"></p-checkbox>
+                        <label for="chk_IsSendEmail" class="ml-2">Reply Email will be sent to:</label>
+                        <input pInputText type="text" [(ngModel)]="replyEmails" class="ml-2 flex-grow">
+                    </div>
+    
+                    <div class="flex items-center">
+                        <p-checkbox [(ngModel)]="isNotValidatePoNumber" [binary]="true"
+                            inputId="chk_isvalidate"></p-checkbox>
+                        <label for="chk_isvalidate" class="ml-2">Disable validation for duplicate PO numbers</label>
+                    </div>
+    
+                    <div *ngIf="branches">
+                        <label class="block mb-2">Branch:</label>
+                        <p-select [options]="branches" [(ngModel)]="selectedBranch" optionLabel="branchName"
+                            optionValue="cinBranchId" [filter]="true" [showClear]="true">
+                            <ng-template let-branch pTemplate="item">
+                                <div>{{branch.branchName}} ({{branch.branchEmail}})</div>
+                            </ng-template>
+                        </p-select>
+                    </div>
+    
+                    <!-- Cash Pickup Section -->
+                    <div *ngIf="isCashPickUp" class="bg-gray-50 p-4 rounded-lg">
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+                            <div>
+                                <label class="block mb-2">Name</label>
+                                <input pInputText type="text" [(ngModel)]="name" class="w-full">
+                            </div>
+                            <div>
+                                <label class="block mb-2">Phone</label>
+                                <input pInputText type="text" [(ngModel)]="phone" class="w-full">
+                            </div>
+                            <div>
+                                <label class="block mb-2">Email</label>
+                                <input pInputText type="text" [(ngModel)]="email" class="w-full">
+                            </div>
+                            <div>
+                                <label class="block mb-2">Pickup Date</label>
+                                <p-datepicker [(ngModel)]="pickUpDate" [showIcon]="true" dateFormat="yy-mm-dd"
+                                    class="w-full"></p-datepicker>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block mb-2">Notes</label>
+                            <textarea pInputTextarea [(ngModel)]="pickupInstructions" rows="3" class="w-full"></textarea>
+                        </div>
+                    </div>
+    
+                    <!-- Order Totals -->
+                    <div class="bg-gray-100 p-4 rounded-lg">
+                        <div class="flex justify-between mb-2">
+                            <span class="font-medium">Subtotal:</span>
+                            <span>${{subTotal.toFixed(2)}}</span>
+                        </div>
+                        <div class="flex justify-between mb-2">
+                            <span class="font-medium">Tax:</span>
+                            <span>${{tax.toFixed(2)}}</span>
+                        </div>
+                        <div class="flex justify-between font-bold text-lg">
+                            <span>Grand Total:</span>
+                            <span>${{grandTotal.toFixed(2)}}</span>
+                        </div>
+                    </div>
+    
+                    <!-- Submit Button -->
+                    <div class="mt-6">
+                        <p-button label="Save and Send" (click)="syncToCin7()" [disabled]="isSubmitted"
+                            [loading]="isSubmitted">
+                        </p-button>
+                    </div>
+                </div>
+            </p-card>
+        </div>
+    
+        <!-- Success Message -->
+        <div *ngIf="issynced && importFoodStuffOrder" class="mt-6">
+            <p-message severity="success" text="Order created successfully"></p-message>
+    
+            <!-- Order Comparison Table -->
+            <div *ngIf="importFoodStuffOrder.angelFoodSalesOrder && importFoodStuffOrder.cin7FoodSalesOrder" class="mt-4">
+                <h4 class="text-xl font-bold mb-4">Angel Food - Cin7 Sales Order</h4>
+                <p-table [value]="[1]" [responsive]="true">
+                    <ng-template pTemplate="header">
+                        <tr>
+                            <th>Fields</th>
+                            <th>Angel Food</th>
+                            <th>Cin7</th>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body">
+                        <tr>
+                            <td>Company</td>
+                            <td>{{importFoodStuffOrder.angelFoodSalesOrder.company}}</td>
+                            <td>{{importFoodStuffOrder.cin7FoodSalesOrder.company}}</td>
+                        </tr>
+                        <!-- Other comparison rows -->
+                    </ng-template>
+                </p-table>
+            </div>
+    
+            <!-- Cin7 Response -->
+            <div *ngIf="importFoodStuffOrder.foodStuffPoDTO" class="mt-6">
+                <h4 class="text-xl font-bold mb-4">Cin7 Response</h4>
+                <p-table [value]="[importFoodStuffOrder.foodStuffPoDTO]" [responsive]="true">
+                    <ng-template pTemplate="header">
+                        <tr>
+                            <th>Fields</th>
+                            <th>Values</th>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-data>
+                        <tr>
+                            <td>Cin7 Id</td>
+                            <td>{{data.cin7Id}}</td>
+                        </tr>
+                        <tr>
+                            <td>Sales Order Code</td>
+                            <td>{{data.salesOrderCode}}</td>
+                        </tr>
+                        <tr>
+                            <td>Errors</td>
+                            <td>{{data.error}}</td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+            </div>
+    
+            <div class="mt-4">
+                <p-button label="Create New Order" (click)="refresh()" icon="pi pi-refresh"></p-button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Update Store Modal -->
+<p-dialog header="Update Store" [(visible)]="displayUpdateModal" [modal]="true" [style]="{width: '70vw'}">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+            <label class="block mb-2">Account Number</label>
+            <input pInputText [(ngModel)]="store.accountNumber" class="w-full">
+        </div>
+        <div>
+            <label class="block mb-2">Pricing Tier</label>
+            <p-select [(ngModel)]="store.priceColumn" [options]="priceTiers" optionLabel="priceTierName">
+                <ng-template let-tier pTemplate="item">
+                    {{formatPriceColumn(tier.priceTierName)}}
+                </ng-template>
+            </p-select>
+        </div>
+        <div>
+            <label class="block mb-2">Group</label>
+            <p-select [(ngModel)]="store.group" [options]="groups" optionLabel="groupName"></p-select>
+        </div>
+        <div>
+            <label class="block mb-2">Independent Banner</label>
+            <p-select [(ngModel)]="store.independentBannerId" [options]="banners" optionLabel="independentBannerName"
+                optionValue="independentBannerId"></p-select>
+        </div>
+        <div>
+            <label class="block mb-2">Sales Team</label>
+            <p-select [(ngModel)]="store.salesTeamId" [options]="salesTeams" optionLabel="salesTeamCode"
+                optionValue="salesTeamId"></p-select>
+        </div>
+        <div>
+            <label class="block mb-2">Island</label>
+            <p-select [(ngModel)]="store.islandId" [options]="islands" optionLabel="islandName"
+                optionValue="islandId"></p-select>
+        </div>
+        <div>
+            <label class="block mb-2">Packing Slip</label>
+            <p-select [(ngModel)]="store.packingSlip" [options]="packingSlips" optionLabel="packingSlipName"></p-select>
+        </div>
+        <div>
+            <label class="block mb-2">Product Category</label>
+            <p-select [(ngModel)]="store.productCategory" [options]="['Retail', 'Food Service']"></p-select>
+        </div>
+        <div class="md:col-span-2">
+            <label class="block mb-2">Reply Email</label>
+            <input pInputText [(ngModel)]="store.replyEmail" class="w-full">
+        </div>
+    </div>
+    <ng-template pTemplate="footer">
+        <p-button label="Cancel" (click)="hideUpdateModal()" icon="pi pi-times" styleClass="p-button-text"></p-button>
+        <p-button label="Save" (click)="updateStore()" icon="pi pi-check" [disabled]="isSubmitDisabled"
+            [loading]="isSubmitDisabled"></p-button>
+    </ng-template>
+</p-dialog>

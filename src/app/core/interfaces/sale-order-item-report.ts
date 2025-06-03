@@ -1,0 +1,31 @@
+export interface SalesOrderItemReport {
+    createdDate: Date;
+    companyName: string;
+    invoiceDate: Date;
+    customerOrderNo: string;
+    invoiceNumber: number;
+    deliveryAddress: string;
+    street: string;
+    suburb: string;
+    state: string;
+    postcode: string;
+    customerReference: string;
+    code: string;
+    name: string;
+    option1: string;
+    unitCost: number;
+    unitPrice: number;
+    uomPrice: number;
+    value: number;
+    cashOnDelivery: string;
+    unitOfMeasure: string;
+    qty: number;
+    itemQty: number;
+    branchId: number;
+    bannerName:string;
+    clusterName:string;
+    clusterSizeName:string;
+    status:string;
+    dispatchedDate:Date;
+    bannerCategoryName:string;
+}
