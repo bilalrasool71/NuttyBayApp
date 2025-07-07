@@ -31,3 +31,13 @@ body {
 .p-tabpanels {
     padding: 1rem 0 !important;
 }
+.p-datatable-thead > tr > th {
+    background-color: red
+}
+.p-datatable-thead > tr > th, .p-datatable-tbody > tr > td {
+    @apply text-sm;
+}
+
+.highcharts-credits {
+    display: none;
+}

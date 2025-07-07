@@ -1,5 +1,5 @@
 export interface LineItem {
-    createdDate?: Date | null;
+    createdDate?: Date | null | string;
     productOptionId?: number;
     integrationRef?: string;
     sort?: number;

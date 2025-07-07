@@ -1,0 +1,89 @@
+<app-header Title="Sales Order Report"></app-header>
+<div class="card">
+    <div class="flex flex-wrap justify-content-between mb-4 gap-2">
+        <!-- Search and Clear -->
+        <div class="flex gap-2">
+            <input pInputText type="text" [(ngModel)]="globalFilterValue" (input)="applyGlobalFilter()"
+                placeholder="Search orders..." />
+            <button pButton label="Clear" icon="pi pi-filter-slash" class="p-button-outlined"
+                (click)="clearFilters()"></button>
+        </div>
+    </div>
+
+    <p-table #dt [value]="filteredOrders" [loading]="loading" [paginator]="true" [rows]="25"
+        [rowsPerPageOptions]="[10,25,50]" [showCurrentPageReport]="true"
+        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+        styleClass="p-datatable-striped p-datatable-gridlines">
+        <ng-template pTemplate="header">
+            <tr>
+                <th>Sales Order Id</th>
+                <th pSortableColumn="createdDate">Order Date</th>
+                <th pSortableColumn="estimatedDeliveryDate">Est. Delivery</th>
+                <th pSortableColumn="customerOrderNo">PO Number</th>
+                <th pSortableColumn="totalProducts">Total Products</th>
+                <th pSortableColumn="productTotal">Product Total</th>
+                <th pSortableColumn="taxRate">Tax Rate</th>
+                <th pSortableColumn="total">Total</th>
+                <th pSortableColumn="deliveryAddress1">Delivery Address</th>
+                <th pSortableColumn="deliveryCity">City</th>
+                <th pSortableColumn="deliveryPostalCode">Postal Code</th>
+                <th pSortableColumn="deliveryCountry">Country</th>
+                <th>Actions</th>
+            </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-order>
+            <tr *ngIf="!loading; else skeletonRow">
+                <td>{{order.salesOrderId}}</td>
+                <td>{{formatDate(order.createdDate)}}</td>
+                <td>{{order.estimatedDeliveryDate ? formatDate(order.estimatedDeliveryDate) : 'N/A'}}</td>
+                <td>{{order.customerOrderNo}}</td>
+                <td>{{order.totalProducts}}</td>
+                <td>${{order.productTotal?.toFixed(2)}}</td>
+                <td>{{order.taxRate ? (order.taxRate*100) + '%' : 'N/A'}}</td>
+                <td>${{order.total?.toFixed(2)}}</td>
+                <td>{{order.deliveryAddress1}}</td>
+                <td>{{order.deliveryCity}}</td>
+                <td>{{order.deliveryPostalCode}}</td>
+                <td>{{order.deliveryCountry}}</td>
+                <td>
+                    <div class="flex gap-1">
+                        <button pButton icon="pi pi-eye" class="p-button-sm p-button-info"
+                            (click)="viewOrderDetails(order.salesOrderId)" pTooltip="View"
+                            tooltipPosition="top"></button>
+                        <button pButton icon="pi pi-pencil" class="p-button-sm p-button-warning"
+                            (click)="editOrder(order.salesOrderId)" pTooltip="Edit" tooltipPosition="top"></button>
+                        <button pButton icon="pi pi-trash" class="p-button-sm p-button-danger"
+                            (click)="confirmDelete(order.salesOrderId)" pTooltip="Delete"
+                            tooltipPosition="top"></button>
+                    </div>
+                </td>
+            </tr>
+
+            <ng-template #skeletonRow>
+                <tr *ngFor="let item of skeletonItems">
+                    <td><p-skeleton></p-skeleton></td>
+                    <td><p-skeleton></p-skeleton></td>
+                    <td><p-skeleton></p-skeleton></td>
+                    <td><p-skeleton></p-skeleton></td>
+                    <td><p-skeleton></p-skeleton></td>
+                    <td><p-skeleton></p-skeleton></td>
+                    <td><p-skeleton></p-skeleton></td>
+                    <td><p-skeleton></p-skeleton></td>
+                    <td><p-skeleton></p-skeleton></td>
+                    <td><p-skeleton></p-skeleton></td>
+                    <td><p-skeleton></p-skeleton></td>
+                    <td><p-skeleton width="2rem" height="2rem"></p-skeleton></td>
+                </tr>
+            </ng-template>
+        </ng-template>
+
+        <ng-template pTemplate="emptymessage">
+            <tr>
+                <td colspan="12" class="text-center">
+                    {{loading ? '' : 'No orders found'}}
+                </td>
+            </tr>
+        </ng-template>
+    </p-table>
+</div>

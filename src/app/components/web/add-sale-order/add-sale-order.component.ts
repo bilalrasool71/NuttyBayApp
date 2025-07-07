@@ -1,5 +1,10 @@
 import { Component } from '@angular/core';
-import { UtilsModule } from '../../../core/utilities/utils.module';
+import { MessageService } from 'primeng/api';
+import { ContactService } from '../../../services/contact-service/contact.service';
+import { ProductService } from '../../../services/product-service/product.service';
+import { SalesOrderService } from '../../../services/sales-order-service/sales-order.service';
+import { BannerService } from '../../../services/banner-service/banner.service';
+
 import { Branch } from '../../../core/interfaces/branch';
 import { Group } from '../../../core/interfaces/group';
 import { IndependentBanner } from '../../../core/interfaces/independent-banner';
@@ -7,26 +12,31 @@ import { Island } from '../../../core/interfaces/Island';
 import { PackingSlip } from '../../../core/interfaces/packing-slip';
 import { PriceTier } from '../../../core/interfaces/price-tier';
 import { SalesTeam } from '../../../core/interfaces/sales-team';
-import { PdfService } from '../../../core/services/pdf.service';
-import { BannerService } from '../../../services/banner-service/banner.service';
-import { ContactService } from '../../../services/contact-service/contact.service';
-import { ProductService } from '../../../services/product-service/product.service';
-import { SalesOrderService } from '../../../services/sales-order-service/sales-order.service';
-import { MessageService } from 'primeng/api';
 import { ContactEntity } from '../../../core/interfaces/contact';
-import { DDLCin7Product } from '../../../core/interfaces/ddl-cin7-product';
+import { Product } from '../../../core/interfaces/product';
 import { LineItem } from '../../../core/interfaces/line-item';
-import { FormBuilder } from '@angular/forms';
-import { ImportFoodStuffOrder } from '../../../core/interfaces/import-foodstuff-dto';
 import { SalesOrder } from '../../../core/interfaces/sales-order';
+import { ImportFoodStuffOrder } from '../../../core/interfaces/import-foodstuff-dto';
+import { UtilsModule } from '../../../core/utilities/utils.module';
+import { RouterLink } from '@angular/router';
+import { AuthService } from '../../../core/services/auth-service/auth.service';
+import { IUser } from '../../../core/interfaces/user.interface';
 
 @Component({
   selector: 'app-add-sale-order',
-  imports: [UtilsModule],
+  standalone: true,
+  imports: [
+    UtilsModule,
+    RouterLink
+  ],
   templateUrl: './add-sale-order.component.html',
-  styleUrl: './add-sale-order.component.scss'
+  styleUrls: ['./add-sale-order.component.scss'],
+  providers: [MessageService]
 })
 export class AddSaleOrderComponent {
+  taxInclusive: boolean = false;
+
+  // Data collections
   packingSlips: PackingSlip[] = [];
   priceTiers: PriceTier[] = [];
   salesTeams: SalesTeam[] = [];
@@ -34,163 +44,199 @@ export class AddSaleOrderComponent {
   groups: Group[] = [];
   banners: IndependentBanner[] = [];
   islands: Island[] = [];
-  displayUpdateModal = false;
-  selectedStore: any;
   companies: ContactEntity[] = [];
-  store: ContactEntity = {} as ContactEntity;
+  products: Product[] = [];
+
+  // Form models
+  selectedStore: ContactEntity | null = null;
+  selectedProduct: Product | null = null;
+  selectedBranch: Branch | null = null;
+
+  // Order details
   salesOrderItems: LineItem[] = [];
-  ddlProducts: DDLCin7Product[] = [];
-
-  selectedProduct: DDLCin7Product = {} as DDLCin7Product;
-  importFoodStuffOrder: ImportFoodStuffOrder = {} as ImportFoodStuffOrder;
-  storeOptions: any[] = [];
-  productOptions: any[] = [];
-
-  subTotal: number = 0;
-  totalQty: number = 0;
-  tax: number = 0;
-  grandTotal: number = 0;
-  rowCount = 0;
-
-  isSubmitted = false;
-  issynced = false;
-  isCashPickUp: boolean = false;
-  phone: string = '';
-  email: string = '';
-  name: string = '';
-  pickUpDate: string = '';
-  pickupInstructions: string = '';
-  bankDetails: string = '';
-  salesOrder: SalesOrder = {};
-
-  isShowStoreDetails = false;
-  isSubmitDisabled = false;
-
   customerPoNumber: string = '';
   createdDate: Date = new Date();
   deliveryDate: Date | null = null;
   isSendEmail: boolean = true;
   isNotValidatePoNumber: boolean = false;
   replyEmails: string = '';
-  selectedBranch: Branch | null = null;
+  isQtyInCarton: boolean = true;
   quantity: number | null = null;
-  storeType: number = undefined;
-  storeTypes: any[] = [
-    {
-      value: 1, label: 'Independent Stores (Regular)'
-    },
-    {
-      value: 2, label: 'Independent Stores (Not Regular)'
-    },
-    {
-      value: 3, label: 'Inactive Stores (Unable to move to Cin7)'
-    },
-    {
-      value: 4, label: 'Woolworth'
-    },
-    {
-      value: 5, label: 'Foodstuffs'
-    }
-  ]
-  private readonly tolerance = 0.09;
 
-  ngOnInit() {
-    this.loadCompaniesByBannerId();
-    this.loadAccountSettings();
-    this.initData();
-    this.loadPackingSlip();
-    this.loadPriceTiers();
-    this.loadSalesTeam();
-    this.loadGroups();
-    this.loadIndependentBanners();
-    this.loadIslands();
-    this.loadBranch();
-  }
+  // Order calculations
+  subTotal: number = 0;
+  totalQty: number = 0;
+  tax: number = 0;
+  grandTotal: number = 0;
+  rowCount = 0;
 
-  loadAccountSettings() {
-    this.salesOrderService.GetAccountSettings().subscribe((data) => {
-      this.bankDetails = data.accountDetails;
-    });
-  }
+  // UI states
+  isSubmitted = false;
+  issynced = false;
+  isShowStoreDetails = false;
+  displayUpdateModal = false;
+  bankDetails: string = '';
 
-  initData() {
-    this.createdDate = new Date();
-  }
+  // Cash pickup
+  isCashPickUp: boolean = false;
+  phone: string = '';
+  email: string = '';
+  name: string = '';
+  pickUpDate: string = '';
+  pickupInstructions: string = '';
+  loggedInUser: IUser = <IUser>{};
+
+  // Import order data
+  importFoodStuffOrder: ImportFoodStuffOrder | null = null;
 
   constructor(
     private contactService: ContactService,
     private productService: ProductService,
     private salesOrderService: SalesOrderService,
+    private bannerService: BannerService,
     private messageService: MessageService,
-    private pdfService: PdfService,
-    private bannerService: BannerService
-  ) { }
+    private authService: AuthService,
+  ) {
+    this.loggedInUser = this.authService.getUserData();
+  }
 
-  loadBranch() {
-    this.contactService.GetBranches().subscribe((data) => {
-      this.branches = data.sort((a, b) => a.branchName.localeCompare(b.branchName));
+  ngOnInit() {
+    this.loadInitialData();
+  }
+
+  loadInitialData() {
+    this.loadCompanies();
+    this.loadPackingSlips();
+    this.loadPriceTiers();
+    this.loadSalesTeams();
+    this.loadGroups();
+    this.loadIndependentBanners();
+    this.loadIslands();
+    this.loadBranches();
+
+  }
+
+  loadAccountSettings() {
+    this.salesOrderService.GetAccountSettings().subscribe({
+      next: (data) => this.bankDetails = data.accountDetails,
+      error: () => this.showError('Failed to load account settings')
     });
   }
 
-  loadCompaniesByBannerId() {
-    this.contactService.GetCompaniesByType(this.storeType).subscribe(data => {
-      this.companies = data;
-      this.storeOptions = data.map(data => ({
-        label: data.company || '',
-        value: data,
-        disabled: false
-      }));
-    },
-      (error) => {
-        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to load companies' });
-      });
+  loadCompanies() {
+    this.contactService.getAllCompanies().subscribe({
+      next: (data) => this.companies = data,
+      error: () => this.showError('Failed to load companies')
+    });
   }
 
-  onStoreChange(event: any) {
-    this.store = event.value.value;
+  loadProducts() {
+    if (!this.selectedStore?.contactId) return;
+
+    this.productService.GetAllProductsByTierWisePricing(this.selectedStore.contactId).subscribe({
+      next: (data) => this.products = data,
+      error: () => this.showError('Failed to load products')
+    });
+  }
+
+  loadPackingSlips() {
+    this.contactService.GetPackingSlips().subscribe({
+      next: (data) => this.packingSlips = data,
+      error: () => this.showError('Failed to load packing slips')
+    });
+  }
+
+  loadPriceTiers() {
+    this.contactService.GetPriceTiers().subscribe({
+      next: (data) => this.priceTiers = data,
+      error: () => this.showError('Failed to load price tiers')
+    });
+  }
+
+  loadSalesTeams() {
+    this.contactService.GetSalesTeam().subscribe({
+      next: (data) => this.salesTeams = data,
+      error: () => this.showError('Failed to load sales teams')
+    });
+  }
+
+  loadGroups() {
+    this.contactService.GetGroups().subscribe({
+      next: (data) => this.groups = data,
+      error: () => this.showError('Failed to load groups')
+    });
+  }
+
+  loadIndependentBanners() {
+    this.bannerService.getIndependentBanners().subscribe({
+      next: (data) => this.banners = data,
+      error: () => this.showError('Failed to load banners')
+    });
+  }
+
+  loadIslands() {
+    this.contactService.GetIslands().subscribe({
+      next: (data) => this.islands = data,
+      error: () => this.showError('Failed to load islands')
+    });
+  }
+
+  loadBranches() {
+    this.contactService.GetBranches().subscribe({
+      next: (data) => {
+        // Sort the branches
+        this.branches = data;
+
+        // Select the first branch as the default if there are any branches
+        if (this.branches && this.branches.length > 0) {
+          this.selectedBranch = this.branches[0];
+          console.log(this.branches, this.selectedBranch);
+        }
+      },
+      error: () => this.showError('Failed to load branches')
+    });
+  }
+
+  onStoreChange() {
+    if (!this.selectedStore) return;
+
     this.isShowStoreDetails = true;
-    this.replyEmails = this.store?.replyEmail || '';
-    this.loadDDLProducts();
+    this.replyEmails = this.selectedStore.replyEmail || '';
+    this.loadProducts();
   }
 
-  loadDDLProducts() {
-    if (!this.store) return;
-
-    this.productService.getAllProducts().subscribe(data => {
-      this.ddlProducts = data;
-      // this.productOptions = data.filter(x => (x.price || 0) > 0).map(data => ({
-      //   label: (data.styleCode + ' - ' + data.name + ' x' + data.quantityInCartion) || '',
-      //   value: data,
-      //   disabled: (data.stockOnHand || 0) <= 0
-      // }));
-    },
-      (error) => {
-        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to load products' });
-      });
-  }
-
-  AddItem(): any {
+  addItem() {
     if (!this.selectedProduct) {
-      this.messageService.add({ severity: 'warn', summary: 'Warning', detail: 'Please select product!' });
-      return false;
+      this.showWarn('Please select a product');
+      return;
     }
-    if (this.quantity == null) {
-      this.messageService.add({ severity: 'warn', summary: 'Warning', detail: 'Please Add Qty!' });
-      return false;
+
+    if (this.quantity === null || this.quantity <= 0) {
+      this.showWarn('Please enter a valid quantity');
+      return;
     }
+
+    const unit = this.selectedProduct.unit || 1;
+    const unitPrice = this.selectedProduct.price || 0;
+
+    // Calculate quantities based on mode
+    const qty = this.isQtyInCarton ? this.quantity * unit : this.quantity;
+    const uomQtyOrdered = this.isQtyInCarton ? this.quantity : this.quantity / unit;
+    const uomPrice = unitPrice * unit; // Always carton price (unitPrice * units per carton)
 
     const item: LineItem = {
-      productOptionId: this.selectedProduct.productOptionId || 0,
+      productOptionId: this.selectedProduct.id || 0,
       name: this.selectedProduct.name,
-      code: this.selectedProduct.styleCode,
-      uomPrice: this.selectedProduct.price,
-      uomQtyOrdered: this.quantity,
-      qty: (this.quantity || 0) * (this.selectedProduct.quantityInCartion || 0),
-      unitPrice: parseFloat(((this.selectedProduct.price || 0) / (this.selectedProduct.quantityInCartion || 0)).toFixed(2)),
-      total: parseFloat(((this.selectedProduct.price || 0) * this.quantity).toFixed(2)),
+      code: this.selectedProduct.code,
+      unitPrice: unitPrice,        // Always base unit price
+      uomPrice: uomPrice,          // Carton price (unitPrice * unit)
+      qtyInCarton: unit,
       uniqueId: ++this.rowCount,
-      qtyInCarton: (this.selectedProduct.quantityInCartion || 0),
-      stockAvailable: this.selectedProduct.stockOnHand
+      stockAvailable: this.selectedProduct.stockInHand || 0,
+      uomQtyOrdered: uomQtyOrdered, // Cartons if carton mode, fraction if unit mode
+      qty: qty,                    // Always in base units
+      total: unitPrice * qty,
+      createdDate: this.formatDateForBackend(this.createdDate || new Date()),
     };
 
     this.salesOrderItems.push(item);
@@ -199,217 +245,189 @@ export class AddSaleOrderComponent {
     this.calculateTotal();
   }
 
-  removeItem(id: any) {
-    this.salesOrderItems = this.salesOrderItems.filter(x => x.uniqueId != id);
+
+  removeItem(id: number) {
+    this.salesOrderItems = this.salesOrderItems.filter(x => x.uniqueId !== id);
     this.calculateTotal();
   }
 
+  updateItemTotal(item: LineItem) {
+    const unit = item.qtyInCarton || 1;
+
+    if (this.isQtyInCarton) {
+      // Carton mode: uomQtyOrdered is cartons, qty is units
+      item.qty = (item.uomQtyOrdered || 0) * unit;
+    } else {
+      // Unit mode: qty is units, uomQtyOrdered is carton equivalent
+      item.uomQtyOrdered = (item.qty || 0) / unit;
+    }
+
+    // uomPrice is always unitPrice * units per carton
+    item.uomPrice = (item.unitPrice || 0) * unit;
+
+    // Total is always unitPrice * qty (in units)
+    item.total = (item.unitPrice || 0) * (item.qty || 0);
+
+    this.calculateTotal();
+  }
   calculateTotal() {
-    this.subTotal = parseFloat(this.salesOrderItems.reduce((sum, product) => sum + (product?.total || 0), 0).toFixed(2));
-    this.totalQty = parseFloat(this.salesOrderItems.reduce((sum, product) => sum + (product?.uomQtyOrdered || 0), 0).toString());
-    this.tax = parseFloat((this.subTotal * 0.15).toFixed(2));
+    this.subTotal = parseFloat(this.salesOrderItems.reduce((sum, item) => sum + (item.total || 0), 0).toFixed(2));
+    this.totalQty = parseFloat(this.salesOrderItems.reduce((sum, item) => sum + (item.uomQtyOrdered || 0), 0).toString());
+    if (this.taxInclusive) {
+      this.tax = parseFloat((this.subTotal * 0.10).toFixed(2));
+    } else {
+      this.tax = 0;
+    }
     this.grandTotal = parseFloat((this.subTotal + this.tax).toFixed(2));
   }
 
-  syncToCin7(): any {
+  syncToCin7() {
     this.issynced = false;
 
-    if (!this.store) {
-      this.messageService.add({ severity: 'warn', summary: 'Warning', detail: 'Please Select store!' });
-      return false;
-    }
-    if (!this.customerPoNumber) {
-      this.messageService.add({ severity: 'warn', summary: 'Warning', detail: 'Please Add Customer No!' });
-      return false;
-    }
-    if (!this.deliveryDate) {
-      this.messageService.add({ severity: 'warn', summary: 'Warning', detail: 'Please Add Due Date!' });
-      return false;
-    }
-    if (this.salesOrderItems.length == 0) {
-      this.messageService.add({ severity: 'warn', summary: 'Warning', detail: 'Please Add atleast 1 item' });
-      return false;
-    }
-    if (this.store.minOrderQty && this.totalQty < (this.store?.minOrderQty || 0)) {
-      this.messageService.add({ severity: 'warn', summary: 'Warning', detail: 'Your order total qty is below mininmum order qty!' });
-      return false;
-    }
+    if (!this.validateOrder()) return;
 
     const salesOrder: SalesOrder = {
-      company: this.store.company,
-      deliveryAddress1: this.store.address1,
-      deliveryCity: this.store.city,
-      deliveryPostalCode: this.store.postCode,
-      deliveryCountry: this.store.country,
-      deliveryState: this.store.state,
-      billingAddress1: this.store.postalAddress1,
-      billingCity: this.store.postalCity,
-      billingCountry: this.store.postalCountry,
-      billingPostalCode: this.store.postalPostCode,
-      billingState: this.store.postalPostCode,
-      memberId: this.store.id,
+      orderMode: this.isQtyInCarton ? 'CARTON' : 'UNIT',
+      company: this.selectedStore?.company || '',
+      deliveryAddress1: this.selectedStore?.address1 || '',
+      deliveryCity: this.selectedStore?.city || '',
+      deliveryPostalCode: this.selectedStore?.postCode || '',
+      deliveryCountry: this.selectedStore?.country || '',
+      deliveryState: this.selectedStore?.state || '',
+      billingAddress1: this.selectedStore?.postalAddress1 || '',
+      billingCity: this.selectedStore?.postalCity || '',
+      billingCountry: this.selectedStore?.postalCountry || '',
+      billingPostalCode: this.selectedStore?.postalPostCode || '',
+      billingState: this.selectedStore?.postalState || '',
+      phone: this.selectedStore?.phone || '',
+      memberId: this.selectedStore?.contactId || 0,
       productTotal: this.subTotal,
       isSendEmail: this.isSendEmail,
       isNotValidatePoNumber: this.isNotValidatePoNumber,
-      branchId: this.selectedBranch?.cinBranchId,
       replyEmail: this.replyEmails,
-      taxRate: 0.15,
+      taxRate: this.taxInclusive ? 0.10 : 0,
       total: this.grandTotal,
       customerOrderNo: this.customerPoNumber,
-      estimatedDeliveryDate: this.deliveryDate || new Date(),
-      createdDate: this.createdDate,
+      estimatedDeliveryDate:  this.formatDateForBackend(this.deliveryDate || new Date()),
+      createdDate: this.formatDateForBackend(this.createdDate || new Date()),
       customFields: {
-        orders_1000: this.store.accountNumber,
-        orders_1001: this.store.packingSlip
+        orders_1000: this.selectedStore?.accountNumber || '',
+        orders_1001: this.selectedStore?.packingSlip || ''
       },
-      lineItems: this.salesOrderItems
+      lineItems: this.salesOrderItems,
+      branchId: this.selectedBranch?.cinBranchId,
+      createdBy: this.loggedInUser.userId,
     };
 
     this.isSubmitted = true;
-    this.salesOrderService.sendCustomSalesOrderToCin7(salesOrder).subscribe((data: any) => {
-      if (data.message == "already exists") {
-        this.messageService.add({ severity: 'error', summary: 'Error', detail: "Customer Order Number already exists!" });
+    this.salesOrderService.sendCustomSalesOrderToCin7(salesOrder).subscribe({
+      next: (data) => this.handleOrderResponse(data, salesOrder),
+      error: () => {
+        // this.showError('Failed to save order');
+        this.messageService.add({ severity: 'error', summary: "PO Number Already Used", detail: 'The PO number your entered has already been used. Please verify the PO number. If You Still Wish to proceed with creating this Sales Order enable the "Disable PO Validation" option and click "Save"' })
+        // this.showError('The PO number your entered has already been used. Please verify the PO number. If You Still Wish to proceed with creating this Sales Order enable the "Disable PO Validation" option and click "Save"');
         this.isSubmitted = false;
-      } else if (data.message == "1") {
-        this.messageService.add({ severity: 'error', summary: 'Error', detail: "Minimum Order is not fullfilled!" });
-        this.isSubmitted = false;
-      } else {
-        if (this.isCashPickUp) {
-          this.salesOrder = salesOrder;
-          salesOrder.phone = this.phone;
-          salesOrder.email = this.email;
-          salesOrder.firstName = this.name;
-          this.sendCashPickUpEmail();
-        }
-        this.messageService.add({ severity: 'success', summary: 'Success', detail: "Saved Successfully" });
-        this.isSubmitted = false;
-        this.issynced = true;
-        this.reset();
-        this.importFoodStuffOrder = data;
       }
-    }, (error) => {
-      this.messageService.add({ severity: 'error', summary: 'Error', detail: "Failed to save order" });
-      this.isSubmitted = false;
     });
   }
 
+  validateOrder(): boolean {
+    if (!this.selectedStore) {
+      this.showWarn('Please select a store');
+      return false;
+    }
+
+    if (!this.customerPoNumber) {
+      this.showWarn('Please enter a PO number');
+      return false;
+    }
+
+    if (!this.deliveryDate) {
+      this.showWarn('Please select a delivery date');
+      return false;
+    }
+
+    if (this.salesOrderItems.length === 0) {
+      this.showWarn('Please add at least one item');
+      return false;
+    }
+
+    // if (this.selectedStore.minOrderQty && this.totalQty < (this.selectedStore.minOrderQty || 0)) {
+    //   this.showWarn(`Your order total quantity is below the minimum order quantity of ${this.selectedStore.minOrderQty} carton(s)`);
+    //   return false;
+    // }
+
+    return true;
+  }
+
+  handleOrderResponse(data: any, salesOrder: SalesOrder) {
+    if (data.message === "already exists") {
+      this.showError('Customer Order Number already exists!');
+      this.isSubmitted = false;
+    } else if (data.message === "1") {
+      this.showSuccess('Email has been sent to the Customer for Approval');
+      this.reset();
+    } else {
+      if (this.isCashPickUp) {
+        salesOrder.phone = this.phone;
+        salesOrder.email = this.email;
+        salesOrder.firstName = this.name;
+        // this.sendCashPickUpEmail();
+      }
+      this.showSuccess('Order created successfully');
+      this.issynced = true;
+      this.importFoodStuffOrder = data;
+      this.reset();
+    }
+    this.isSubmitted = false;
+  }
+
   reset() {
-    this.customerPoNumber = "";
+    this.customerPoNumber = '';
     this.subTotal = 0;
     this.deliveryDate = null;
-    this.storeType = 0;
-    this.store = null;
-    this.replyEmails = "";
+    this.selectedStore = null;
+    this.replyEmails = '';
     this.tax = 0;
     this.grandTotal = 0;
     this.salesOrderItems = [];
     this.isShowStoreDetails = false;
+    this.products = [];
   }
 
-  sendCashPickUpEmail() {
-    // this.pdfService.generatePdfBlobForCashPickUpOrders(['CashPickPDFContent'], this.email, this.name);
-
-    // setTimeout(() => {
-    //   this.phone = '';
-    //   this.email = '';
-    //   this.name = '';
-    //   this.pickupInstructions = '';
-    //   this.pickUpDate = '';
-    //   this.salesOrder = {};
-    // }, 1000);
+  showSuccess(message: string) {
+    this.messageService.add({ severity: 'success', summary: 'Success', detail: message });
   }
 
-  exceedsTolerance(value1?: any, value2?: any): boolean {
-    return Math.abs((value1 || 0) - (value2 || 0)) > this.tolerance;
+  showWarn(message: string) {
+    this.messageService.add({ severity: 'warn', summary: 'Warning', detail: message });
   }
 
-  refresh() {
-    location.reload();
+  showError(message: string) {
+    this.messageService.add({ severity: 'error', summary: 'Error', detail: message });
   }
 
-  isSameDate(date1: any, date2: any): boolean {
-    const d1 = new Date(date1);
-    const d2 = new Date(date2);
-    return (
-      d1.getDate() === d2.getDate() &&
-      d1.getMonth() === d2.getMonth() &&
-      d1.getFullYear() === d2.getFullYear()
-    );
-  }
-
-  loadPackingSlip() {
-    this.contactService.GetPackingSlips().subscribe(
-      (data) => {
-        this.packingSlips = data;
-      });
-  }
-
-  loadPriceTiers() {
-    this.contactService.GetPriceTiers().subscribe(
-      (data) => {
-        this.priceTiers = data;
-      });
-  }
-
-  loadSalesTeam() {
-    this.contactService.GetSalesTeam().subscribe(
-      (data) => {
-        this.salesTeams = data;
-      });
-  }
-
-  loadGroups() {
-    this.contactService.GetGroups().subscribe(
-      (data) => {
-        this.groups = data;
-      });
-  }
-
-  loadIndependentBanners() {
-    this.bannerService.getIndependentBanners().subscribe((data) => {
-      this.banners = data;
-    });
-  }
-
-  loadIslands() {
-    this.contactService.GetIslands().subscribe((data) => {
-      this.islands = data;
-    });
-  }
-
-  showUpdateModal() {
-    this.displayUpdateModal = true;
-  }
-
-  hideUpdateModal() {
-    this.displayUpdateModal = false;
-  }
-
-  updateStore() {
-    if (!this.store) return;
-
-    this.isSubmitDisabled = true;
-    this.contactService.updateStore(this.store).subscribe(data => {
-      this.isSubmitDisabled = false;
-      this.messageService.add({ severity: 'success', summary: 'Success', detail: "Saved Successfully!" });
-      this.displayUpdateModal = false;
-    }, (error) => {
-      this.isSubmitDisabled = false;
-      this.messageService.add({ severity: 'error', summary: 'Error', detail: "Failed to update store" });
-    });
-  }
-
-  updateItemTotal(item: LineItem) {
-    if (item.uomQtyOrdered && item.uomPrice) {
-      item.total = (item.uomQtyOrdered || 0) * (item.uomPrice || 0);
-      this.calculateTotal();
-    }
-  }
-formatPriceColumn(value: string): string {
+  formatPriceTier(value: string): string {
     if (!value) return '';
     return value.charAt(0).toUpperCase() + value.slice(1).replace('pricecolumn', 'Price Tier ');
-}
+  }
 
 
- 
+  onPriceEdit(item: LineItem) {
+    const unit = item.qtyInCarton || 1;
+    item.uomPrice = (item.unitPrice || 0) * unit;
+    item.total = (item.unitPrice || 0) * (item.qty || 0);
+    this.calculateTotal();
+  }
+
+
+  private formatDateForBackend(date: Date): string {
+    // Get date parts in local timezone
+    const year = date.getFullYear();
+    const month = date.getMonth() + 1; // Months are 0-indexed
+    const day = date.getDate();
+
+    // Return as ISO format (YYYY-MM-DD)
+    return `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
+  }
 }

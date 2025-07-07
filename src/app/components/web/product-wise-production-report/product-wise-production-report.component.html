@@ -1,0 +1,44 @@
+<app-header [GoBackLink]="'/web/product-inventory-report'"
+  [Title]="'Production Report Report - '+ (productionData[0]?.productName || 'Loading ..')"></app-header>
+
+
+<!-- Loading state -->
+<div *ngIf="loading" class="space-y-4">
+  <div *ngFor="let item of skeletonItems" class="h-12 bg-gray-200 rounded animate-pulse"></div>
+</div>
+
+<!-- Production Data -->
+<div *ngIf="!loading" class="px-2">
+  <p-table [value]="productionData" [paginator]="true" [rows]="25" [rowsPerPageOptions]="[10,25,50]"
+    [showCurrentPageReport]="true" currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries" showGridlines stripedRows>
+    <ng-template pTemplate="header">
+      <tr>
+        <th>Production #</th>
+        <th pSortableColumn="date">Date</th>
+        <th pSortableColumn="batchNo">Batch No</th>
+        <th pSortableColumn="producedQty">Quantity Produced</th>
+        <th pSortableColumn="batchSize">Batch Size</th>
+        <th pSortableColumn="productionRunId">Production Run ID</th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-item>
+      <tr>
+        <td>{{item.productionRunId}}</td>
+        <td>{{formatDate(item.date)}}</td>
+        <td>{{item.batchNo}}</td>
+        <td>{{item.producedQty}}</td>
+        <td>{{item.batchSize}}</td>
+        <td>{{item.productionRunId}}</td>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="5" class="text-center">
+          No production records found
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>

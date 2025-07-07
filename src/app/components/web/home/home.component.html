@@ -1,0 +1,9 @@
+<app-header Title="Sales Dashboard"></app-header>
+<div class="grid lg:grid-cols-2 gap-4 px-2">
+    <div highchartsChart [options]="productionChartOptions" class="chart shadow-md"></div>
+    <div highchartsChart [options]="inventoryChartOptions" class="chart shadow-md"></div>
+    <div class="col-span-2">
+        <div highchartsChart [options]="reconciliationChartOptions" class="chart shadow-md"></div>
+    </div>
+
+</div>

@@ -1,0 +1,32 @@
+/* Ensure router links work and are highlighted when active */
+a[routerLink] {
+  cursor: pointer;
+}
+
+.router-link-active {
+  background-color: #1d4ed8 !important;
+  font-weight: 500;
+}
+
+/* Style the menubar for mobile */
+@media (max-width: 1023px) {
+  .p-menubar {
+    width: 100%;
+    background: transparent !important;
+    border: none !important;
+    
+    .p-menubar-root-list {
+      margin-left: auto;
+      justify-content: flex-end;
+    }
+  }
+}
+
+/* Ensure gradient is visible */
+header {
+  background: linear-gradient(to right, #2563eb, #3b82f6) !important;
+}
+
+footer {
+  background: linear-gradient(to right, #1f2937, #374151) !important;
+}

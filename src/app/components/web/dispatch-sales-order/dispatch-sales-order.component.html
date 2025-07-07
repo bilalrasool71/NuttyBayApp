@@ -1,0 +1,95 @@
+<div class="p-4 max-w-6xl mx-auto">
+  <p-toast></p-toast>
+
+  <!-- Header with back button -->
+  <div class="flex items-center mb-6">
+    <button (click)="cancel()" class="flex items-center text-blue-600 hover:text-blue-800 mr-4">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+        <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
+      </svg>
+      Back to Orders
+    </button>
+    <div>
+      <h2 class="text-xl font-bold text-gray-800">Dispatch Order #{{orderId}}</h2>
+      <h4 class="text-sm font-bold text-gray-800" *ngIf="orderDetails">Order Mode {{orderDetails?.orderMode === 'CARTON' ? 'Carton' : 'Quantity'}}</h4>
+    </div>
+  </div>
+
+  <!-- Loading state -->
+  <div *ngIf="loading" class="flex justify-center py-8">
+    <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+  </div>
+
+  <!-- Products and batches -->
+  <div *ngIf="!loading" class="bg-white shadow rounded-lg overflow-hidden">
+    <p-table [value]="lineItems" [responsive]="true" styleClass="p-datatable-striped">
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Product</th>
+          <th>Batch Selection</th>
+          <th>Quantity</th>
+          <th>Available Batch Qty</th>
+          <th>Status</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-item>
+        <tr [ngClass]="{'bg-red-50': item.quantityError}">
+          <td>
+            <div class="font-medium">{{item.productName}} ({{item.productCode}})</div>
+            <div *ngIf="item.variant1 || item.variant2" class="text-xs text-gray-500">
+              {{item.variant1}} {{item.variant2}}
+            </div>
+          </td>
+          <td>
+            <p-select *ngIf="item.availableBatches.length > 0" 
+                       [options]="item.availableBatches" 
+                       [(ngModel)]="item.selectedBatch"
+                       (onChange)="onBatchSelect(item)"
+                       optionLabel="batchNo"
+                       placeholder="Select Batch"
+                       [style]="{'width':'100%'}" appendTo="body">
+              <ng-template pTemplate="selectedItem" let-batch>
+                <span class="font-medium">{{batch?.batchNo}}</span>
+              </ng-template>
+              <ng-template let-batch pTemplate="item">
+                <div class="flex justify-between items-center">
+                  <span>{{batch.batchNo}}</span>
+                  <span class="text-xs text-gray-500">Avail: {{batch.availableQuantity}}</span>
+                </div>
+              </ng-template>
+            </p-select>
+            <span *ngIf="item.availableBatches.length === 0" class="text-sm text-gray-500">
+              No batches available
+            </span>
+          </td>
+          <td>
+            <p-input-number (ngModelChange)="checkDispatchAbility()" [disabled]="!item.selectedBatch" [(ngModel)]="item.quantity" [min]="1" [max]="item.selectedBatch?.availableQuantity"></p-input-number>
+          </td> 
+          <!-- <td>{{item.quantity}} {{item.unitOfMeasure}}</td> -->
+          <td>
+            {{item.selectedBatch ? (item.selectedBatch?.availableQuantity  - item.quantity) : 'N/A'}}
+          </td>
+          <td>
+            <span *ngIf="item.quantityError" class="text-red-500 text-sm">
+              <i class="pi pi-exclamation-triangle mr-1"></i>
+              Quantity exceeds available
+            </span>
+            <span *ngIf="!item.selectedBatch && item.availableBatches.length > 0" 
+                  class="text-yellow-500 text-sm">
+              <i class="pi pi-exclamation-circle mr-1"></i>
+              Select batch
+            </span>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+
+  <!-- Action buttons -->
+  <div class="mt-6 flex justify-end space-x-3">
+    <button pButton type="button" label="Cancel" icon="pi pi-times" class="p-button-outlined"
+            (click)="cancel()"></button>
+    <button pButton type="button" label="Confirm Dispatch" icon="pi pi-check" 
+            [disabled]="!canDispatch || loading" (click)="confirmDispatch()"></button>
+  </div>
+</div>

@@ -1,0 +1,72 @@
+<app-header Title="Product Pricing Management"></app-header>
+<div class="card">
+  <!-- Price Tier Selection -->
+  <div class="mb-4">
+    <label for="priceTier" class="block font-medium mb-2">Select Price Tier</label>
+    <p-select [options]="priceTiers" [(ngModel)]="selectedPriceTier" 
+                optionLabel="priceTierName" optionValue="priceTierId"
+                placeholder="Select a price tier" (onChange)="loadProductPrices($event.value)"
+                [disabled]="loading"></p-select>
+  </div>
+
+  <!-- Action Buttons -->
+  <div class="flex flex-wrap justify-content-between mb-4 gap-2">
+    <div class="flex gap-2">
+      <input pInputText type="text" [(ngModel)]="globalFilterValue" (input)="applyGlobalFilter()"
+             placeholder="Search products..." [disabled]="!selectedPriceTier || loading" />
+      <button pButton label="Clear" icon="pi pi-filter-slash" class="p-button-outlined"
+              (click)="clearFilters()" [disabled]="!selectedPriceTier || loading"></button>
+    </div>
+    
+    <div class="flex gap-2" *ngIf="selectedPriceTier">
+      <button pButton *ngIf="!editMode" label="Edit Prices" icon="pi pi-pencil" 
+              class="p-button-warning" (click)="toggleEditMode()" [disabled]="loading"></button>
+      <button pButton *ngIf="editMode" label="Save Changes" icon="pi pi-save" 
+              class="p-button-success" (click)="savePriceChanges()" [disabled]="loading"></button>
+      <button pButton *ngIf="editMode" label="Cancel" icon="pi pi-times" 
+              class="p-button-secondary" (click)="cancelEdit()" [disabled]="loading"></button>
+    </div>
+  </div>
+
+  <!-- Product Pricing Table -->
+  <p-table #dt [value]="filteredProducts" [loading]="loading" [paginator]="true" [rows]="25"
+           [rowsPerPageOptions]="[10,25,50]" [showCurrentPageReport]="true"
+           currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+           styleClass="p-datatable-striped p-datatable-gridlines">
+    <ng-template #header>
+      <tr>
+        <th pSortableColumn="productName">Product <p-sortIcon field="productName"></p-sortIcon></th>
+        <th pSortableColumn="productPrice">Price <p-sortIcon field="productPrice"></p-sortIcon></th>
+      </tr>
+    </ng-template>
+
+    <ng-template #body let-item>
+      <tr *ngIf="!loading; else skeletonRow">
+        <td>{{item.productName}}</td>
+        <td>
+          <span *ngIf="!editMode">{{item.productPrice | currency}}</span>
+          <input *ngIf="editMode" pInputText type="number" 
+                 [value]="editedPrices[item.productId] || item.productPrice"
+                 (change)="onPriceChange(item.productId, $event)"
+                 style="width: 100px" />
+        </td>
+      </tr>
+
+      <ng-template #skeletonRow>
+        <tr *ngFor="let item of skeletonItems">
+          <td><p-skeleton></p-skeleton></td>
+          <td><p-skeleton></p-skeleton></td>
+          <td><p-skeleton></p-skeleton></td>
+        </tr>
+      </ng-template>
+    </ng-template>
+
+    <ng-template #emptymessage>
+      <tr>
+        <td colspan="4" class="text-center">
+          {{loading ? '' : (selectedPriceTier ? 'No products found for this price tier' : 'Please select a price tier')}}
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>

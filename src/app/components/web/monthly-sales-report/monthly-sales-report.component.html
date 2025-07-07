@@ -1,0 +1,70 @@
+<app-header Title="Monthly Dispatched Sales Orders"></app-header>
+
+<div class="card">
+  <div class="flex flex-wrap justify-content-between mb-4 gap-2">
+    <p-date-picker [(ngModel)]="selectedMonth" [view]="'month'" [dateFormat]="'MM yy'" [monthNavigator]="true"
+      [yearNavigator]="true" yearRange="2020:2030" [showIcon]="true" placeholder="Select Month & Year">
+    </p-date-picker>
+    <button pButton label="Load Report" icon="pi pi-search" (click)="loadOrders()"></button>
+
+    <div class="flex gap-2 flex-grow-1">
+      <input pInputText type="text" [(ngModel)]="globalFilterValue" (input)="applyFilters()"
+        placeholder="Search all fields..." class="w-full" />
+      <button pButton label="Clear" icon="pi pi-filter-slash" class="p-button-outlined"
+        (click)="clearFilter()"></button>
+    </div>
+  </div>
+
+  <div class="mb-4">
+    <div class="flex itmes-center gap-3">
+      <div class="text-sm">Show dispatched orders only</div>
+      <p-checkbox [(ngModel)]="showDispatchedOnly" [binary]="true" (onChange)="toggleDispatchedOnly()" />
+    </div>
+  </div>
+
+  <p-table #dt [value]="filteredOrders" [loading]="loading" [paginator]="true" [rows]="25"
+    [rowsPerPageOptions]="[10,25,50]" [showCurrentPageReport]="true"
+    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+    styleClass="p-datatable-striped p-datatable-gridlines">
+
+    <ng-template pTemplate="header">
+      <tr>
+        <th pSortableColumn="dispatchedDate">Dispatch Date <p-sortIcon field="dispatchedDate"></p-sortIcon></th>
+        <th pSortableColumn="company">Company <p-sortIcon field="company"></p-sortIcon></th>
+        <th pSortableColumn="customerOrderNo">PO Number <p-sortIcon field="customerOrderNo"></p-sortIcon></th>
+        <th>Total Products</th>
+        <th pSortableColumn="productTotal">Product Total <p-sortIcon field="productTotal"></p-sortIcon></th>
+        <th>GST</th>
+        <th pSortableColumn="total">Total <p-sortIcon field="total"></p-sortIcon></th>
+        <th>Delivery Address</th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-order>
+      <tr *ngIf="!loading; else skeletonRow">
+        <td>{{order.dispatchedDate ? formatDate(order.dispatchedDate) : 'Not Dispatched Yet'}}</td>
+        <td>{{order.company}}</td>
+        <td>{{order.customerOrderNo}}</td>
+        <td>{{order.totalProducts}}</td>
+        <td>${{order.productTotal?.toFixed(2)}}</td>
+        <td>{{order.taxRate ? (order.taxRate * 100) + '%' : '0.00%'}}</td>
+        <td>${{order.total?.toFixed(2)}}</td>
+        <td>{{order.deliveryAddress1}}</td>
+      </tr>
+    </ng-template>
+
+    <ng-template #skeletonRow>
+      <tr *ngFor="let item of skeletonItems">
+        <td colspan="8"><p-skeleton></p-skeleton></td>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="8" class="text-center">
+          {{loading ? '' : 'No orders found'}}
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>

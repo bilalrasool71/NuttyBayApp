@@ -17,6 +17,8 @@ import { callInterceptor } from './core/interceptors/call.interceptor';
 import { LoadingService } from './core/services/loading-service/loading.service';
 import { tokenInterceptor } from './core/interceptors/token.interceptor';
 import { ConfirmationService, MessageService } from 'primeng/api';
+import { DatePipe } from '@angular/common';
+import { provideHighcharts } from 'highcharts-angular';
 
 
 export function playerFactory () {
@@ -46,6 +48,8 @@ export const appConfig: ApplicationConfig = {
     LoadingService,
     MessageService,
     ConfirmationService,
+    provideHighcharts(),
+    DatePipe,
     provideLottieOptions({
       player: () => player,
     }),

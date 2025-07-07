@@ -31,11 +31,16 @@ import { MessageModule } from 'primeng/message';
 import { MessageService } from 'primeng/api';
 import { DialogModule } from 'primeng/dialog';
 import { FieldsetModule } from 'primeng/fieldset';
+import { RadioButtonModule } from 'primeng/radiobutton';
+import { SkeletonModule } from 'primeng/skeleton';
+import { HeaderComponent } from '../../components/web/header/header.component';
+import { TabViewModule } from 'primeng/tabview';
 
 @NgModule({
   declarations: [],
   imports: [
     CommonModule,
+    HeaderComponent,
     Menubar,
     ConfirmDialog,
   ],
@@ -69,6 +74,10 @@ import { FieldsetModule } from 'primeng/fieldset';
     MessageModule,
     DialogModule,
     FieldsetModule,
+    RadioButtonModule,
+    SkeletonModule,
+    HeaderComponent,
+    TabViewModule,
     ReactiveFormsModule,
     FormsModule,
     CommonModule

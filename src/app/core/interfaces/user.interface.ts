@@ -11,6 +11,7 @@ export interface IUser {
     role?:IRole;
     organizationId?:number;
     organization?:IOrganization;
+    purpose?: string;
 }
 
 export interface ILoginResponse {

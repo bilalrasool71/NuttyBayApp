@@ -135,4 +135,7 @@ export class ContactService {
   GetStoresForGroceryAudit(bannerId: any, islandId: any, userId: any): Observable<ContactEntity[]> {
     return this.http.get<ContactEntity[]>(`${this.baseURL}/GetStoresForGroceryAudit?bannerId=${bannerId}&islandId=${islandId}&userId=${userId}`);
   }
+  getAllCompanies(): Observable<ContactEntity[]> {
+    return this.http.get<ContactEntity[]>(`${this.baseURL}/GetAllCompanies`);
+  }
 }

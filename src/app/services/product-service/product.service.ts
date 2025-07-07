@@ -37,4 +37,8 @@ export class ProductService {
   updateProductSettings(product: DDLCin7Product[]): Observable<any> {
     return this.http.put<any>(`${this.baseURL}/UpdateProductSettings`, product);
   }
+  
+  GetAllProductsByTierWisePricing(contactId: any): Observable<Product[]> {
+    return this.http.get<Product[]>(`${this.baseURL}/GetAllProductsByTierWisePricing?contactId=${contactId}`);
+  }
 }

@@ -11,7 +11,7 @@ import { switchMap } from 'rxjs';
 })
 export class PdfService {
   private api2pdfUrl = 'https://v2.api2pdf.com/chrome/pdf/html';
-  apiUrl = apiBaseURL + "NuttyBay/UploadNBProductionRunPdf";
+  apiUrl = apiBaseURL + "api/NuttyBay/UploadNBProductionRunPdf";
   private apiKey = pdfKey;
   private loggedInUser: IUser = {};
 

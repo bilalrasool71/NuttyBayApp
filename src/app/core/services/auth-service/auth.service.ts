@@ -1,15 +1,15 @@
 import { Injectable } from '@angular/core';
-import apiBaseURL from '../../constant/constant';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { IUser, ILoginResponse } from '../../interfaces/user.interface';
+import { apiBaseURL } from '../../constant/constant';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
 
-  private apiUrl = `${apiBaseURL}Auth/`;
+  private apiUrl = `${apiBaseURL}api/Auth/`;
 
   constructor(private http: HttpClient, private router: Router) { }
 
@@ -24,7 +24,7 @@ export class AuthService {
           if (typeof localStorage !== 'undefined') {
             localStorage.setItem('authorizationdata', data.token);
             localStorage.setItem('userdata', JSON.stringify(data.user));
-            this.router.navigate(['/app']);
+            this.router.navigate(['/landing-page']);
 
           }
         }

@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { apiBaseURL } from '../../core/constant/constant';
@@ -15,6 +15,9 @@ import { SalesDashboardByDateRangeReport } from '../../core/interfaces/sales-bys
 import { SalesOrder } from '../../core/interfaces/sales-order';
 import { Setting } from '../../core/interfaces/setting';
 import { WoolWorthPO } from '../../core/interfaces/woolworth-po';
+import { ReconciliationReportDto } from '../../core/interfaces/ReconciliationReport';
+import { DispatchUpdateRequest, SalesOrderWithHeaderAndItemsDto } from '../../core/interfaces/SalesorderDto';
+import { ProductProduction, ProductSalesRpt, StockReport } from '../../core/interfaces/stockReport';
 
 @Injectable({
   providedIn: 'root'
@@ -237,5 +240,60 @@ export class SalesOrderService {
   }
   UpdateInvoiceEmail(memberId: any, updatedEmail: any): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}UpdateInvoiceEmail?memberId=${memberId}&updatedEmail=${updatedEmail}`);
+  }
+
+  GetPendingSalesOrdersAsync(): Observable<SalesOrder[]> {
+    return this.http.get<SalesOrder[]>(this.apiUrl + "GetPendingSalesOrdersAsync");
+  }
+  getBatches(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}GetBatches`);
+  }
+  GetReconciliationReport(
+    startDate: string | null = null,
+    endDate: string | null = null,
+    productId: number | null = null,
+    contactId: number | null = null
+  ): Observable<ReconciliationReportDto[]> {
+    let params = new HttpParams();
+
+    if (startDate) params = params.append('startDate', startDate);
+    if (endDate) params = params.append('endDate', endDate);
+    if (productId) params = params.append('productId', productId.toString());
+    if (contactId) params = params.append('contactId', contactId.toString());
+
+    return this.http.get<ReconciliationReportDto[]>(
+      `${this.apiUrl}GetReconciliationReport`,
+      { params }
+    );
+  }
+
+  GetSalesOrdersAsync(): Observable<any[]> {
+    return this.http.get<any[]>(this.apiUrl + "GetSalesOrdersAsync");
+  }
+
+
+  getSalesOrderDetails(salesOrderId: number): Observable<SalesOrderWithHeaderAndItemsDto> {
+    return this.http.get<SalesOrderWithHeaderAndItemsDto>(
+      `${this.apiUrl}GetSalesOrderDetails/${salesOrderId}`
+    );
+  }
+
+  updateDispatchDetails(salesOrderId: number, dispatchData: DispatchUpdateRequest): Observable<any> {
+    return this.http.put(
+      `${this.apiUrl}UpdateDispatchDetails/${salesOrderId}`,
+      dispatchData
+    );
+  }
+
+   getStockReport(): Observable<StockReport[]> {
+    return this.http.get<StockReport[]>(`${this.apiUrl}GetStockReport`);
+  }
+
+  getProductWiseProductionReport(productId: number): Observable<ProductProduction[]> {
+    return this.http.get<ProductProduction[]>(`${this.apiUrl}GetProductWiseProductionReport/${productId}`);
+  }
+
+  getProductWiseSalesReport(productId: number): Observable<ProductSalesRpt[]> {
+    return this.http.get<ProductSalesRpt[]>(`${this.apiUrl}GetProductWiseSalesReport/${productId}`);
   }
 }

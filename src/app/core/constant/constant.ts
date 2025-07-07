@@ -1,6 +1,5 @@
 //  export const apiBaseURL="https://nuttybayapi.webappconsulting.com.au/";
 export const apiBaseURL="https://localhost:7148/";
-export default `${apiBaseURL}api/`;
 
 export const webURL=`http://localhost:4200/`
 //export const webURL=`https://nuttybay-app.web.app/`

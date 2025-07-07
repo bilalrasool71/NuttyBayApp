@@ -1,0 +1,87 @@
+<div class="relative bg-gradient-to-r from-indigo-600 to-purple-600 shadow-lg overflow-hidden mb-3">
+    <div
+        class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiPjxkZWZzPjxwYXR0ZXJuIGlkPSJwYXR0ZXJuIiB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHBhdHRlcm5Vbml0cz0idXNlclNwYWNlT25Vc2UiIHBhdHRlcm5UcmFuc2Zvcm09InJvdGF0ZSg0NSkiPjxyZWN0IHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCIgZmlsbD0icmdiYSgyNTUsMjU1LDI1NSwwLjA1KSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3QgZmlsbD0idXJsKCNwYXR0ZXJuKSIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIvPjwvc3ZnPg==')]">
+    </div>
+    <div class="relative z-10 px-2 py-4">
+        <div class="flex items-center lg:justify-start justify-center">
+            <div class="text-center">
+                <h1 class="text-xl font-bold text-white tracking-tight drop-shadow-md">
+                    Pending To Dispatch Orders
+                </h1>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="card">
+    <div class="flex justify-content-between mb-4">
+            <input pInputText type="text" [(ngModel)]="globalFilterValue" 
+                   (input)="applyGlobalFilter()" 
+                   placeholder="Search all fields..." class="w-full" />
+        <button pButton label="Clear" icon="pi pi-filter-slash" class="p-button-outlined ml-2" 
+                (click)="clearFilter()"></button>
+    </div>
+
+    <p-table #dt [value]="filteredOrders" [loading]="loading" [paginator]="true" [rows]="25"
+             [rowsPerPageOptions]="[10,25,50]" [showCurrentPageReport]="true"
+             currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+             styleClass="p-datatable-striped p-datatable-gridlines">
+        
+        <ng-template pTemplate="header">
+            <tr>
+                <th pSortableColumn="createdDate">Order Date <p-sortIcon field="createdDate"></p-sortIcon></th>
+                <th pSortableColumn="estimatedDeliveryDate">Est. Delivery <p-sortIcon field="estimatedDeliveryDate"></p-sortIcon></th>
+                <th pSortableColumn="company">Company <p-sortIcon field="company"></p-sortIcon></th>
+                <th pSortableColumn="customerOrderNo">PO Number <p-sortIcon field="customerOrderNo"></p-sortIcon></th>
+                <th>Total Products</th>
+                <th pSortableColumn="productTotal">Product Total <p-sortIcon field="productTotal"></p-sortIcon></th>
+                <th>GST</th>
+                <th pSortableColumn="total">Total <p-sortIcon field="total"></p-sortIcon></th>
+                <th>Delivery Address</th>
+                <th>Action</th>
+            </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-order>
+            <tr *ngIf="!loading; else skeletonRow">
+                <td>{{formatDate(order.createdDate)}}</td>
+                <td>{{order.estimatedDeliveryDate ? formatDate(order.estimatedDeliveryDate) : 'N/A'}}</td>
+                <td>{{order.company}}</td>
+                <td>{{order.customerOrderNo}}</td>
+                <td>{{order.totalProducts}}</td>
+                <td>${{order.productTotal?.toFixed(2)}}</td>
+                <td>{{order.taxRate ? (order.taxRate*100) + '%' : '0.00'}}</td>
+                <td>${{order.total?.toFixed(2)}}</td>
+                <td>{{order.deliveryAddress1}}</td>
+                <td>
+                    <button pButton icon="pi pi-truck" class="p-button-sm p-button-success" 
+                            (click)="navigateToDispatch(order.salesOrderId)" title="Dispatch"></button>
+                </td>
+            </tr>
+            
+            <ng-template #skeletonRow>
+                <tr *ngFor="let item of skeletonItems">
+                    <td><p-skeleton></p-skeleton></td>
+                    <td><p-skeleton></p-skeleton></td>
+                    <td><p-skeleton></p-skeleton></td>
+                    <td><p-skeleton></p-skeleton></td>
+                    <td><p-skeleton></p-skeleton></td>
+                    <td><p-skeleton></p-skeleton></td>
+                    <td><p-skeleton></p-skeleton></td>
+                    <td><p-skeleton></p-skeleton></td>
+                    <td><p-skeleton></p-skeleton></td>
+                    <td><p-skeleton></p-skeleton></td>
+                    <td><p-skeleton></p-skeleton></td>
+                    <td><p-skeleton width="2rem" height="2rem"></p-skeleton></td>
+                </tr>
+            </ng-template>
+        </ng-template>
+
+        <ng-template pTemplate="emptymessage">
+            <tr>
+                <td colspan="12" class="text-center">
+                    {{loading ? '' : 'No orders found'}}
+                </td>
+            </tr>
+        </ng-template>
+    </p-table>
+</div> 

@@ -1,0 +1,68 @@
+<app-header Title="Product Inventory Report"></app-header>
+<div class="card">
+    <div class="flex flex-wrap justify-content-between mb-4 gap-2">
+        <!-- Search and Clear -->
+        <div class="flex gap-2">
+            <input pInputText type="text" [(ngModel)]="globalFilterValue" (input)="applyGlobalFilter()"
+                placeholder="Search products..." />
+            <button pButton label="Clear" icon="pi pi-filter-slash" class="p-button-outlined"
+                (click)="clearFilters()"></button>
+        </div>
+    </div>
+
+    <p-table #dt [value]="filteredData" [loading]="loading" [paginator]="true" [rows]="25"
+        [rowsPerPageOptions]="[10,25,50]" [showCurrentPageReport]="true"
+        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+        styleClass="p-datatable-striped p-datatable-gridlines">
+        <ng-template #header>
+            <tr>
+                <th pSortableColumn="productName">Product Name <p-sortIcon field="productName"></p-sortIcon></th>
+                <th pSortableColumn="qtyIn">Production <p-sortIcon field="qtyIn"></p-sortIcon></th>
+                <th pSortableColumn="productionReturns">Production Reverse <p-sortIcon field="productionReturns"></p-sortIcon></th>
+                <th pSortableColumn="qtyOut">Sold <p-sortIcon field="qtyOut"></p-sortIcon></th>
+                <th pSortableColumn="salesReturns">Sales Return <p-sortIcon field="salesReturns"></p-sortIcon></th>
+                <th pSortableColumn="stockInHand">Stock In Hand <p-sortIcon field="stockInHand"></p-sortIcon></th>
+            </tr>
+        </ng-template>
+
+        <ng-template #body let-item>
+            <tr *ngIf="!loading; else skeletonRow">
+                <td>{{item.productName}}</td>
+                <td>
+                    <a class="text-blue-500 hover:text-blue-700 cursor-pointer" 
+                       (click)="navigateToReport(item.productId, 'production')">
+                        {{item.qtyIn?.toFixed(2)}}
+                    </a>
+                </td>
+                <td>{{item.productionReturns?.toFixed(2)}}</td>
+                <td>
+                    <a class="text-blue-500 hover:text-blue-700 cursor-pointer" 
+                       (click)="navigateToReport(item.productId, 'sales')">
+                        {{item.qtyOut?.toFixed(2)}}
+                    </a>
+                </td>
+                <td>{{item.salesReturns?.toFixed(2)}}</td>
+                <td>{{item.stockInHand?.toFixed(2)}}</td>
+            </tr>
+
+            <ng-template #skeletonRow>
+                <tr *ngFor="let item of skeletonItems">
+                    <td><p-skeleton></p-skeleton></td>
+                    <td><p-skeleton></p-skeleton></td>
+                    <td><p-skeleton></p-skeleton></td>
+                    <td><p-skeleton></p-skeleton></td>
+                    <td><p-skeleton></p-skeleton></td>
+                    <td><p-skeleton></p-skeleton></td>
+                </tr>
+            </ng-template>
+        </ng-template>
+
+        <ng-template #emptymessage>
+            <tr>
+                <td colspan="6" class="text-center">
+                    {{loading ? '' : 'No inventory data found'}}
+                </td>
+            </tr>
+        </ng-template>
+    </p-table>
+</div>

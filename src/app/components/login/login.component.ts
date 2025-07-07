@@ -23,7 +23,7 @@ export class LoginComponent {
     });
     if (this.authService.isAuthenticated()) {
       this.isUser.set(true);
-      this.router.navigate(['/app']);
+      this.router.navigate(['/landing-page']);
     } 
   }
 

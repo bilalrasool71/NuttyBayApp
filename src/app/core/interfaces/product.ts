@@ -33,6 +33,9 @@ export interface Product {
     isRanged?:boolean
     isSohLow?:boolean
     isDeleted?:boolean
+    price?: number;
+    stockInHand?: number;
+    unit?: number;
     bannerCategorySales?:BannerCategorySales[]
 }
 

@@ -1,0 +1,60 @@
+<div class="landing-page" [@pageAnimations]>
+  <!-- Animated Background -->
+  <div class="animated-bg"></div>
+  
+  <!-- Main Content -->
+  <div class="container mx-auto px-4 h-screen flex flex-col justify-center items-center">
+    <!-- Logo with animation -->
+    <div class="logo-container mb-8">
+      <img src="web-assets/logo-full.webp" 
+           alt="Company Logo" 
+           class="logo w-32 h-32 md:w-48 md:h-48 transition-all duration-500 hover:rotate-6 hover:scale-110">
+    </div>
+
+    <!-- Hero Text -->
+    <div class="hero-content text-center mb-12">
+      <h1 class="text-4xl md:text-6xl font-bold text-white mb-4">
+        Welcome to <span class="text-blue-300">Nutty Bay</span>
+      </h1>
+      <p class="text-xl md:text-2xl text-gray-200 max-w-2xl">
+        Where quality meets efficiency. Choose your workspace below.
+      </p>
+    </div>
+
+    <!-- Action Cards -->
+    <div class="action-grid w-full max-w-4xl grid grid-cols-1 md:grid-cols-2 gap-8">
+      <!-- Production Card -->
+      <div class="action-card" 
+           [@cardHover]="cardState"
+           (mouseenter)="onCardHover('hover')"
+           (mouseleave)="onCardHover('initial')"
+           (click)="navigateTo('/app')">
+        <div class="card-inner bg-gradient-to-br from-blue-800 to-blue-600">
+          <i class="pi pi-cog text-5xl mb-4"></i>
+          <h2 class="text-2xl font-bold mb-2">Production</h2>
+          <p class="text-gray-100">Manage operations and inventory</p>
+          <div class="pulse-ring"></div>
+        </div>
+      </div>
+
+      <!-- Sales Card -->
+      <div class="action-card" 
+           [@cardHover]="cardState"
+           (mouseenter)="onCardHover('hover')"
+           (mouseleave)="onCardHover('initial')"
+           (click)="navigateTo('/web/new-sales-order')">
+        <div class="card-inner bg-gradient-to-br from-green-700 to-green-500">
+          <i class="pi pi-shopping-cart text-5xl mb-4"></i>
+          <h2 class="text-2xl font-bold mb-2">Sales</h2>
+          <p class="text-gray-100">Create orders and view reports</p>
+          <div class="pulse-ring"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer Note -->
+    <p class="text-gray-300 mt-12 text-sm animate-pulse">
+      Tap or click on your preferred workspace
+    </p>
+  </div>
+</div>
