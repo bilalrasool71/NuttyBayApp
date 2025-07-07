@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { UtilsModule } from '../../../core/utilities/utils.module';
 import { MessageService } from 'primeng/api';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { ProductStockLevel, BatchStockLevel, StockAdjustmentHistory, StockTakeHistory, StockAdjustmentRequest, StockTakeRequest } from '../../../core/interfaces/stock-adjustment';
+import { ProductStockLevel, BatchStockLevel, StockAdjustmentHistory, StockAdjustmentRequest } from '../../../core/interfaces/stock-adjustment';
 import { RestService } from '../../../services/rest-service/rest.service';
 
 @Component({
@@ -14,44 +14,38 @@ import { RestService } from '../../../services/rest-service/rest.service';
 })
 export class StockAdjustmentComponent {
   adjustmentForm: FormGroup;
-  stockTakeForm: FormGroup;
 
-  // Datat
+  // Data
   products: ProductStockLevel[] = [];
   batches: BatchStockLevel[] = [];
   adjustmentHistory: StockAdjustmentHistory[] = [];
-  stockTakeHistory: StockTakeHistory[] = [];
+  stateOptions: any[] = [{ label: 'One-Way', value: 'one-way' }, { label: 'Return', value: 'return' }];
 
   // UI State
-  activeTabIndex = 0;
+  showHistory = false;
   isLoading = false;
   historyLoading = false;
   selectedProduct: ProductStockLevel | null = null;
   selectedBatch: BatchStockLevel | null = null;
+  adjustmentType: 'units' | 'cartons' = 'units';
+
+  // History filters
+  historyProductId: number | null = null;
+  historyBatchNo: string | null = null;
+  historyDateRange: Date[] | null = null;
 
   constructor(
     private fb: FormBuilder,
     private stockService: RestService,
     private messageService: MessageService
   ) {
-    // Initialize forms
     this.adjustmentForm = this.fb.group({
       productId: [null, Validators.required],
       productionRunProductId: [null, Validators.required],
-      unitAdjustment: [0, [Validators.required]],
+      unitAdjustment: [0],
       cartonAdjustment: [0],
       reason: ['', Validators.required],
-      userId: [3, Validators.required],
-      isStockTake: [false]
-    });
-
-    this.stockTakeForm = this.fb.group({
-      productId: [null, Validators.required],
-      productionRunProductId: [null, Validators.required],
-      actualUnits: [0, [Validators.required, Validators.min(0)]],
-      actualCartons: [0, [Validators.required, Validators.min(0)]],
-      notes: [''],
-      userId: [1, Validators.required]
+      userId: [3, Validators.required]
     });
   }
 
@@ -61,7 +55,6 @@ export class StockAdjustmentComponent {
   }
 
   setupFormListeners(): void {
-    // Adjustment form listeners
     this.adjustmentForm.get('productId')?.valueChanges.subscribe(productId => {
       this.selectedProduct = this.products.find(p => p.productId === productId) || null;
       this.adjustmentForm.patchValue({ productionRunProductId: null });
@@ -74,33 +67,17 @@ export class StockAdjustmentComponent {
       this.selectedBatch = this.batches.find(b => b.productionRunProductId === prpId) || null;
     });
 
-    // Stock take form listeners
-    this.stockTakeForm.get('productId')?.valueChanges.subscribe(productId => {
-      this.selectedProduct = this.products.find(p => p.productId === productId) || null;
-      this.stockTakeForm.patchValue({ productionRunProductId: null });
-      if (this.selectedProduct) {
-        this.batches = this.selectedProduct.batches;
+    // Watch adjustment type changes to reset the other field
+    this.adjustmentForm.get('unitAdjustment')?.valueChanges.subscribe(() => {
+      if (this.adjustmentType === 'units') {
+        this.adjustmentForm.patchValue({ cartonAdjustment: 0 }, { emitEvent: false });
       }
     });
 
-    this.stockTakeForm.get('productionRunProductId')?.valueChanges.subscribe(prpId => {
-      this.selectedBatch = this.batches.find(b => b.productionRunProductId === prpId) || null;
-      if (this.selectedBatch) {
-        this.updateStockTakeFormDefaults();
+    this.adjustmentForm.get('cartonAdjustment')?.valueChanges.subscribe(() => {
+      if (this.adjustmentType === 'cartons') {
+        this.adjustmentForm.patchValue({ unitAdjustment: 0 }, { emitEvent: false });
       }
-    });
-  }
-
-  updateStockTakeFormDefaults(): void {
-    if (!this.selectedBatch) return;
-
-    const unitsPerCarton = this.selectedBatch.unitsPerCarton;
-    const systemUnits = this.selectedBatch.unitQuantity;
-    const systemCartons = Math.floor(systemUnits / unitsPerCarton);
-
-    this.stockTakeForm.patchValue({
-      actualUnits: systemUnits % unitsPerCarton,
-      actualCartons: systemCartons
     });
   }
 
@@ -122,18 +99,34 @@ export class StockAdjustmentComponent {
     if (this.adjustmentForm.invalid || !this.selectedBatch) return;
 
     this.isLoading = true;
+    const formValue = this.adjustmentForm.value;
+
+    // Calculate adjustments based on type
+    let unitAdjustment = 0;
+    let cartonAdjustment = 0;
+
+    if (this.adjustmentType === 'units') {
+      unitAdjustment = formValue.unitAdjustment;
+      cartonAdjustment = 0; // Will be calculated on backend
+    } else {
+      cartonAdjustment = formValue.cartonAdjustment;
+      unitAdjustment = 0; // Will be calculated on backend
+    }
+
     const request: StockAdjustmentRequest = {
-      ...this.adjustmentForm.value,
-      batchNo: this.selectedBatch.batchNo
+      ...formValue,
+      batchNo: this.selectedBatch.batchNo,
+      unitAdjustment: unitAdjustment,
+      cartonAdjustment: cartonAdjustment
     };
 
     this.stockService.adjustStockWithUnitsAndCartons(request).subscribe({
       next: (response) => {
         this.showSuccess(
-          'Stock Adjusted',
-          `Successfully adjusted stock. New quantity: ${response.newUnitQuantity}u (${response.newCartonQuantity}c)`
+          'Stock Adjusted Successfully',
+          `New quantity: ${response.newUnitQuantity}u (${response.newCartonQuantity}c)`
         );
-        this.resetFormsAndReload();
+        this.resetFormAndReload();
       },
       error: (err) => {
         this.showError('Adjustment Failed', err);
@@ -142,97 +135,56 @@ export class StockAdjustmentComponent {
     });
   }
 
-  onStockTake(): void {
-    if (this.stockTakeForm.invalid || !this.selectedBatch) return;
-
-    this.isLoading = true;
-    const request: StockTakeRequest = {
-      ...this.stockTakeForm.value,
-      batchNo: this.selectedBatch.batchNo
-    };
-
-    this.stockService.performStockTakeWithUnitsAndCartons(request).subscribe({
-      next: (response) => {
-        this.showSuccess(
-          'Stock Take Completed',
-          `Adjusted from ${response.previousUnitQuantity}u to ${response.newUnitQuantity}u`
-        );
-        this.resetFormsAndReload();
-      },
-      error: (err) => {
-        this.showError('Stock Take Failed', err);
-        this.isLoading = false;
-      }
-    });
-  }
-
-  resetFormsAndReload(): void {
-    const currentProductId = this.activeTabIndex === 0
-      ? this.adjustmentForm.value.productId
-      : this.stockTakeForm.value.productId;
-
+  resetFormAndReload(): void {
+    const currentProductId = this.adjustmentForm.value.productId;
     this.loadProducts();
     this.loadHistory();
 
-    if (this.activeTabIndex === 0) {
-      this.adjustmentForm.reset({
-        productId: currentProductId,
-        userId: 1
-      });
-    } else {
-      this.stockTakeForm.reset({
-        productId: currentProductId,
-        userId: 1
-      });
-    }
+    this.adjustmentForm.reset({
+      productId: currentProductId,
+      userId: 3,
+      unitAdjustment: 0,
+      cartonAdjustment: 0
+    });
 
     this.isLoading = false;
   }
 
   loadHistory(): void {
-    if (!this.selectedProduct) return;
-
     this.historyLoading = true;
 
-    // Load both histories when history tab is active
-    if (this.activeTabIndex === 2) {
-      this.stockService.getAdjustmentHistory(
-        this.selectedProduct.productId,
-        this.selectedBatch?.batchNo
-      ).subscribe({
-        next: (history) => {
-          this.adjustmentHistory = history;
-          this.loadStockTakeHistory();
-        },
-        error: (err) => {
-          this.showError('Failed to load adjustment history', err);
-          this.historyLoading = false;
-        }
-      });
+    const productId = this.historyProductId;
+    const batchNo = this.historyBatchNo;
+    let startDate: Date | null = null;
+    let endDate: Date | null = null;
+
+    if (this.historyDateRange && this.historyDateRange.length === 2) {
+      startDate = this.historyDateRange[0];
+      endDate = this.historyDateRange[1];
     }
-  }
 
-  loadStockTakeHistory(): void {
-    if (!this.selectedProduct) return;
-
-    this.stockService.getStockTakeHistory(
-      this.selectedProduct.productId,
-      this.selectedBatch?.batchNo
-    ).subscribe({
+    this.stockService.getAdjustmentHistory(productId, batchNo).subscribe({
       next: (history) => {
-        this.stockTakeHistory = history;
+        // Filter by date range if specified
+        if (startDate && endDate) {
+          this.adjustmentHistory = history.filter(item => {
+            const itemDate = new Date(item.adjustmentDate);
+            return itemDate >= startDate! && itemDate <= endDate!;
+          });
+        } else {
+          this.adjustmentHistory = history;
+        }
         this.historyLoading = false;
       },
       error: (err) => {
-        this.showError('Failed to load stock take history', err);
+        this.showError('Failed to load history', err);
         this.historyLoading = false;
       }
     });
   }
 
-  onTabChange(event: any): void {
-    this.activeTabIndex = event.index;
-    if (this.activeTabIndex === 2) {
+  onViewModeChange(): void {
+    if (this.showHistory) {
       this.loadHistory();
     }
   }
@@ -254,13 +206,5 @@ export class StockAdjustmentComponent {
       detail,
       life: 10000
     });
-  }
-
-  calculateCartons(units: number, unitsPerCarton: number = 6): number {
-    return Math.floor(units / unitsPerCarton);
-  }
-
-  calculateUnits(cartons: number, unitsPerCarton: number = 6): number {
-    return cartons * unitsPerCarton;
   }
 }

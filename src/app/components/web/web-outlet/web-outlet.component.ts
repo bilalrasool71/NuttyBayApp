@@ -31,8 +31,8 @@ export class WebOutletComponent {
         { label: 'Reconciliation Report', routerLink: '/web/reconciliation-report' },
         { label: 'Product Inventory Report', routerLink: '/web/product-inventory-report' },
         { label: 'Production Summary Report', routerLink: '/web/production-summary-report' },
-        { label: 'Monthly Sales Report', routerLink: '/web/monthly-sales-report'},
-        { label: 'Product Wise Monthly Sales Report', routerLink: '/web/product-wise-sales-report-monthly'}
+        { label: 'Monthly Sales Report', routerLink: '/web/monthly-sales-report' },
+        { label: 'Product Wise Monthly Sales Report', routerLink: '/web/product-wise-sales-report-monthly' }
       ]
     },
     {
@@ -42,6 +42,7 @@ export class WebOutletComponent {
         { label: 'Add New Tier', routerLink: '/web/upsert-tiers' },
       ]
     },
+    { label: 'Stock Adjustment', routerLink: '/web/stock-adjustment' },
     { label: 'Go To Production Run', routerLink: '/app' }
   ];
 
@@ -54,9 +55,9 @@ export class WebOutletComponent {
   ];
 
   constructor(
-    private authService: AuthService, 
-    private confirmationService: ConfirmationService, 
-    private restService: RestService, 
+    private authService: AuthService,
+    private confirmationService: ConfirmationService,
+    private restService: RestService,
     private router: Router
   ) {
     this.logginedUser = authService.getUserData();

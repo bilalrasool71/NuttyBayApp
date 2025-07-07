@@ -35,6 +35,8 @@ import { RadioButtonModule } from 'primeng/radiobutton';
 import { SkeletonModule } from 'primeng/skeleton';
 import { HeaderComponent } from '../../components/web/header/header.component';
 import { TabViewModule } from 'primeng/tabview';
+import { ToggleButtonModule } from 'primeng/togglebutton';
+import { TextareaModule } from 'primeng/textarea';
 
 @NgModule({
   declarations: [],
@@ -77,6 +79,8 @@ import { TabViewModule } from 'primeng/tabview';
     RadioButtonModule,
     SkeletonModule,
     HeaderComponent,
+    ToggleButtonModule,
+    TextareaModule,
     TabViewModule,
     ReactiveFormsModule,
     FormsModule,

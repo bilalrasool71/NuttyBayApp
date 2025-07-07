@@ -5,38 +5,32 @@
   <!-- Header -->
   <div class="flex justify-between items-center mb-6">
     <h1 class="text-2xl font-bold text-gray-800">Stock Management System</h1>
-    <p-tabView [(activeIndex)]="activeTabIndex" (onChange)="onTabChange($event)" class="w-auto">
-      <p-tabPanel header="Adjustment">
-        <i class="pi pi-pencil mr-2"></i>
-      </p-tabPanel>
-      <p-tabPanel header="Stock Take">
-        <i class="pi pi-clipboard mr-2"></i>
-      </p-tabPanel>
-      <p-tabPanel header="History">
-        <i class="pi pi-history mr-2"></i>
-      </p-tabPanel>
-    </p-tabView>
+    <div class="flex items-center space-x-4">
+      <!-- <p-inputSwitch [(ngModel)]="showHistory" (onChange)="onViewModeChange()" [ngModelOptions]="{standalone: true}">
+        <ng-template pTemplate="checked">
+          <span class="text-xs">History</span>
+        </ng-template>
+        <ng-template pTemplate="unchecked">
+          <span class="text-xs">Adjustment</span>
+        </ng-template>
+      </p-inputSwitch> -->
+      <p-togglebutton [(ngModel)]="showHistory" [onLabel]="'Show Adjustment'" [offLabel]="'Show History'" />
+
+    </div>
   </div>
 
-  <!-- Adjustment Tab -->
-  <div *ngIf="activeTabIndex === 0" class="bg-white rounded-lg shadow p-6 mb-6">
+  <!-- Adjustment View -->
+  <div *ngIf="!showHistory" class="bg-white rounded-lg shadow p-6 mb-6">
     <h2 class="text-xl font-semibold text-gray-700 mb-4">
       <i class="pi pi-pencil mr-2"></i>Manual Stock Adjustment
     </h2>
-    
+
     <form [formGroup]="adjustmentForm" (ngSubmit)="onAdjustStock()" class="space-y-4">
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <!-- Product Selection -->
         <div class="space-y-2">
           <label class="block text-sm font-medium text-gray-700">Product</label>
-          <p-select [options]="products" 
-                      formControlName="productId"
-                      optionLabel="productName"
-                      optionValue="productId"
-                      [showClear]="true"
-                      placeholder="Select Product"
-                      [disabled]="isLoading"
-                      class="w-full">
+          <p-select [options]="products" formControlName="productId" optionLabel="productName" optionValue="productId" [showClear]="true" placeholder="Select Product" [disabled]="isLoading" class="w-full">
             <ng-template let-product pTemplate="item">
               <div class="flex items-center">
                 <span>{{product.productName}}</span>
@@ -51,13 +45,7 @@
         <!-- Batch Selection -->
         <div class="space-y-2" *ngIf="selectedProduct">
           <label class="block text-sm font-medium text-gray-700">Batch</label>
-          <p-select [options]="batches" 
-                      formControlName="productionRunProductId"
-                      optionLabel="batchNo"
-                      optionValue="productionRunProductId"
-                      placeholder="Select Batch"
-                      [disabled]="isLoading"
-                      class="w-full">
+          <p-select [options]="batches" formControlName="productionRunProductId" optionLabel="batchNo" optionValue="productionRunProductId" placeholder="Select Batch" [disabled]="isLoading" class="w-full">
             <ng-template let-batch pTemplate="item">
               <div class="flex items-center">
                 <span>{{batch.batchNo}}</span>
@@ -70,217 +58,122 @@
         </div>
       </div>
 
+      <!-- Adjustment Type Selection -->
+      <div class="space-y-2">
+        <label class="block text-sm font-medium text-gray-700 mb-2">Adjustment Type</label>
+        <div class="flex space-x-4">
+          <div class="flex items-center">
+            <p-radioButton name="adjustmentType" value="units" [(ngModel)]="adjustmentType" [ngModelOptions]="{standalone: true}" inputId="units"></p-radioButton>
+            <label for="units" class="ml-2">Adjust by Units</label>
+          </div>
+          <div class="flex items-center">
+            <p-radioButton name="adjustmentType" value="cartons" [(ngModel)]="adjustmentType" [ngModelOptions]="{standalone: true}" inputId="cartons"></p-radioButton>
+            <label for="cartons" class="ml-2">Adjust by Cartons</label>
+          </div>
+        </div>
+      </div>
+
       <!-- Adjustment Quantities -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div class="space-y-2">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4" *ngIf="selectedBatch">
+        <div class="space-y-2" *ngIf="adjustmentType === 'units'">
           <label class="block text-sm font-medium text-gray-700">Unit Adjustment</label>
-          <p-inputNumber formControlName="unitAdjustment" 
-                        mode="decimal" 
-                        [minFractionDigits]="0"
-                        [maxFractionDigits]="0"
-                        [disabled]="isLoading"
-                        class="w-full"></p-inputNumber>
+          <p-inputNumber formControlName="unitAdjustment" mode="decimal" [minFractionDigits]="0" [maxFractionDigits]="0" [disabled]="isLoading" class="w-full"></p-inputNumber>
           <small class="text-gray-500">Positive for stock in, negative for stock out</small>
         </div>
 
-        <div class="space-y-2">
+        <div class="space-y-2" *ngIf="adjustmentType === 'cartons'">
           <label class="block text-sm font-medium text-gray-700">Carton Adjustment</label>
-          <p-inputNumber formControlName="cartonAdjustment" 
-                        mode="decimal" 
-                        [minFractionDigits]="0"
-                        [maxFractionDigits]="0"
-                        [disabled]="isLoading"
-                        class="w-full"></p-inputNumber>
-          <small class="text-gray-500" *ngIf="selectedBatch">
+          <p-inputNumber formControlName="cartonAdjustment" mode="decimal" [minFractionDigits]="0" [maxFractionDigits]="0" [disabled]="isLoading" class="w-full"></p-inputNumber>
+          <small class="text-gray-500">
             1 carton = {{selectedBatch.unitsPerCarton}} units
           </small>
+        </div>
+
+        <div class="space-y-2">
+          <label class="block text-sm font-medium text-gray-700">Equivalent Adjustment</label>
+          <div class="p-2 border border-gray-200 rounded bg-gray-50">
+            <span *ngIf="adjustmentType === 'units'">
+              {{adjustmentForm.value.unitAdjustment || 0}} units =
+              {{(adjustmentForm.value.unitAdjustment || 0) / selectedBatch.unitsPerCarton | number:'1.0-2'}} cartons
+            </span>
+            <span *ngIf="adjustmentType === 'cartons'">
+              {{adjustmentForm.value.cartonAdjustment || 0}} cartons =
+              {{(adjustmentForm.value.cartonAdjustment || 0) * selectedBatch.unitsPerCarton}} units
+            </span>
+          </div>
         </div>
       </div>
 
       <!-- Reason -->
       <div class="space-y-2">
         <label class="block text-sm font-medium text-gray-700">Reason</label>
-        <textarea pInputTextarea formControlName="reason" rows="3" [disabled]="isLoading" 
-                  class="w-full" placeholder="Enter adjustment reason..."></textarea>
+        <textarea pTextarea formControlName="reason" rows="3" [disabled]="isLoading" class="w-full" placeholder="Enter adjustment reason..."></textarea>
       </div>
 
       <!-- Submit Button -->
       <div class="flex justify-end">
-        <p-button type="submit" 
-                  label="Adjust Stock" 
-                  icon="pi pi-save"
-                  [disabled]="adjustmentForm.invalid || isLoading"
-                  [loading]="isLoading"></p-button>
+        <p-button type="submit" label="Adjust Stock" icon="pi pi-save" [disabled]="adjustmentForm.invalid || isLoading" [loading]="isLoading"></p-button>
       </div>
     </form>
   </div>
 
-  <!-- Stock Take Tab -->
-  <div *ngIf="activeTabIndex === 1" class="bg-white rounded-lg shadow p-6 mb-6">
+  <!-- History View -->
+  <div *ngIf="showHistory" class="bg-white rounded-lg shadow p-6 mb-6">
     <h2 class="text-xl font-semibold text-gray-700 mb-4">
-      <i class="pi pi-clipboard mr-2"></i>Stock Take
+      <i class="pi pi-history mr-2"></i>Adjustment History
     </h2>
-    
-    <form [formGroup]="stockTakeForm" (ngSubmit)="onStockTake()" class="space-y-4">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <!-- Product Selection -->
+
+    <div class="mb-4">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div class="space-y-2">
           <label class="block text-sm font-medium text-gray-700">Product</label>
-          <p-select [options]="products" 
-                      formControlName="productId"
-                      optionLabel="productName"
-                      optionValue="productId"
-                      [showClear]="true"
-                      placeholder="Select Product"
-                      [disabled]="isLoading"
-                      class="w-full"></p-select>
+          <p-select [options]="products" [(ngModel)]="historyProductId" optionLabel="productName" optionValue="productId" [showClear]="true" placeholder="Filter by Product" [disabled]="historyLoading" (onChange)="loadHistory()" class="w-full"></p-select>
         </div>
 
-        <!-- Batch Selection -->
-        <div class="space-y-2" *ngIf="selectedProduct">
+        <div class="space-y-2" *ngIf="historyProductId">
           <label class="block text-sm font-medium text-gray-700">Batch</label>
-          <p-select [options]="batches" 
-                      formControlName="productionRunProductId"
-                      optionLabel="batchNo"
-                      optionValue="productionRunProductId"
-                      placeholder="Select Batch"
-                      [disabled]="isLoading"
-                      class="w-full">
-            <ng-template let-batch pTemplate="item">
-              <div class="flex items-center">
-                <span>{{batch.batchNo}}</span>
-                <span class="ml-auto text-sm text-gray-500">
-                  System: {{batch.unitQuantity | number}}u / {{batch.cartonQuantity | number}}c
-                </span>
-              </div>
-            </ng-template>
-          </p-select>
-        </div>
-      </div>
-
-      <!-- Actual Counts -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4" *ngIf="selectedBatch">
-        <div class="space-y-2">
-          <label class="block text-sm font-medium text-gray-700">Actual Units</label>
-          <p-inputNumber formControlName="actualUnits" 
-                        mode="decimal" 
-                        [minFractionDigits]="0"
-                        [maxFractionDigits]="0"
-                        [disabled]="isLoading"
-                        class="w-full"></p-inputNumber>
+          <p-select [options]="batches" [(ngModel)]="historyBatchNo" optionLabel="batchNo" optionValue="batchNo" [showClear]="true" placeholder="Filter by Batch" [disabled]="historyLoading" (onChange)="loadHistory()" class="w-full"></p-select>
         </div>
 
         <div class="space-y-2">
-          <label class="block text-sm font-medium text-gray-700">Actual Cartons</label>
-          <p-inputNumber formControlName="actualCartons" 
-                        mode="decimal" 
-                        [minFractionDigits]="0"
-                        [maxFractionDigits]="0"
-                        [disabled]="isLoading"
-                        class="w-full"></p-inputNumber>
-          <small class="text-gray-500">
-            {{selectedBatch.unitsPerCarton}} units per carton
-          </small>
+          <label class="block text-sm font-medium text-gray-700">Date Range</label>
+          <p-date-picker [(ngModel)]="historyDateRange" selectionMode="range" [readonlyInput]="true" [showIcon]="true" (onSelect)="loadHistory()" [disabled]="historyLoading" class="w-full"></p-date-picker>
         </div>
       </div>
-
-      <!-- Notes -->
-      <div class="space-y-2">
-        <label class="block text-sm font-medium text-gray-700">Notes</label>
-        <textarea pInputTextarea formControlName="notes" rows="3" [disabled]="isLoading" 
-                  class="w-full" placeholder="Enter any additional notes..."></textarea>
-      </div>
-
-      <!-- Submit Button -->
-      <div class="flex justify-end">
-        <p-button type="submit" 
-                  label="Perform Stock Take" 
-                  icon="pi pi-check"
-                  [disabled]="stockTakeForm.invalid || isLoading"
-                  [loading]="isLoading"></p-button>
-      </div>
-    </form>
-  </div>
-
-  <!-- History Tab -->
-  <div *ngIf="activeTabIndex === 2" class="bg-white rounded-lg shadow p-6 mb-6">
-    <h2 class="text-xl font-semibold text-gray-700 mb-4">
-      <i class="pi pi-history mr-2"></i>History
-    </h2>
-    
-    <div class="mb-8">
-      <h3 class="text-lg font-medium text-gray-700 mb-2">Adjustment History</h3>
-      <p-table [value]="adjustmentHistory" [loading]="historyLoading" styleClass="p-datatable-sm">
-        <ng-template pTemplate="header">
-          <tr>
-            <th>Date</th>
-            <th>Product</th>
-            <th>Batch</th>
-            <th>Adjustment</th>
-            <th>Reason</th>
-            <th>User</th>
-          </tr>
-        </ng-template>
-        <ng-template pTemplate="body" let-item>
-          <tr>
-            <td>{{item.adjustmentDate | date:'short'}}</td>
-            <td>{{item.productName}}</td>
-            <td>{{item.batchNo}}</td>
-            <td [ngClass]="{'text-green-600': item.unitAdjustment > 0, 'text-red-600': item.unitAdjustment < 0}">
-              {{item.unitAdjustment > 0 ? '+' : ''}}{{item.unitAdjustment | number}}u
-              ({{item.cartonAdjustment > 0 ? '+' : ''}}{{item.cartonAdjustment | number}}c)
-            </td>
-            <td>{{item.reason}}</td>
-            <td>{{item.userName}}</td>
-          </tr>
-        </ng-template>
-        <ng-template pTemplate="emptymessage">
-          <tr>
-            <td colspan="6" class="text-center py-4 text-gray-500">
-              No adjustment history available
-            </td>
-          </tr>
-        </ng-template>
-      </p-table>
     </div>
 
-    <div>
-      <h3 class="text-lg font-medium text-gray-700 mb-2">Stock Take History</h3>
-      <p-table [value]="stockTakeHistory" [loading]="historyLoading" styleClass="p-datatable-sm">
-        <ng-template pTemplate="header">
-          <tr>
-            <th>Date</th>
-            <th>Product</th>
-            <th>Batch</th>
-            <th>System Qty</th>
-            <th>Actual Qty</th>
-            <th>Adjustment</th>
-            <th>User</th>
-          </tr>
-        </ng-template>
-        <ng-template pTemplate="body" let-item>
-          <tr>
-            <td>{{item.stockTakeDate | date:'short'}}</td>
-            <td>{{item.productName}}</td>
-            <td>{{item.batchNo}}</td>
-            <td>{{item.systemUnitQuantity | number}}u ({{item.systemCartonQuantity | number}}c)</td>
-            <td>{{item.actualUnitQuantity | number}}u ({{item.actualCartonQuantity | number}}c)</td>
-            <td [ngClass]="{'text-green-600': item.adjustedUnitQuantity > 0, 'text-red-600': item.adjustedUnitQuantity < 0}">
-              {{item.adjustedUnitQuantity > 0 ? '+' : ''}}{{item.adjustedUnitQuantity | number}}u
-              ({{item.adjustedCartonQuantity > 0 ? '+' : ''}}{{item.adjustedCartonQuantity | number}}c)
-            </td>
-            <td>{{item.userName}}</td>
-          </tr>
-        </ng-template>
-        <ng-template pTemplate="emptymessage">
-          <tr>
-            <td colspan="7" class="text-center py-4 text-gray-500">
-              No stock take history available
-            </td>
-          </tr>
-        </ng-template>
-      </p-table>
-    </div>
+    <p-table [value]="adjustmentHistory" [loading]="historyLoading" styleClass="p-datatable-sm">
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Date</th>
+          <th>Product</th>
+          <th>Batch</th>
+          <th>Adjustment</th>
+          <th>Reason</th>
+          <th>User</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-item>
+        <tr>
+          <td>{{item.adjustmentDate | date:'short'}}</td>
+          <td>{{item.productName}}</td>
+          <td>{{item.batchNo}}</td>
+          <td [ngClass]="{'text-green-600': item.unitAdjustment > 0, 'text-red-600': item.unitAdjustment < 0}">
+            {{item.unitAdjustment > 0 ? '+' : ''}}{{item.unitAdjustment | number}}u
+            ({{item.cartonAdjustment > 0 ? '+' : ''}}{{item.cartonAdjustment | number}}c)
+          </td>
+          <td>{{item.reason}}</td>
+          <td>{{item.userName}}</td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="6" class="text-center py-4 text-gray-500">
+            No adjustment history available
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
   </div>
 
   <!-- Current Stock Levels -->
@@ -290,7 +183,7 @@
         <i class="pi pi-box mr-2"></i>Current Stock Levels
       </h2>
     </div>
-    
+
     <p-table [value]="products" [loading]="isLoading" styleClass="p-datatable-sm">
       <ng-template pTemplate="header">
         <tr>
@@ -301,7 +194,7 @@
           <th>Production Date</th>
         </tr>
       </ng-template>
-      
+
       <ng-template pTemplate="body" let-product>
         <ng-container *ngFor="let batch of product.batches">
           <tr>
@@ -313,7 +206,7 @@
           </tr>
         </ng-container>
       </ng-template>
-      
+
       <ng-template pTemplate="emptymessage">
         <tr>
           <td colspan="5" class="text-center py-4 text-gray-500">
