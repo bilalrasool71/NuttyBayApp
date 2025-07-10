@@ -18,9 +18,14 @@
             <tr>
                 <th pSortableColumn="productName">Product Name <p-sortIcon field="productName"></p-sortIcon></th>
                 <th pSortableColumn="qtyIn">Production <p-sortIcon field="qtyIn"></p-sortIcon></th>
-                <th pSortableColumn="productionReturns">Production Reverse <p-sortIcon field="productionReturns"></p-sortIcon></th>
+                <th pSortableColumn="productionReturns">Production Reverse <p-sortIcon
+                        field="productionReturns"></p-sortIcon></th>
                 <th pSortableColumn="qtyOut">Sold <p-sortIcon field="qtyOut"></p-sortIcon></th>
                 <th pSortableColumn="salesReturns">Sales Return <p-sortIcon field="salesReturns"></p-sortIcon></th>
+                <th pSortableColumn="stockAdjustmentIn">Stock Adjustment In<p-sortIcon
+                        field="stockAdjustmentIn"></p-sortIcon></th>
+                <th pSortableColumn="stockAdjustmentOut">Stock Adjustment Out<p-sortIcon
+                        field="stockAdjustmentOut"></p-sortIcon></th>
                 <th pSortableColumn="stockInHand">Stock In Hand <p-sortIcon field="stockInHand"></p-sortIcon></th>
             </tr>
         </ng-template>
@@ -29,20 +34,22 @@
             <tr *ngIf="!loading; else skeletonRow">
                 <td>{{item.productName}}</td>
                 <td>
-                    <a class="text-blue-500 hover:text-blue-700 cursor-pointer" 
-                       (click)="navigateToReport(item.productId, 'production')">
-                        {{item.qtyIn?.toFixed(2)}}
+                    <a class="text-blue-500 hover:text-blue-700 cursor-pointer"
+                        (click)="navigateToReport(item.productId, 'production')">
+                        {{item.qtyIn?.toFixed(2)}}&nbsp;({{item?.cartonIn?.toFixed(2)}})
                     </a>
                 </td>
                 <td>{{item.productionReturns?.toFixed(2)}}</td>
                 <td>
-                    <a class="text-blue-500 hover:text-blue-700 cursor-pointer" 
-                       (click)="navigateToReport(item.productId, 'sales')">
-                        {{item.qtyOut?.toFixed(2)}}
+                    <a class="text-blue-500 hover:text-blue-700 cursor-pointer"
+                        (click)="navigateToReport(item.productId, 'sales')">
+                        {{item.qtyOut?.toFixed(2)}}&nbsp;({{item?.cartonOut?.toFixed(2)}})
                     </a>
                 </td>
-                <td>{{item.salesReturns?.toFixed(2)}}</td>
-                <td>{{item.stockInHand?.toFixed(2)}}</td>
+                <td>{{item.salesReturns?.toFixed(2)}}&nbsp;({{item?.salesReturnsCarton?.toFixed(2)}})</td>
+                <td>{{item.stockAdjustmentIn?.toFixed(2)}}&nbsp;({{item?.stockAdjustmentInCarton?.toFixed(2)}})</td>
+                <td>{{item.stockAdjustmentOut?.toFixed(2)}}&nbsp;({{item?.stockAdjustmentOutCarton?.toFixed(2)}})</td>
+                <td>{{item.stockInHand?.toFixed(2)}}&nbsp;({{item?.stockInHandCartons?.toFixed(2)}})</td>
             </tr>
 
             <ng-template #skeletonRow>

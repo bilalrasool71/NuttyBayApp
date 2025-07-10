@@ -42,7 +42,8 @@ export class DispatchSalesOrderComponent implements OnInit {
         this.lineItems = orderDetails.lineItems.map(item => ({
           ...item,
           selectedBatch: null,
-          quantityError: false
+          quantityError: false,
+          availableBatches: item.availableBatches.filter(x => x.availableQuantity > 0)
         }));
         console.log(orderDetails)
         this.checkDispatchAbility();

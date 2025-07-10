@@ -1,12 +1,20 @@
 export interface StockReport {
     productId: number;
     productName: string;
+    stockInHand: number;
+    stockInHandCartons: number | null;
     qtyIn: number;
     qtyOut: number;
-    stockInHand: number;
     productionReturns: number;
     salesReturns: number;
-
+    stockAdjustmentOut: number;
+    stockAdjustmentIn: number;
+    cartonIn: number | null;
+    cartonOut: number | null;
+    productionReturnsCarton: number | null;
+    salesReturnsCarton: number | null;
+    stockAdjustmentOutCarton: number | null;
+    stockAdjustmentInCarton: number | null;
 }
 
 export interface ProductSalesRpt {
