@@ -16,6 +16,7 @@ import { DatePipe } from '@angular/common';
 import { ProductPriceDto } from '../../core/interfaces/productPriceDto';
 import { PriceTier, PriceUpdateDto, UpdateResultDto } from '../../core/interfaces/price-tier';
 import { ProductStockLevel, BatchStockLevel, StockAdjustmentRequest, StockAdjustmentResponse, StockTakeRequest, StockTakeResponse, StockAdjustmentHistory, StockTakeHistory } from '../../core/interfaces/stock-adjustment';
+import { HoldRequest, InventoryHold } from '../../core/interfaces/inventory-hold';
 
 @Injectable({
   providedIn: 'root'
@@ -166,6 +167,21 @@ export class RestService {
     return this.http.get<StockTakeHistory[]>(url);
   }
 
+  HoldBatch(request: HoldRequest): Observable<InventoryHold> {
+    return this.http.post<InventoryHold>(`${this.baseUrl}/HoldBatch`, request);
+  }
+
+  UnHoldBatch(holdId: number): Observable<any> {
+    return this.http.post(`${this.baseUrl}/UnHoldBatch/${holdId}`, {});
+  }
+
+  GetActiveHoldsBatch(productId?: number, batchNo?: string): Observable<InventoryHold[]> {
+    let params: any = {};
+    if (productId) params.productId = productId.toString();
+    if (batchNo) params.batchNo = batchNo;
+
+    return this.http.get<InventoryHold[]>(`${this.baseUrl}/GetActiveHoldsBatch`, { params });
+  }
 
 
 

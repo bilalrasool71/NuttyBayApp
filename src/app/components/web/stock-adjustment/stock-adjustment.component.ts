@@ -87,7 +87,6 @@ export class StockAdjustmentComponent {
       next: (products) => {
         this.products = products;
         this.isLoading = false;
-        console.log(this.products)
       },
       error: (err) => {
         this.showError('Failed to load products', err);

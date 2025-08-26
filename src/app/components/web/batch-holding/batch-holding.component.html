@@ -1,0 +1,143 @@
+<app-header [Title]="'Hold Batch'"></app-header>
+<div class="p-2">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+        <!-- Product Selection -->
+        <div class="space-y-1">
+            <label class="block text-sm font-medium text-gray-700">Product</label>
+            <p-select [options]="products" (onChange)="onProductChange($event)" optionLabel="productName" optionValue="productId"
+                [showClear]="true" placeholder="Select Product" [disabled]="isLoading" class="w-full">
+                <ng-template let-product pTemplate="item">
+                    <div class="flex items-center">
+                        <span>{{product.productName}}</span>
+                        <span class="ml-auto text-sm text-gray-500">
+                            {{product.totalUnits | number}}u / {{product.totalCartons | number}}c
+                        </span>
+                    </div>
+                </ng-template>
+            </p-select>
+        </div>
+        
+        <!-- Batch Selection -->
+        <div class="space-y-1" *ngIf="selectedProduct">
+            <label class="block text-sm font-medium text-gray-700">Batch</label>
+            <p-select [options]="batches" (onChange)="onBatchChange($event)" optionLabel="batchNo" 
+                optionValue="productionRunProductId" placeholder="Select Batch" [disabled]="isLoading" class="w-full">
+                <ng-template let-batch pTemplate="item">
+                    <div class="flex items-center">
+                        <span>{{batch.batchNo}}</span>
+                        <span class="ml-auto text-sm text-gray-500">
+                            {{batch.unitQuantity | number}}u / {{batch.cartonQuantity | number}}c
+                        </span>
+                    </div>
+                </ng-template>
+            </p-select>
+        </div>
+    </div>
+
+    <!-- Hold Form -->
+    <div *ngIf="showHoldForm && selectedBatch" class="bg-white rounded-lg shadow p-4 mb-4">
+        <h3 class="text-lg font-medium text-gray-700 mb-3">Hold Batch Quantity</h3>
+        
+        <form [formGroup]="holdForm" (ngSubmit)="onHoldSubmit()" class="space-y-3">
+            <div class="space-y-2">
+                <label class="block text-sm font-medium text-gray-700">Hold Type</label>
+                <div class="flex space-x-4">
+                    <div class="flex items-center">
+                        <p-radioButton name="adjustmentType" value="units" [(ngModel)]="adjustmentType" 
+                            [ngModelOptions]="{standalone: true}" inputId="units"></p-radioButton>
+                        <label for="units" class="ml-2">Hold by Units</label>
+                    </div>
+                    <div class="flex items-center">
+                        <p-radioButton name="adjustmentType" value="cartons" [(ngModel)]="adjustmentType" 
+                            [ngModelOptions]="{standalone: true}" inputId="cartons"></p-radioButton>
+                        <label for="cartons" class="ml-2">Hold by Cartons</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-2">
+                <label class="block text-sm font-medium text-gray-700">
+                    Quantity to Hold ({{adjustmentType === 'units' ? 'Units' : 'Cartons'}})
+                </label>
+                <p-inputNumber formControlName="quantity" mode="decimal" [min]="1" 
+                    [max]="adjustmentType === 'units' ? selectedBatch.unitQuantity : selectedBatch.cartonQuantity"
+                    [minFractionDigits]="0" [maxFractionDigits]="0" [disabled]="isLoading" class="w-full">
+                </p-inputNumber>
+                <small class="text-gray-500">
+                    Available: {{adjustmentType === 'units' ? selectedBatch.unitQuantity : selectedBatch.cartonQuantity | number}}
+                    {{adjustmentType === 'units' ? 'units' : 'cartons'}}
+                </small>
+            </div>
+
+            <div class="space-y-2">
+                <label class="block text-sm font-medium text-gray-700">Reason</label>
+                <textarea pTextarea formControlName="reason" rows="3" [disabled]="isLoading" 
+                    class="w-full" placeholder="Enter reason for holding..."></textarea>
+            </div>
+
+            <!-- Add this to your form to show both quantities -->
+<div class="grid grid-cols-2 gap-4 mb-3" *ngIf="holdForm.get('quantity')?.value > 0">
+    <div class="bg-gray-100 p-2 rounded">
+        <span class="text-sm font-medium text-gray-700">Unit Quantity:</span>
+        <span class="ml-2">
+            {{adjustmentType === 'units' ? 
+              (holdForm.get('quantity')?.value | number:'1.0-0') : 
+              (holdForm.get('quantity')?.value * selectedBatch?.unitsPerCarton | number:'1.0-0')}}
+        </span>
+    </div>
+    <div class="bg-gray-100 p-2 rounded">
+        <span class="text-sm font-medium text-gray-700">Carton Quantity:</span>
+        <span class="ml-2">
+            {{adjustmentType === 'cartons' ? 
+              (holdForm.get('quantity')?.value | number:'1.2-2') : 
+              (holdForm.get('quantity')?.value / selectedBatch?.unitsPerCarton | number:'1.2-2')}}
+        </span>
+    </div>
+</div>
+
+            <div class="flex justify-end">
+                <p-button type="submit" label="Hold Batch" icon="pi pi-lock" 
+                    [disabled]="holdForm.invalid || isLoading" [loading]="isLoading"></p-button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Active Holds -->
+    <div *ngIf="selectedProduct" class="bg-white rounded-lg shadow p-4">
+        <h3 class="text-lg font-medium text-gray-700 mb-3">Active Holds for {{selectedProduct.productName}}</h3>
+        
+        <p-table [value]="activeHolds" [loading]="isLoading" styleClass="p-datatable-sm">
+            <ng-template pTemplate="header">
+                <tr>
+                    <th>Batch No</th>
+                    <th>Hold Date</th>
+                    <th>Quantity</th>
+                    <th>Reason</th>
+                    <th>Action</th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-hold>
+                <tr>
+                    <td>{{hold.batchNo}}</td>
+                    <td>{{hold.holdDate | date:'short'}}</td>
+                    <td>
+                        <span *ngIf="hold.isUnitHold">{{hold.quantity | number}} units</span>
+                        <span *ngIf="!hold.isUnitHold">{{hold.cartonQuantity | number}} cartons</span>
+                    </td>
+                    <td>{{hold.reason}}</td>
+                    <td>
+                        <p-button icon="pi pi-unlock" label="Unhold" (click)="onUnhold(hold.holdId)" 
+                            [disabled]="isLoading"></p-button>
+                    </td>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="emptymessage">
+                <tr>
+                    <td colspan="5" class="text-center py-4 text-gray-500">
+                        No active holds for this product
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </div>
+</div>

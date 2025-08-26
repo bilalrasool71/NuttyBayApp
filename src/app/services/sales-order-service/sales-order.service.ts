@@ -278,12 +278,9 @@ export class SalesOrderService {
     );
   }
 
-  updateDispatchDetails(salesOrderId: number, dispatchData: DispatchUpdateRequest): Observable<any> {
-    return this.http.put(
-      `${this.apiUrl}UpdateDispatchDetails/${salesOrderId}`,
-      dispatchData
-    );
-  }
+ updateDispatchDetails(salesOrderId: number, dispatchData: any): Observable<any> {
+  return this.http.put(`${this.apiUrl}UpdateDispatchDetails/${salesOrderId}`, dispatchData);
+}
 
    getStockReport(): Observable<StockReport[]> {
     return this.http.get<StockReport[]>(`${this.apiUrl}GetStockReport`);

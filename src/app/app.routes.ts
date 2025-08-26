@@ -91,6 +91,10 @@ export const routes: Routes = [
             {
                 path: 'stock-adjustment',
                 loadComponent: () => import('./components/web/stock-adjustment/stock-adjustment.component').then(x=>x.StockAdjustmentComponent)
+            },
+            {
+                path: 'hold-batch',
+                loadComponent: () => import('./components/web/batch-holding/batch-holding.component').then(x=>x.BatchHoldingComponent)
             }
         ]
     }

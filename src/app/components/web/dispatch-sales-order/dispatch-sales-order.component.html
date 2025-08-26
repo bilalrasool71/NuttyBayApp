@@ -1,38 +1,49 @@
-<div class="p-4 max-w-6xl mx-auto">
+<div class="p-4 mx-auto">
   <p-toast></p-toast>
-
-  <!-- Header with back button -->
+  <p-confirm-dialog></p-confirm-dialog>
   <div class="flex items-center mb-6">
     <button (click)="cancel()" class="flex items-center text-blue-600 hover:text-blue-800 mr-4">
       <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
-        <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
+        <path fill-rule="evenodd"
+          d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"
+          clip-rule="evenodd" />
       </svg>
       Back to Orders
     </button>
     <div>
       <h2 class="text-xl font-bold text-gray-800">Dispatch Order #{{orderId}}</h2>
-      <h4 class="text-sm font-bold text-gray-800" *ngIf="orderDetails">Order Mode {{orderDetails?.orderMode === 'CARTON' ? 'Carton' : 'Quantity'}}</h4>
+      <h4 class="text-sm font-bold text-gray-800" *ngIf="orderDetails">Order Mode {{orderDetails?.orderMode === 'CARTON'
+        ? 'Carton' : 'Quantity'}}</h4>
+      <div class="flex items-center mt-1">
+        <span class="text-sm font-medium">Order Qty: {{getTotalOrderQty()}}</span>
+        <span class="mx-2">|</span>
+        <span class="text-sm font-medium">Dispatched Qty: {{getTotalDispatchedQty()}}</span>
+        <span class="mx-2">|</span>
+        <span class="text-sm font-medium"
+          [ngClass]="{'text-green-600': getRemainingQty() >= 0, 'text-red-600': getRemainingQty() < 0}">
+          Remaining: {{getRemainingQty()}}
+        </span>
+      </div>
     </div>
   </div>
 
-  <!-- Loading state -->
   <div *ngIf="loading" class="flex justify-center py-8">
     <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
   </div>
 
-  <!-- Products and batches -->
   <div *ngIf="!loading" class="bg-white shadow rounded-lg overflow-hidden">
     <p-table [value]="lineItems" [responsive]="true" styleClass="p-datatable-striped">
       <ng-template pTemplate="header">
         <tr>
           <th>Product</th>
-          <th>Batch Selection</th>
-          <th>Quantity</th>
-          <th>Available Batch Qty</th>
-          <th>Status</th>
+          <th>Order Qty</th>
+          <th>Batches</th>
+          <th>Dispatch Qty</th>
+          <th>Total Dispatch</th>
+          <!-- <th>Status</th> -->
         </tr>
       </ng-template>
-      <ng-template pTemplate="body" let-item>
+      <ng-template pTemplate="body" let-item let-rowIndex="rowIndex">
         <tr [ngClass]="{'bg-red-50': item.quantityError}">
           <td>
             <div class="font-medium">{{item.productName}} ({{item.productCode}})</div>
@@ -40,56 +51,61 @@
               {{item.variant1}} {{item.variant2}}
             </div>
           </td>
-          <td>
-            <p-select *ngIf="item.availableBatches.length > 0" 
-                       [options]="item.availableBatches" 
-                       [(ngModel)]="item.selectedBatch"
-                       (onChange)="onBatchSelect(item)"
-                       optionLabel="batchNo"
-                       placeholder="Select Batch"
-                       [style]="{'width':'100%'}" appendTo="body">
-              <ng-template pTemplate="selectedItem" let-batch>
-                <span class="font-medium">{{batch?.batchNo}}</span>
-              </ng-template>
-              <ng-template let-batch pTemplate="item">
-                <div class="flex justify-between items-center">
-                  <span>{{batch.batchNo}}</span>
-                  <span class="text-xs text-gray-500">Avail: {{batch.availableQuantity}}</span>
-                </div>
-              </ng-template>
-            </p-select>
-            <span *ngIf="item.availableBatches.length === 0" class="text-sm text-gray-500">
-              No batches available
-            </span>
+          <td class="whitespace-nowrap">
+            {{item.orderQty}} {{item.unitOfMeasure}}
           </td>
           <td>
-            <p-input-number (ngModelChange)="checkDispatchAbility()" [disabled]="!item.selectedBatch" [(ngModel)]="item.quantity" [min]="1" [max]="item.selectedBatch?.availableQuantity"></p-input-number>
-          </td> 
-          <!-- <td>{{item.quantity}} {{item.unitOfMeasure}}</td> -->
-          <td>
-            {{item.selectedBatch ? (item.selectedBatch?.availableQuantity  - item.quantity) : 'N/A'}}
+            <div *ngFor="let batch of item.batchSelections; let i = index; let last = last" class="mb-2 last:mb-0">
+              <div class="flex items-center gap-2">
+                <p-select [options]="getAvailableBatchesForSelection(item, i)" [(ngModel)]="batch.batchNo"
+                  (onChange)="onBatchSelect(item, i)" optionLabel="batchNo" placeholder="Select Batch" appendTo="body">
+                  <ng-template pTemplate="selectedItem" let-batchOption>
+                    <span class="font-medium">{{batchOption?.batchNo}}</span>
+                  </ng-template>
+                  <ng-template let-batchOption pTemplate="item">
+                    <div class="flex justify-between items-center">
+                      <span>{{batchOption.batchNo}}</span>
+                      <span class="text-xs text-gray-500">Avail: {{batchOption.availableQuantity}}</span>
+                    </div>
+                  </ng-template>
+                </p-select>
+                <button *ngIf="i > 0" pButton icon="pi pi-times" class="p-button-rounded p-button-danger p-button-text"
+                  (click)="removeBatchSelection(item, i)"></button>
+                <button *ngIf="last && shouldShowAddBatchButton(item)" pButton icon="pi pi-plus"
+                  class="p-button-rounded p-button-text p-button-sm" (click)="addBatchSelection(item)"></button>
+              </div>
+            </div>
           </td>
           <td>
-            <span *ngIf="item.quantityError" class="text-red-500 text-sm">
+            <div *ngFor="let batch of item.batchSelections; let i = index" class="mb-2 last:mb-0">
+              <p-inputNumber [(ngModel)]="batch.dispatchQty" [min]="0" [max]="getMaxBatchQty(item, i)"
+                (ngModelChange)="checkDispatchAbility()" [disabled]="!batch.batchNo"
+                [showButtons]="true"></p-inputNumber>
+            </div>
+          </td>
+          <td class="whitespace-nowrap">
+            <div class="font-medium">{{getItemDispatchedQty(item)}} / {{item.orderQty}}</div>
+            <div *ngIf="item.quantityError" class="text-red-500 text-xs">
               <i class="pi pi-exclamation-triangle mr-1"></i>
-              Quantity exceeds available
-            </span>
-            <span *ngIf="!item.selectedBatch && item.availableBatches.length > 0" 
-                  class="text-yellow-500 text-sm">
-              <i class="pi pi-exclamation-circle mr-1"></i>
-              Select batch
-            </span>
+              {{item.quantityError}}
+            </div>
           </td>
+          <!-- <td>
+            <div *ngFor="let batch of item.batchSelections">
+              <span *ngIf="batch.batchNo" class="text-xs whitespace-nowrap">
+                Avail: {{getAvailableQtyForBatch(item, batch.batchNo.batchNo)}}
+              </span>
+            </div>
+          </td> -->
         </tr>
       </ng-template>
     </p-table>
   </div>
 
-  <!-- Action buttons -->
   <div class="mt-6 flex justify-end space-x-3">
     <button pButton type="button" label="Cancel" icon="pi pi-times" class="p-button-outlined"
-            (click)="cancel()"></button>
-    <button pButton type="button" label="Confirm Dispatch" icon="pi pi-check" 
-            [disabled]="!canDispatch || loading" (click)="confirmDispatch()"></button>
+      (click)="cancel()"></button>
+    <button pButton type="button" label="Confirm Dispatch" icon="pi pi-check"
+      [disabled]="!canDispatch || loading || getRemainingQty() < 0" (click)="confirmDispatch()"></button>
   </div>
 </div>
